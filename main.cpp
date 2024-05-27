@@ -32,7 +32,9 @@
  * tolerance. Output is printed in decades from t = .4 to t = 4.e10.
  * Run statistics (optional outputs) are printed at the end.
  * -----------------------------------------------------------------*/
-#include <math.h>                       // 
+#include <math.h>                       
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <sundials/sundials_math.h>     // Import math functions 
 #include <cvode/cvode.h>                /* prototypes for CVODE fcts., consts.  */
@@ -79,13 +81,14 @@
 #define T0    RCONST(0.0)      /* initial time           */
 #define T1    RCONST(0.01)      /* first output time      */
 #define TMULT RCONST(10.0)     /* output time factor     */
-#define NOUT  12               /* number of output times */
+#define NOUT  1000               /* number of output times */
 
 #define ZERO  RCONST(0.0)
 
 /* Functions Called by the Solver */
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data);
+static int mass_dumper(realtype t, N_Vector y, N_Vector ydot, void *user_data);
 
 static int g(realtype t, N_Vector y, realtype *gout, void *user_data);
 
@@ -95,6 +98,8 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
 /* Private functions to output results */
 
 static void PrintOutput(realtype t, realtype y1, realtype y2);
+static void PrintOutputToTxt(std::string fileName, realtype t, realtype y1, realtype y2);
+
 static void PrintRootInfo(int root_f1, int root_f2);
 
 /* Private function to check function return values */
@@ -125,6 +130,7 @@ int main()
   int retvalr;
   int rootsfound[2];
   FILE* FID;
+
    
   y = NULL;
   abstol = NULL;
@@ -159,7 +165,8 @@ int main()
   /* Call CVodeInit to initialize the integrator memory and specify the
    * user's right hand side function in y'=f(t,y), the initial time T0, and
    * the initial dependent variable vector y. */
-  retval = CVodeInit(cvode_mem, f, T0, y);
+  retval = CVodeInit(cvode_mem, mass_dumper, T0, y);
+    // retval = CVodeInit(cvode_mem, f, T0, y);
   if (check_retval(&retval, "CVodeInit", 1)) return(1);
 
   /* Call CVodeSVtolerances to specify the scalar relative tolerance
@@ -195,10 +202,19 @@ int main()
   FID = fopen("mass_dumper_results.csv", "w");
 
   iout = 0;  tout = T1;
+  std::string fileName =  "mass_dumper_results.txt";
+    std::ofstream outputFile;
+  outputFile.open(fileName);
+  outputFile << "Writing this to a file.\n";
+  outputFile << "Time\ty1\ty2\n";
+
+
   while(1) {
     retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
-    PrintOutput(t, Ith(y,1), Ith(y,2));
+    // PrintOutput(t, Ith(y,1), Ith(y,2));
+  //  PrintOutputToTxt( fileName, tout, Ith(y,1), Ith(y,2));
 
+  outputFile << tout << "\t" << Ith(y,1) << "\t" << Ith(y,2) << "\t" << std::endl;
     // if (retval == CV_ROOT_RETURN) {
     //   retvalr = CVodeGetRootInfo(cvode_mem, rootsfound);
     //   if (check_retval(&retvalr, "CVodeGetRootInfo", 1)) return(1);
@@ -216,6 +232,7 @@ int main()
     if (iout == NOUT) break;
   }
   fclose(FID);
+  outputFile.close();
 
   /* Print final statistics to the screen */
   printf("\nFinal Statistics:\n");
@@ -261,7 +278,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
   return(0);
 }
 
-static int mass_damper(realtype t, N_Vector y, N_Vector ydot, void *user_data)
+static int mass_dumper(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
   // This function computes the ODE right-hand side for a given value of the independent variable 
   //  and state vector 
@@ -286,7 +303,9 @@ static int mass_damper(realtype t, N_Vector y, N_Vector ydot, void *user_data)
   realtype k = 1;
 
   Ith(ydot,1) = y2;
-  Ith(ydot,1) = (u - c*y2 - k*y1)/m;
+  Ith(ydot,2) = (u - c*y2 - k*y1)/m;
+
+  return(0);
 
 }
 
@@ -348,6 +367,19 @@ static void PrintOutput(realtype t, realtype y1, realtype y2)
 #endif
 
   return;
+}
+
+static void PrintOutputToTxt(std::string fileName, realtype t, realtype y1, realtype y2)
+{
+  std::ofstream outputFile;
+  outputFile.open(fileName);
+  outputFile << "Writing this to a file.\n";
+  outputFile << "Time\ty1\ty2\n";
+  outputFile << t << "\t" << y1 << "\t" << y2 << "\t" << std::endl;
+  outputFile.close();
+
+  return;
+
 }
 
 static void PrintRootInfo(int root_f1, int root_f2)
