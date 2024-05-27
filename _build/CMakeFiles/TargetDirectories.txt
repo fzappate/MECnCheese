@@ -1,8 +1,0 @@
-C:/Software/MECAndCheese/_build/CMakeFiles/Experimental.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/Nightly.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/Continuous.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/NightlyMemoryCheck.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/MEC.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/RUN_TESTS.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/ALL_BUILD.dir
-C:/Software/MECAndCheese/_build/CMakeFiles/ZERO_CHECK.dir
