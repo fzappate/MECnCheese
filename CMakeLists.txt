@@ -69,8 +69,9 @@ find_library(SUNDIALS_MANYVEC_LIB
   sundials_nvecmanyvector ${SUNDIALS_LIBRARY_DIR}
   DOC "NVECTOR_MANYVECTOR library")
 
-# Set additional libraries
-set(SUNDIALS_EXTRA_LIBS  CACHE STRING "Additional libraries")
+set(SUNDIALS_EXTRA_LIBS  
+  CACHE STRING 
+  "Additional libraries")
 
 # List of SUNDIALS libraries
 set(SUNDIALS_LIBRARIES
@@ -80,17 +81,44 @@ set(SUNDIALS_LIBRARIES
   ${SUNDIALS_MANYVEC_LIB}
   ${SUNDIALS_EXTRA_LIBS})
 
-# Include the current directory
-include_directories(.)
+# Specify the path to MEC libraries NOT USED YET
+# set(MEC_SOURCE_DIR
+# C:/Software/MACnCheese/src/*.cpp
+#  CACHE PATH "Location of source files")
+ set(MEC_SOURCE_DIR
+ ./src/chamber.cpp
+ CACHE PATH "Location of source files")
+
+include(src/CMakeList.txt)
+
+#  set(MEC_SOURCE_FILES
+#  ./src/chamber.cpp
+#  ./src/orifice.cpp
+#  ./src/body.cpp
+#  CACHE PATH "Location of source files")
+
+ set(MEC_INCLUDES
+  -L${MEC_INCLUDE_DIR}
+  ${MEC_SOURCE_DIR})
+
+# Set the relative path to the project include directory
+include_directories(./include/)
+
+
 
 # ------------------------------------------------------------------------------
 
 # Set the names of the executable to be built and their dependencies
 set(exeName MEC)
-set(examples_dependencies )
 
 # example source files
-add_executable(${exeName} main.cpp ${examples_dependencies})
+# add_executable(${exeName} main.cpp ./src/chamber.cpp ./src/orifice.cpp)
+add_executable(${exeName} main.cpp ${MEC_SOURCES})
+# add_executable(${exeName} main.cpp ${MEC_SOURCE_FILES})
+# add_executable(${exeName} main.cpp ${MEC_SOURCE_DIR})
+
+# directories to include
+target_sources(${exeName} PRIVATE ${MEC_SOURCE_DIR})
 
 # directories to include
 target_include_directories(${exeName} PRIVATE ${SUNDIALS_INCLUDE_DIR})
