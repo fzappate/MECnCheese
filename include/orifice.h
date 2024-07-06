@@ -1,28 +1,51 @@
 #pragma once
 
 #include <string>
+
+#include "./equation.h"
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice
+class Orifice: public Equation
 {
-
-    std::string name;
     double area;
-    double perim;
-    double diam;
-    double hydrDiam;
-    double Cf;
-    Chamber upCh;
-    Chamber downCh;
+    double Cf = 0.678;
+    double flowrate;
+    Chamber &upChamber;
+    Chamber &downChamber;
 
 public:
-    // Default constructor
-    Orifice();
-    // Member initializer constructor 
-    Orifice(double area);
-    // Member initializer constructor
-    Orifice(std::string name, double area);
+
+    Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
+
+    void SetIsDifferential(bool isDifferential) override;
+
+    bool GetIsDifferential() override;
+
+    void SetArea(double area);
+
+    double GetArea();
+
+    void SetCf(double Cf);
 
     double GetCf();
+
+    void SetFlowrate(double flowrate);
+
+    double GetFlowrate();
+
+    void SetUpChamber(Chamber &upChamber);
+
+    Chamber GetUpChamber();
+
+    void SetDownChamber(Chamber &downChamber);
+
+    Chamber GetDownChamber();
+
+    void CalculateFlowrate();
+
+    void UpdateChambersFlow();
+
+    double CalculateRHS() override;
+
 };

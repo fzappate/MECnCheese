@@ -3,21 +3,23 @@
 #include <fstream>
 #include <stdio.h>
 #include <sundials/sundials_math.h>    // Import math functions
-#include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.  
-#include <nvector/nvector_serial.h>    // access to serial N_Vector            
-#include <sunmatrix/sunmatrix_dense.h> // access to dense SUNMatrix            
-#include <sunlinsol/sunlinsol_dense.h> // access to dense SUNLinearSolver      
+#include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.
+#include <nvector/nvector_serial.h>    // access to serial N_Vector
+#include <sunmatrix/sunmatrix_dense.h> // access to dense SUNMatrix
+#include <sunlinsol/sunlinsol_dense.h> // access to dense SUNLinearSolver
 
 #include "./orifice.h"
 #include "./chamber.h"
+#include "./equation.h"
+#include "./system.h"
 
 #define PI 3.1415926535897932
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
 // Problem Constants
-#define NEQ 1          // number of equations
-#define Y1 RCONST(1.0) // initial y components
+#define NEQ 1               // number of equations
+#define Y1 RCONST(1.0)      // initial y components
 #define RTOL RCONST(1.0e-4) // scalar relative tolerance
 #define ATOL RCONST(1.0e-8) // vector absolute tolerance components
 #define T0 RCONST(0.0)      // initial time
@@ -39,14 +41,14 @@ static int check_retval(void *returnvalue, const char *funcname, int opt);
 
 int main()
 {
-  SUNContext sunctx;
+  // Create the SUNDIALS context
   sunrealtype t, tout;
   N_Vector y;
   N_Vector abstol;
   SUNMatrix A;
   SUNLinearSolver LS;
   void *cvode_mem;
-  int retval, iout;
+  int iout;
   int retvalr;
   FILE *FID;
 
@@ -55,34 +57,56 @@ int main()
   A = NULL;
   LS = NULL;
   cvode_mem = NULL;
-
-  Chamber chamber = Chamber("Chamber1", 7, 7);
-  chamber.SetPressure(7);
-  std::cout << "Chamber pressure: " << chamber.GetPressure() << std::endl;
-  Orifice orifice = Orifice("Orifice1",10); 
-
-  std::cout << "Orifice Cf: " << orifice.GetCf() << std::endl;
-
-  // Create the SUNDIALS context
-  retval = SUNContext_Create(NULL, &sunctx);
+  SUNContext sunctx;
+  int retval = SUNContext_Create(NULL, &sunctx);
   if (check_retval(&retval, "SUNContext_Create", 1))
     return (1);
+
+  System sys = System(sunctx);
+
+  InfChamber HPChamber = InfChamber("HPChamber", 10);
+  InfChamber LPChamber = InfChamber("LPChamber", 1);
+  ConstChamber chamber = ConstChamber("MidCh", 1, 1);
+  Orifice upOrif = Orifice("UpOrif", 5, HPChamber, chamber);
+  Orifice downOrif = Orifice("DownOrif", 5, chamber, LPChamber);
+  sys.AddEquation(chamber);
+  sys.AddEquation(HPChamber);
+  sys.AddEquation(LPChamber);
+  sys.AddEquation(upOrif);
+  sys.AddEquation(downOrif);
 
   // Initial conditions
   y = N_VNew_Serial(NEQ, sunctx);
   if (check_retval((void *)y, "N_VNew_Serial", 0))
     return (1);
 
-  // Initialize y
-  Ith(y, 1) = Y1;
+    Ith(y, 1) = 1.1;
+
+  sunrealtype yExtract = Ith(y, 1);
+  sunrealtype yExtract2= ( ( ( (N_VectorContent_Serial)(y->content) )->data )[1 - 1] );
+  sunrealtype * yExtractCastToDoublePointer = ( ( (N_VectorContent_Serial)(y->content) )->data );
+  sunrealtype yExtractCastToDouble = *yExtractCastToDoublePointer; // Dereference 
+  sunrealtype bb = yExtractCastToDouble+1;
+
+  N_Vector initCond = sys.GetInitCondition();
+
+  double chamberRhs = chamber.CalculateRHS();
+  double HPChamberRhs = HPChamber.CalculateRHS();
+  double LPChamberRhs = LPChamber.CalculateRHS();
+  double upOrifQ = upOrif.CalculateRHS();
+  double downOrifQ = downOrif.CalculateRHS();
+
+
 
   // Set the vector absolute tolerance
   abstol = N_VNew_Serial(NEQ, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
     return (1);
+  Ith(abstol, 1) = 0.001;
 
-  Ith(abstol, 1) = ATOL;
 
+ 
+  // auto * test = y->content;
   // Call CVodeCreate to create the solver memory and specify the
   // Backward Differentiation Formula
   cvode_mem = CVodeCreate(CV_BDF, sunctx);
@@ -92,6 +116,9 @@ int main()
   // Call CVodeInit to initialize the integrator memory and specify the
   // user's right hand side function in y'=f(t,y), the initial time T0, and
   // the initial dependent variable vector y.
+  // retval = CVodeInit(cvode_mem, sys.CalculateSystemRHS(), T0, y);
+  // if (check_retval(&retval, "CVodeInit", 1))
+  //   return (1);
   retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, y);
   if (check_retval(&retval, "CVodeInit", 1))
     return (1);
