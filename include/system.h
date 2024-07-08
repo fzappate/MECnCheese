@@ -34,43 +34,9 @@
 // assumes y->content points to a structure with a data member that holds a pointer to double.
 
 
-// ===== WHAT IS I WANT TO DO IT IN CPP =====
-// In C++, you can use modern practices to achieve a similar effect while improving readability and safety. 
-// Here’s how you could refactor the code using C++ features:
-// Assuming y is a pointer to an object of some class type that has a member content, and content is of 
-// type N_VectorContent_Serial (possibly a struct), you can use static_cast for type casting and smart 
-// pointers for memory management. Here's an example:
-// ----- Example: -----
-// // Assuming y is a pointer to an object of some class type
-// // and content is a member of type N_VectorContent_Serial
-// " auto content = y->content; " // Assuming y->content is already of type N_VectorContent_Serial
-// // Use static_cast to cast content to N_VectorContent_Serial if needed
-// // Assuming data is a pointer to double within N_VectorContent_Serial
-// " double *ttest = static_cast<double *>(content.data); "
-// // Finally, dereference the pointer to access its content
-// " double value = *ttest; // Dereferencing ttest to get the double value "
-// ----- Explanation: -----
-// Auto Keyword:
-// auto content = y->content;: Using auto allows the compiler to deduce the type of content based on y->content. 
-// This assumes that y->content is already of type N_VectorContent_Serial.
-// Static Cast:
-// double *ttest = static_cast<double *>(content.data);
-// : static_cast is used for type casting in C++. It's safer than C-style casting 
-// ((N_VectorContent_Serial)(y->content)) because it performs type checking at compile-time and ensures type 
-// safety.
-// ----- Pointer Initialization: -----
-// double *ttest: Declares ttest as a pointer to double, which will point to the same location as content.data.
-// ----- Advantages of C++ Approach: ----- 
-// Type Safety: Using static_cast ensures type safety and makes the code more readable by explicitly stating the intended type conversion.
-// Modern Practices: Utilizing auto for type deduction and static_cast for type casting aligns with modern C++ best practices.
-// Readability: The use of auto and static_cast makes the code clearer and easier to understand compared to C-style casts.
-// Note:
-// Ensure that y->content is indeed of type N_VectorContent_Serial or can be safely cast to it using static_cast. This assumes you have control over the types and can verify the safety of the cast at compile-time.
-// By leveraging these C++ features, you can write clearer, safer, and more maintainable code compared to traditional C-style casting and pointer operations.
-
 class System{
 
-    int noOfDiffEq = 0;
+    
     int noOfAuxEq = 0;
     std::vector<Equation> auxEquations;
     std::vector<Equation> diffEquations;
@@ -85,6 +51,7 @@ class System{
 
 public:
 
+int noOfDiffEq = 0;
     System(SUNContext &sunctx);
 
     void AddEquation(Equation equation);
@@ -93,6 +60,6 @@ public:
 
     N_Vector GetInitCondition();
 
-    N_Vector CalculateSystemRHS(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
+    std::vector<double> CalculateSystemRHS();
 
 };

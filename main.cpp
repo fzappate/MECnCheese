@@ -33,6 +33,7 @@
 static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int mass_dumper(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
+static int solve_system(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 
 static void PrintOutput(sunrealtype t, sunrealtype y1);
 static void PrintOutputToTxt(std::string fileName, sunrealtype t, sunrealtype y1, sunrealtype y2);
@@ -96,10 +97,13 @@ int main()
   double upOrifQ = upOrif.CalculateRHS();
   double downOrifQ = downOrif.CalculateRHS();
 
+  int noOfDiffEq = sys.noOfDiffEq;
+
+
 
 
   // Set the vector absolute tolerance
-  abstol = N_VNew_Serial(NEQ, sunctx);
+  abstol = N_VNew_Serial(noOfDiffEq, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
     return (1);
   Ith(abstol, 1) = 0.001;
@@ -119,7 +123,10 @@ int main()
   // retval = CVodeInit(cvode_mem, sys.CalculateSystemRHS(), T0, y);
   // if (check_retval(&retval, "CVodeInit", 1))
   //   return (1);
-  retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, y);
+  // CVRhsFn test = sys.CalculateSystemRHS;
+  System *sysPtr = &sys;
+  CVodeSetUserData(cvode_mem,sysPtr);
+  retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, initCond);
   if (check_retval(&retval, "CVodeInit", 1))
     return (1);
 
@@ -279,6 +286,17 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // A CVRhsFn should return 0 if successful, a positive value if a recoverable error occurred (in
   // which case CVODE will attempt to correct), or a negative value if it failed unrecoverably (in
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
+
+  // Cast the user_data void pointer to a pointer to system
+  System * sysDerefPtr =  static_cast<System *>(user_data);
+  // Dereference the pointer 
+  System sysDeref = * sysDerefPtr;
+
+  std::vector<sunrealtype> RHS = sysDeref.CalculateSystemRHS();
+  sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
+  // SUNContext sunctx = sysDeref.
+  // N_Vector ydot = N_VMake_Serial(noOfDiffEq,RHS,);
+
 
   sunrealtype bulkMod = 1.5 * 1e9;
   sunrealtype vol1 = 1;

@@ -46,6 +46,8 @@ N_Vector System::GetInitCondition()
 {
     N_Vector initCondTemp;
     initCondTemp = NULL;
+    // Instead of N_VNew use N_VMake
+    // https://sundials.readthedocs.io/en/latest/cvode/Usage/index.html
     initCondTemp = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
     sunrealtype temp;
     // Ith(initCondTemp,1) = this->initConditions[ii];
@@ -63,18 +65,17 @@ N_Vector System::GetInitCondition()
     return initCondTemp;
 };
 
-N_Vector System::CalculateSystemRHS(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
+std::vector<double> System::CalculateSystemRHS()
 {
-    // Update RHS of the aux equations 
-    // Update RHS of differential equations 
-
     int noOfDiffEquations = diffEquations.size();
+    std::vector<double> RHS;
+    double RHStemp;
+    
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Ith(ydot,ii+1) = 111;
+        RHStemp = diffEquations[ii].CalculateRHS();
+        RHS.push_back(RHStemp);
     };
-    N_Vector u;
-    u = NULL;
-    u = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
-    return u;
+    
+    return RHS;
 };
