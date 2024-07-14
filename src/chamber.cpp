@@ -86,6 +86,13 @@ void InfChamber::AddFlowIn(std::string flowName, double flowrate)
     return;
 };
 
+void InfChamber::CalculateRHS()
+{
+
+    return;
+
+};
+
 // Chamber
 ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure), volume(volume)
 {

@@ -14,7 +14,11 @@ void Equation::SetInitialCondition(double initCond){
 
 double Equation::GetInitialCondition(){ return initCond; };
 
-void Equation::CalculateRHS() { return; };
+void Equation::CalculateRHS() 
+{ 
+    std::cout << "Equation CalculateRHS" << std::endl;
+    return; 
+};
 
 double Equation::GetRHS() 
 { 

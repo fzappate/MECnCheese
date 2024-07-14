@@ -48,6 +48,8 @@ public:
     InfChamber(std::string name,double pressure);
     
     void AddFlowIn(std::string name, double flow) override;
+
+    void CalculateRHS() override;
 };
 
 

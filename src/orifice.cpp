@@ -13,7 +13,7 @@ Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) 
     
     isDifferential = false;
 
-    CalculateFlowrate();
+    // CalculateFlowrate();
 
     initCond = flowrate;
 
