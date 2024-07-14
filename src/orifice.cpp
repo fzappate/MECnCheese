@@ -95,15 +95,16 @@ void Orifice::CalculateFlowrate()
     double upPress = upCh.GetPressure();
     double downPress = downCh.GetPressure();
 
-    flowrate = Cf * area * sqrt(upPress - downPress);
+    flowrate = signbit(upPress - downPress)*Cf * area * sqrt(abs(upPress - downPress));
 
     UpdateChambersFlow();
     return;
 };
 
 void Orifice::UpdateChambersFlow(){
-    upChamber.AddFlowIn(name,flowrate);
-    downChamber.AddFlowIn(name,-flowrate);
+    // Flow entering a chamber is negative
+    upChamber.AddFlowIn(name,-flowrate);
+    downChamber.AddFlowIn(name,flowrate);
     return;
 };
 

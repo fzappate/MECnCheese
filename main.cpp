@@ -99,6 +99,7 @@ int main()
 
   N_Vector y = sys.GetInitCondition();
 
+double checkY = Ith(y,1);
   // Absolute tolerance
   abstol = N_VNew_Serial(noOfDiffEq, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
@@ -265,6 +266,8 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // A CVRhsFn should return 0 if successful, a positive value if a recoverable error occurred (in
   // which case CVODE will attempt to correct), or a negative value if it failed unrecoverably (in
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
+
+  double checkY = Ith(y,1);
 
   std::cout << "Into f function" << std::endl;
 
