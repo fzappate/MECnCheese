@@ -106,10 +106,15 @@ void Orifice::UpdateChambersFlow(){
     return;
 };
 
-double Orifice::CalculateRHS()
+void Orifice::CalculateRHS()
 {
     // Calculate and update the flowrate
-    CalculateFlowrate();
-    // Output the flowrate
-    return flowrate;
-}
+    this->CalculateFlowrate();
+
+    return;
+};
+
+double Orifice::GetRHS()
+{
+    return this->flowrate;
+};

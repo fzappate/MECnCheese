@@ -56,10 +56,18 @@ int noOfDiffEq = 0;
 
     void AddEquation(Equation equation);
 
-    void AddSunContext(SUNContext &sunctx);
+    void AddSUNContext(SUNContext &sunctx);
+
+    SUNContext GetSUNContext();
 
     N_Vector GetInitCondition();
 
-    std::vector<double> CalculateSystemRHS();
+    // std::vector<double> CalculateSystemRHS();
+
+    void CalculateDiffEqRHS();
+
+    void CalculateAuxEqRHS();
+
+    std::vector<double> GetDiffEqRHS();
 
 };

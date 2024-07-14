@@ -28,8 +28,13 @@ void System::AddEquation(Equation equation)
     };
 };
 
-void System::AddSunContext(SUNContext &sunctx){
+void System::AddSUNContext(SUNContext &sunctx){
     sunctx = sunctx;
+};
+
+SUNContext System::GetSUNContext(){
+    // SUNContext* sunctxPtr = sunctx;
+    return sunctx; 
 };
 
 void System::AddDiffEqCount()
@@ -65,17 +70,50 @@ N_Vector System::GetInitCondition()
     return initCondTemp;
 };
 
-std::vector<double> System::CalculateSystemRHS()
+// std::vector<double> System::CalculateSystemRHS()
+// {
+//     int noOfDiffEquations = diffEquations.size();
+//     std::vector<double> RHS;
+//     double RHStemp;
+
+//     for (int ii = 0; ii < noOfDiffEquations; ii++)
+//     {
+//         // RHStemp = diffEquations[ii].CalculateRHS();
+//         // RHS.push_back(RHStemp);
+//     };
+    
+//     return RHS;
+// };
+
+void System::CalculateAuxEqRHS()
+{
+    int noOfAuxEquations = auxEquations.size();
+    for (int ii = 0; ii < noOfAuxEquations; ii++)
+    {
+        this->auxEquations[ii].CalculateRHS();
+    };
+};
+
+void System::CalculateDiffEqRHS()
 {
     int noOfDiffEquations = diffEquations.size();
-    std::vector<double> RHS;
-    double RHStemp;
-    
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        RHStemp = diffEquations[ii].CalculateRHS();
-        RHS.push_back(RHStemp);
+        this->diffEquations[ii].CalculateRHS();
     };
+};
+
+std::vector<double> System::GetDiffEqRHS()
+{
+    std::vector<double> diffEqRHS;
     
-    return RHS;
+    int noOfDiffEquations = diffEquations.size();
+    for (int ii = 0; ii < noOfDiffEquations; ii++)
+    {
+        Equation tempEq = diffEquations[ii];
+        double rhs = this->diffEquations[ii].GetRHS();
+        diffEqRHS.push_back(this->diffEquations[ii].GetRHS());
+    };
+
+    return diffEqRHS;
 };

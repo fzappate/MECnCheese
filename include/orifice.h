@@ -46,6 +46,8 @@ public:
 
     void UpdateChambersFlow();
 
-    double CalculateRHS() override;
+    void CalculateRHS() override;
+
+    double GetRHS() override;
 
 };

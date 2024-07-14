@@ -13,5 +13,6 @@ void Equation::SetInitialCondition(double initCond){
 
 double Equation::GetInitialCondition(){ return initCond; };
 
-double Equation::CalculateRHS() { return RHS; };
+void Equation::CalculateRHS() { return; };
 
+double Equation::GetRHS() { return RHS; };

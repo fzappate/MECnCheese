@@ -25,6 +25,8 @@ public:
 
     virtual double GetInitialCondition();
 
-    virtual double CalculateRHS();
+    virtual void CalculateRHS();
+
+    virtual double GetRHS();
 
 };

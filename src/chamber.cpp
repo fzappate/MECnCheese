@@ -52,13 +52,18 @@ void Chamber::AddFlowIn(std::string flowName, double flowrate)
     return;
 };
 
-double Chamber::CalculateRHS()
+void Chamber::CalculateRHS()
 {
 
-    double RHS = bulkMod / volume * (flowSum - volDer);
+    this->pressure = bulkMod / volume * (flowSum - volDer);
 
-    return RHS;
+    return;
 
+};
+
+double Chamber::GetRHS()
+{
+    return this->pressure;
 };
 
 // InfChamber

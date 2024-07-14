@@ -87,15 +87,16 @@ int main()
   sunrealtype yExtract2= ( ( ( (N_VectorContent_Serial)(y->content) )->data )[1 - 1] );
   sunrealtype * yExtractCastToDoublePointer = ( ( (N_VectorContent_Serial)(y->content) )->data );
   sunrealtype yExtractCastToDouble = *yExtractCastToDoublePointer; // Dereference 
-  sunrealtype bb = yExtractCastToDouble+1;
+
 
   N_Vector initCond = sys.GetInitCondition();
+  
 
-  double chamberRhs = chamber.CalculateRHS();
-  double HPChamberRhs = HPChamber.CalculateRHS();
-  double LPChamberRhs = LPChamber.CalculateRHS();
-  double upOrifQ = upOrif.CalculateRHS();
-  double downOrifQ = downOrif.CalculateRHS();
+  // double chamberRhs = chamber.CalculateRHS();
+  // double HPChamberRhs = HPChamber.CalculateRHS();
+  // double LPChamberRhs = LPChamber.CalculateRHS();
+  // double upOrifQ = upOrif.CalculateRHS();
+  // double downOrifQ = downOrif.CalculateRHS();
 
   int noOfDiffEq = sys.noOfDiffEq;
 
@@ -170,14 +171,18 @@ int main()
   outputFile << "Writing this to a file.\n";
   outputFile << "Time,p,\n";
 
+  sunrealtype yExamin;
+
   while (1)
   {
     retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
     // PrintOutput(t, Ith(y, 1)); // Print to screen
     //  PrintOutputToTxt( fileName, tout, Ith(y,1), Ith(y,2));
 
+    yExamin = Ith(y, 1);
     outputFile << tout << "\t" << Ith(y, 1) << std::endl;
 
+    yExtractCastToDouble = *yExtractCastToDoublePointer;
     if (check_retval(&retval, "CVode", 1))
       break;
     if (retval == CV_SUCCESS)
@@ -292,19 +297,19 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // Dereference the pointer 
   System sysDeref = * sysDerefPtr;
 
-  std::vector<sunrealtype> RHS = sysDeref.CalculateSystemRHS();
+
+  // Extract RHS from the system
+  sysDeref.CalculateAuxEqRHS();
+  sysDeref.CalculateDiffEqRHS();
+  std::vector<sunrealtype> RHS =sysDeref.GetDiffEqRHS();
   sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
-  // SUNContext sunctx = sysDeref.
-  // N_Vector ydot = N_VMake_Serial(noOfDiffEq,RHS,);
+  // std::vector<sunrealtype> RHS = sysDeref.CalculateSystemRHS();
+  // SUNContext sunctx = sysDeref.GetSUNContext();
 
-
-  sunrealtype bulkMod = 1.5 * 1e9;
-  sunrealtype vol1 = 1;
-  sunrealtype volDer = 0;
-  sunrealtype Qin1 = 0.002;
-  sunrealtype Qout1 = 0.001;
-
-  Ith(ydot, 1) = bulkMod / vol1 * (Qin1 - Qout1 - volDer);
+  for (int ii = 0; ii < noOfDiffEq; ii++)
+  {
+    Ith(ydot, ii + 1) = RHS[ii];
+  };
 
   return (0);
 }

@@ -33,7 +33,9 @@ class Chamber : public Equation
 
     virtual void AddFlowIn(std::string name, double flow);
 
-    virtual double CalculateRHS();
+    void CalculateRHS() override;
+
+    double GetRHS() override;
 
 };
 
