@@ -1,5 +1,6 @@
 #include <math.h>
 #include <string>
+#include <iostream>
 #include <corecrt_math_defines.h>
 
 #include "./equation.h"
@@ -116,5 +117,6 @@ void Orifice::CalculateRHS()
 
 double Orifice::GetRHS()
 {
+    std::cout << "Orifice GetRHS" << std::endl;
     return this->flowrate;
 };

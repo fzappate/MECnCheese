@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include "./equation.h"
 
 Equation::Equation(std::string name) : name(name){};
@@ -15,4 +16,8 @@ double Equation::GetInitialCondition(){ return initCond; };
 
 void Equation::CalculateRHS() { return; };
 
-double Equation::GetRHS() { return RHS; };
+double Equation::GetRHS() 
+{ 
+    std::cout << "Equation GetRHS" << std::endl;
+    return RHS; 
+};
