@@ -7,7 +7,6 @@
 // Chamber
 Chamber::Chamber(std::string name, double pressure) : Equation(name), pressure(pressure)
 {
-    this->SetInitialCondition(pressure);
     return;
 };
 
@@ -19,16 +18,6 @@ void Chamber::SetPressure(double press)
 };
 
 double Chamber::GetPressure()
-{
-    return pressure;
-};
-
-void Chamber::SetInitialCondition(double initCond)
-{
-    this->initCond = initCond;
-};
-
-double Chamber::GetInitialCondition()
 {
     return pressure;
 };
@@ -64,6 +53,11 @@ void Chamber::CalculateRHS()
 double Chamber::GetRHS()
 {
     std::cout << "Chamber GetRHS" << std::endl;
+    return this->dpdt;
+};
+
+double Chamber::GetInitialCondition()
+{
     return this->pressure;
 };
 

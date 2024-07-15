@@ -23,10 +23,6 @@ class Chamber : public Equation
     void SetPressure(double pressure);
 
     double GetPressure();
-    
-    void SetInitialCondition(double initCond);
-
-    double GetInitialCondition();
 
     void SetIsDifferential(bool isDifferential) override;
 
@@ -37,6 +33,8 @@ class Chamber : public Equation
     void CalculateRHS() override;
 
     double GetRHS() override;
+
+    double GetInitialCondition() override;
 
 };
 

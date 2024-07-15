@@ -50,4 +50,5 @@ public:
 
     double GetRHS() override;
 
+    double GetInitialCondition() override;
 };

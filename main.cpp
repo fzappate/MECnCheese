@@ -39,10 +39,7 @@ static void PrintOutput(sunrealtype t, sunrealtype y1);
 static void PrintOutputToTxt(std::string fileName, sunrealtype t, sunrealtype y1, sunrealtype y2);
 
 static int check_retval(void *returnvalue, const char *funcname, int opt);
-static void CallRHS(Equation eq)
-{
 
-};
 
 int main()
 {

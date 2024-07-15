@@ -13,10 +13,6 @@ Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) 
     
     isDifferential = false;
 
-    // CalculateFlowrate();
-
-    initCond = flowrate;
-
     return;
 };
 
@@ -103,7 +99,7 @@ void Orifice::CalculateFlowrate()
     else{
         sign = 1;
     }
-    
+
     flowrate = sign * Cf * area * sqrt(abs(upPress - downPress));
 
     UpdateChambersFlow();
@@ -129,4 +125,10 @@ double Orifice::GetRHS()
 {
     std::cout << "Orifice GetRHS" << std::endl;
     return this->flowrate;
+};
+
+double Orifice::GetInitialCondition()
+{
+    return this->flowrate;
+
 };

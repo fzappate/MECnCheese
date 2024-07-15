@@ -9,24 +9,20 @@ protected:
     // Properties
     std::string name;
     bool isDifferential;
-    double initCond;
-    double RHS;
 
 public:
 
     // Methods
     Equation(std::string name);
 
-    virtual void SetIsDifferential(bool isDifferential);
+    virtual void SetIsDifferential(bool isDifferential) = 0;
 
-    virtual bool GetIsDifferential();
+    virtual bool GetIsDifferential() = 0;
 
-    virtual void SetInitialCondition(double initCond);
+    virtual void CalculateRHS() = 0;
 
-    virtual double GetInitialCondition();
+    virtual double GetRHS() = 0;
 
-    virtual void CalculateRHS();
-
-    virtual double GetRHS();
+    virtual double GetInitialCondition() = 0;
 
 };
