@@ -12,6 +12,7 @@ class Chamber : public Equation
     double volume = 1;
     double volDer = 0;
     double flowSum = 0;
+    double dpdt = 0;
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
 

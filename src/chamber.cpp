@@ -55,7 +55,7 @@ void Chamber::AddFlowIn(std::string flowName, double flowrate)
 void Chamber::CalculateRHS()
 {
 
-    this->pressure = bulkMod / volume * (flowSum - volDer);
+    this->dpdt = bulkMod / volume * (flowSum - volDer);
 
     return;
 

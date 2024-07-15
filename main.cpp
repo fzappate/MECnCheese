@@ -99,7 +99,7 @@ int main()
 
   N_Vector y = sys.GetInitCondition();
 
-double checkY = Ith(y,1);
+  double checkY = Ith(y,1);
   // Absolute tolerance
   abstol = N_VNew_Serial(noOfDiffEq, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
@@ -269,7 +269,7 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
 
   double checkY = Ith(y,1);
 
-  std::cout << "Into f function" << std::endl;
+  std::cout << "t = " << t << "\nInto f function" << std::endl;
 
   // Cast the user_data void pointer to a pointer to system
   System * sysDerefPtr =  static_cast<System *>(user_data);

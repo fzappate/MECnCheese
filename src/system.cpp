@@ -107,7 +107,6 @@ std::vector<double> System::GetDiffEqRHS()
 {
     std::vector<double> diffEqRHS;
     
-    
     int noOfDiffEquations = diffEquations.size();
     
     for (int ii = 0; ii < noOfDiffEquations; ii++)
