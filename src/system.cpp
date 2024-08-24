@@ -119,3 +119,22 @@ std::vector<double> System::GetDiffEqRHS()
 
     return diffEqRHS;
 };
+
+void System::ResetDiffEq(N_Vector y)
+{
+    int noOfDiffEquations = diffEquations.size();
+
+    
+    for (int ii = 0; ii < noOfDiffEquations; ii++)
+    {
+        Equation &tempEq = *diffEquations[ii];
+        double tempDepVar = Ith(y,ii+1);
+        
+        tempEq.UpdateDepVar(tempDepVar);
+        tempEq.ZeroParameters();
+
+    };
+
+    return;
+
+}

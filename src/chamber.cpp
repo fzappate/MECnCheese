@@ -41,6 +41,21 @@ void Chamber::AddFlowIn(std::string flowName, double flowrate)
     return;
 };
 
+void Chamber::UpdateDepVar(double pressure)
+{
+
+    this->pressure = pressure;
+    return; 
+}
+
+void Chamber::ZeroParameters()
+{
+    flowSum = 0;
+    flowIn.clear();
+    flowInNames.clear();
+    
+    return;
+}
 void Chamber::CalculateRHS()
 {
 

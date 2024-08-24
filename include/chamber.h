@@ -11,8 +11,8 @@ class Chamber : public Equation
     double pressure = 1; 
     double volume = 1;
     double volDer = 0;
-    double flowSum = 0;
     double dpdt = 0;
+    double flowSum = 0;
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
 
@@ -29,6 +29,10 @@ class Chamber : public Equation
     bool GetIsDifferential() override;
 
     virtual void AddFlowIn(std::string name, double flow);
+
+    void UpdateDepVar(double pressure) override;
+
+    void ZeroParameters() override;
 
     void CalculateRHS() override;
 

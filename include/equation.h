@@ -19,6 +19,10 @@ public:
 
     virtual bool GetIsDifferential() = 0;
 
+    virtual void UpdateDepVar(double depVar) = 0;
+
+    virtual void ZeroParameters() = 0;
+
     virtual void CalculateRHS() = 0;
 
     virtual double GetRHS() = 0;

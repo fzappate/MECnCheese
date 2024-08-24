@@ -113,6 +113,16 @@ void Orifice::UpdateChambersFlow(){
     return;
 };
 
+void Orifice::UpdateDepVar(double depVar)
+{
+    return;
+};
+
+void Orifice::ZeroParameters()
+{
+    return;
+};
+
 void Orifice::CalculateRHS()
 {
     // Calculate and update the flowrate

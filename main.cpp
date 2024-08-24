@@ -40,7 +40,7 @@ static void PrintOutputToTxt(std::string fileName, sunrealtype t, sunrealtype y1
 
 static int check_retval(void *returnvalue, const char *funcname, int opt);
 
-
+static int testFun(N_Vector y);
 int main()
 {
   // Create the SUNDIALS context
@@ -95,7 +95,7 @@ int main()
 
 
   N_Vector y = sys.GetInitCondition();
-
+  int b = testFun(y);
   double checkY = Ith(y,1);
   // Absolute tolerance
   abstol = N_VNew_Serial(noOfDiffEq, sunctx);
@@ -198,6 +198,12 @@ int main()
 
   return (retval);
 }
+static int testFun(N_Vector y)
+{
+  
+  int a = 3;
+  return a; 
+}
 
 static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
@@ -273,6 +279,8 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // Dereference the pointer 
   System sysDeref = *sysDerefPtr;
 
+
+  sysDeref.ResetDiffEq(y);
 
   // Extract RHS from the system
   sysDeref.CalculateAuxEqRHS();
