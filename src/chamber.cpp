@@ -7,7 +7,6 @@
 // Chamber
 Chamber::Chamber(std::string name, double pressure) : Equation(name), pressure(pressure)
 {
-    this->SetInitialCondition(pressure);
     return;
 };
 
@@ -19,16 +18,6 @@ void Chamber::SetPressure(double press)
 };
 
 double Chamber::GetPressure()
-{
-    return pressure;
-};
-
-void Chamber::SetInitialCondition(double initCond)
-{
-    this->initCond = initCond;
-};
-
-double Chamber::GetInitialCondition()
 {
     return pressure;
 };
@@ -52,16 +41,37 @@ void Chamber::AddFlowIn(std::string flowName, double flowrate)
     return;
 };
 
+void Chamber::UpdateDepVar(double pressure)
+{
+
+    this->pressure = pressure;
+    return; 
+}
+
+void Chamber::ZeroParameters()
+{
+    flowSum = 0;
+    flowIn.clear();
+    flowInNames.clear();
+    
+    return;
+}
 void Chamber::CalculateRHS()
 {
 
-    this->pressure = bulkMod / volume * (flowSum - volDer);
+    this->dpdt = bulkMod / volume * (flowSum - volDer);
 
     return;
 
 };
 
 double Chamber::GetRHS()
+{
+    std::cout << "Chamber GetRHS" << std::endl;
+    return this->dpdt;
+};
+
+double Chamber::GetInitialCondition()
 {
     return this->pressure;
 };
@@ -83,6 +93,13 @@ void InfChamber::AddFlowIn(std::string flowName, double flowrate)
     this->flowInNames.push_back(flowName);
 
     return;
+};
+
+void InfChamber::CalculateRHS()
+{
+
+    return;
+
 };
 
 // Chamber

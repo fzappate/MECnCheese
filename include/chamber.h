@@ -11,6 +11,7 @@ class Chamber : public Equation
     double pressure = 1; 
     double volume = 1;
     double volDer = 0;
+    double dpdt = 0;
     double flowSum = 0;
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
@@ -22,10 +23,6 @@ class Chamber : public Equation
     void SetPressure(double pressure);
 
     double GetPressure();
-    
-    void SetInitialCondition(double initCond);
-
-    double GetInitialCondition();
 
     void SetIsDifferential(bool isDifferential) override;
 
@@ -33,9 +30,15 @@ class Chamber : public Equation
 
     virtual void AddFlowIn(std::string name, double flow);
 
+    void UpdateDepVar(double pressure) override;
+
+    void ZeroParameters() override;
+
     void CalculateRHS() override;
 
     double GetRHS() override;
+
+    double GetInitialCondition() override;
 
 };
 
@@ -48,6 +51,8 @@ public:
     InfChamber(std::string name,double pressure);
     
     void AddFlowIn(std::string name, double flow) override;
+
+    void CalculateRHS() override;
 };
 
 

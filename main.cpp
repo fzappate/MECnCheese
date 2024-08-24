@@ -40,11 +40,12 @@ static void PrintOutputToTxt(std::string fileName, sunrealtype t, sunrealtype y1
 
 static int check_retval(void *returnvalue, const char *funcname, int opt);
 
+static int testFun(N_Vector y);
 int main()
 {
   // Create the SUNDIALS context
   sunrealtype t, tout;
-  N_Vector y;
+  // N_Vector y;
   N_Vector abstol;
   SUNMatrix A;
   SUNLinearSolver LS;
@@ -53,7 +54,7 @@ int main()
   int retvalr;
   FILE *FID;
 
-  y = NULL;
+  // y = NULL;
   abstol = NULL;
   A = NULL;
   LS = NULL;
@@ -63,53 +64,47 @@ int main()
   if (check_retval(&retval, "SUNContext_Create", 1))
     return (1);
 
+  // Create system
   System sys = System(sunctx);
 
-  InfChamber HPChamber = InfChamber("HPChamber", 10);
-  InfChamber LPChamber = InfChamber("LPChamber", 1);
-  ConstChamber chamber = ConstChamber("MidCh", 1, 1);
-  Orifice upOrif = Orifice("UpOrif", 5, HPChamber, chamber);
-  Orifice downOrif = Orifice("DownOrif", 5, chamber, LPChamber);
+  InfChamber HPChamber = InfChamber("HPChamber", 10*1e5);
+  InfChamber LPChamber = InfChamber("LPChamber", 1*1e5);
+  ConstChamber chamber = ConstChamber("MidCh", 2*1e5, 1e-3);
+  Orifice upOrif = Orifice("UpOrif", 5*1e-6, HPChamber, chamber);
+  Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber, LPChamber);
   sys.AddEquation(chamber);
   sys.AddEquation(HPChamber);
   sys.AddEquation(LPChamber);
   sys.AddEquation(upOrif);
   sys.AddEquation(downOrif);
 
-  // Initial conditions
-  y = N_VNew_Serial(NEQ, sunctx);
-  if (check_retval((void *)y, "N_VNew_Serial", 0))
-    return (1);
-
-    Ith(y, 1) = 1.1;
-
-  sunrealtype yExtract = Ith(y, 1);
-  sunrealtype yExtract2= ( ( ( (N_VectorContent_Serial)(y->content) )->data )[1 - 1] );
-  sunrealtype * yExtractCastToDoublePointer = ( ( (N_VectorContent_Serial)(y->content) )->data );
-  sunrealtype yExtractCastToDouble = *yExtractCastToDoublePointer; // Dereference 
-
-
-  N_Vector initCond = sys.GetInitCondition();
-  
-
-  // double chamberRhs = chamber.CalculateRHS();
-  // double HPChamberRhs = HPChamber.CalculateRHS();
-  // double LPChamberRhs = LPChamber.CalculateRHS();
-  // double upOrifQ = upOrif.CalculateRHS();
-  // double downOrifQ = downOrif.CalculateRHS();
-
   int noOfDiffEq = sys.noOfDiffEq;
 
+  // Initial conditions
+  // y = N_VNew_Serial(NEQ, sunctx);
+  // if (check_retval((void *)y, "N_VNew_Serial", 0))
+  //   return (1);
+
+  //   Ith(y, 1) = 1.1;
+
+  // sunrealtype yExtract = Ith(y, 1);
+  // sunrealtype yExtract2= ( ( ( (N_VectorContent_Serial)(y->content) )->data )[1 - 1] );
+  // sunrealtype * yExtractCastToDoublePointer = ( ( (N_VectorContent_Serial)(y->content) )->data );
+  // sunrealtype yExtractCastToDouble = *yExtractCastToDoublePointer; // Dereference 
 
 
 
-  // Set the vector absolute tolerance
+  N_Vector y = sys.GetInitCondition();
+  int b = testFun(y);
+  double checkY = Ith(y,1);
+  // Absolute tolerance
   abstol = N_VNew_Serial(noOfDiffEq, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
     return (1);
   Ith(abstol, 1) = 0.001;
 
 
+#pragma region HideThis
  
   // auto * test = y->content;
   // Call CVodeCreate to create the solver memory and specify the
@@ -118,16 +113,15 @@ int main()
   if (check_retval((void *)cvode_mem, "CVodeCreate", 0))
     return (1);
 
+  // Give user data to the solver function 
+  System *sysPtr = &sys;
+  CVodeSetUserData(cvode_mem,sysPtr);
+#pragma endregion
+
   // Call CVodeInit to initialize the integrator memory and specify the
   // user's right hand side function in y'=f(t,y), the initial time T0, and
   // the initial dependent variable vector y.
-  // retval = CVodeInit(cvode_mem, sys.CalculateSystemRHS(), T0, y);
-  // if (check_retval(&retval, "CVodeInit", 1))
-  //   return (1);
-  // CVRhsFn test = sys.CalculateSystemRHS;
-  System *sysPtr = &sys;
-  CVodeSetUserData(cvode_mem,sysPtr);
-  retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, initCond);
+  retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, y);
   if (check_retval(&retval, "CVodeInit", 1))
     return (1);
 
@@ -137,10 +131,7 @@ int main()
   if (check_retval(&retval, "CVodeSVtolerances", 1))
     return (1);
 
-  // Call CVodeRootInit to specify the root function g with 2 components
-  // retval = CVodeRootInit(cvode_mem, 2, g);
-  // if (check_retval(&retval, "CVodeRootInit", 1)) return(1);
-
+#pragma region HideThis
   // Create dense SUNMatrix for use in linear solves
   A = SUNDenseMatrix(NEQ, NEQ, sunctx);
   if (check_retval((void *)A, "SUNDenseMatrix", 0))
@@ -171,18 +162,15 @@ int main()
   outputFile << "Writing this to a file.\n";
   outputFile << "Time,p,\n";
 
-  sunrealtype yExamin;
+#pragma endregion
 
   while (1)
   {
     retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
-    // PrintOutput(t, Ith(y, 1)); // Print to screen
-    //  PrintOutputToTxt( fileName, tout, Ith(y,1), Ith(y,2));
-
-    yExamin = Ith(y, 1);
+    
     outputFile << tout << "\t" << Ith(y, 1) << std::endl;
 
-    yExtractCastToDouble = *yExtractCastToDoublePointer;
+    
     if (check_retval(&retval, "CVode", 1))
       break;
     if (retval == CV_SUCCESS)
@@ -190,8 +178,6 @@ int main()
       iout++;
       tout = tout + 0.01;
     }
-
-    // retval = CVodePrintAllStats(cvode_mem, FID, SUN_OUTPUTFORMAT_CSV);
 
     if (iout == NOUT)
       break;
@@ -201,10 +187,6 @@ int main()
 
   /* Print final statistics to the screen */
   printf("\nFinal Statistics:\n");
-  // retval = CVodePrintAllStats(cvode_mem, stdout, SUN_OUTPUTFORMAT_TABLE);
-
-  /* check the solution error */
-  // retval = check_ans(y, t, RTOL, abstol);
 
   /* Free memory */
   N_VDestroy(y);            /* Free y vector */
@@ -216,16 +198,12 @@ int main()
 
   return (retval);
 }
-
-/*
- *-------------------------------
- * Functions called by the solver
- *-------------------------------
- */
-
-/*
- * f routine. Compute function f(t,y).
- */
+static int testFun(N_Vector y)
+{
+  
+  int a = 3;
+  return a; 
+}
 
 static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
@@ -292,22 +270,26 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // which case CVODE will attempt to correct), or a negative value if it failed unrecoverably (in
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
+  double checkY = Ith(y,1);
+
+  std::cout << "t = " << t << "\nInto f function" << std::endl;
+
   // Cast the user_data void pointer to a pointer to system
   System * sysDerefPtr =  static_cast<System *>(user_data);
   // Dereference the pointer 
-  System sysDeref = * sysDerefPtr;
+  System sysDeref = *sysDerefPtr;
 
+
+  sysDeref.ResetDiffEq(y);
 
   // Extract RHS from the system
   sysDeref.CalculateAuxEqRHS();
   sysDeref.CalculateDiffEqRHS();
-  std::vector<sunrealtype> RHS =sysDeref.GetDiffEqRHS();
-  sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
-  // std::vector<sunrealtype> RHS = sysDeref.CalculateSystemRHS();
-  // SUNContext sunctx = sysDeref.GetSUNContext();
+  std::vector<sunrealtype> RHS = sysDeref.GetDiffEqRHS();
 
+  sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
   for (int ii = 0; ii < noOfDiffEq; ii++)
-  {
+  {    
     Ith(ydot, ii + 1) = RHS[ii];
   };
 
@@ -351,11 +333,7 @@ static int Jac(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix J,
   return (0);
 }
 
-/*
- *-------------------------------
- * Private helper functions
- *-------------------------------
- */
+
 
 static void PrintOutput(sunrealtype t, sunrealtype y1)
 {

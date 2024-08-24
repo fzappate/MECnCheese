@@ -1,5 +1,6 @@
 #include <math.h>
 #include <string>
+#include <iostream>
 #include <corecrt_math_defines.h>
 
 #include "./equation.h"
@@ -11,10 +12,6 @@ Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) 
 {
     
     isDifferential = false;
-
-    CalculateFlowrate();
-
-    initCond = flowrate;
 
     return;
 };
@@ -93,16 +90,36 @@ void Orifice::CalculateFlowrate()
     Chamber &downCh = this->downChamber;
     double upPress = upCh.GetPressure();
     double downPress = downCh.GetPressure();
+    
+    double isDpNeg = signbit(-upPress + downPress);
+    int sign;
+    if (isDpNeg == 0){
+        sign = -1;
+    }
+    else{
+        sign = 1;
+    }
 
-    flowrate = Cf * area * sqrt(upPress - downPress);
+    flowrate = sign * Cf * area * sqrt(abs(upPress - downPress));
 
     UpdateChambersFlow();
     return;
 };
 
 void Orifice::UpdateChambersFlow(){
-    upChamber.AddFlowIn(name,flowrate);
-    downChamber.AddFlowIn(name,-flowrate);
+    // Flow entering a chamber is negative
+    upChamber.AddFlowIn(name,-flowrate);
+    downChamber.AddFlowIn(name,flowrate);
+    return;
+};
+
+void Orifice::UpdateDepVar(double depVar)
+{
+    return;
+};
+
+void Orifice::ZeroParameters()
+{
     return;
 };
 
@@ -116,5 +133,12 @@ void Orifice::CalculateRHS()
 
 double Orifice::GetRHS()
 {
+    std::cout << "Orifice GetRHS" << std::endl;
     return this->flowrate;
+};
+
+double Orifice::GetInitialCondition()
+{
+    return this->flowrate;
+
 };

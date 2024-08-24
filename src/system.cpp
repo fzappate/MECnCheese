@@ -8,7 +8,7 @@
 
 System::System(SUNContext &sunctx): sunctx(sunctx){};
 
-void System::AddEquation(Equation equation)
+void System::AddEquation(Equation& equation)
 {
 
     // Store initial condition in the system
@@ -16,14 +16,14 @@ void System::AddEquation(Equation equation)
     // Increase the proper counter by one
     if (equation.GetIsDifferential())
     {
-        diffEquations.push_back(equation);
+        diffEquations.push_back(&equation);
         double initConditions = equation.GetInitialCondition();
         this->initConditions.push_back(initConditions);
         this->AddDiffEqCount();
     }
     else
     {
-        auxEquations.push_back(equation);
+        auxEquations.push_back(&equation);
         this->AddLinEqCount();
     };
 };
@@ -54,6 +54,7 @@ N_Vector System::GetInitCondition()
     // Instead of N_VNew use N_VMake
     // https://sundials.readthedocs.io/en/latest/cvode/Usage/index.html
     initCondTemp = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
+
     sunrealtype temp;
     // Ith(initCondTemp,1) = this->initConditions[ii];
     for (int ii = 0; ii<noOfDiffEq; ii++)
@@ -62,11 +63,7 @@ N_Vector System::GetInitCondition()
         Ith(initCondTemp,ii+1) = this->initConditions[ii];
 
     };
-    // Store initial conditions
-    N_VectInitConditions = initCondTemp;
      
-    sunrealtype testCont = Ith(initCondTemp, 1);
-    // Output initial conditions
     return initCondTemp;
 };
 
@@ -88,9 +85,11 @@ N_Vector System::GetInitCondition()
 void System::CalculateAuxEqRHS()
 {
     int noOfAuxEquations = auxEquations.size();
+    
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
-        this->auxEquations[ii].CalculateRHS();
+        Equation &eqTemp = *auxEquations[ii];
+        eqTemp.CalculateRHS();
     };
 };
 
@@ -99,7 +98,8 @@ void System::CalculateDiffEqRHS()
     int noOfDiffEquations = diffEquations.size();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        this->diffEquations[ii].CalculateRHS();
+        Equation &eqTemp = *diffEquations[ii];
+        eqTemp.CalculateRHS();
     };
 };
 
@@ -108,12 +108,33 @@ std::vector<double> System::GetDiffEqRHS()
     std::vector<double> diffEqRHS;
     
     int noOfDiffEquations = diffEquations.size();
+    
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation tempEq = diffEquations[ii];
-        double rhs = this->diffEquations[ii].GetRHS();
-        diffEqRHS.push_back(this->diffEquations[ii].GetRHS());
+        Equation &tempEq = *diffEquations[ii];
+
+        double rhs = tempEq.GetRHS();
+        diffEqRHS.push_back(rhs);
     };
 
     return diffEqRHS;
 };
+
+void System::ResetDiffEq(N_Vector y)
+{
+    int noOfDiffEquations = diffEquations.size();
+
+    
+    for (int ii = 0; ii < noOfDiffEquations; ii++)
+    {
+        Equation &tempEq = *diffEquations[ii];
+        double tempDepVar = Ith(y,ii+1);
+        
+        tempEq.UpdateDepVar(tempDepVar);
+        tempEq.ZeroParameters();
+
+    };
+
+    return;
+
+}

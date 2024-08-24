@@ -46,8 +46,13 @@ public:
 
     void UpdateChambersFlow();
 
+    void UpdateDepVar(double depVar) override;
+
+    void ZeroParameters() override;
+    
     void CalculateRHS() override;
 
     double GetRHS() override;
 
+    double GetInitialCondition() override;
 };
