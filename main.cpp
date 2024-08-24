@@ -44,7 +44,7 @@ int main()
   sunrealtype t;
   sunrealtype tstart = 0;
   sunrealtype tout = 0.01;
-  sunrealtype tEnd = 10;
+  sunrealtype tEnd = 5;
 
   // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
@@ -56,13 +56,23 @@ int main()
 
   InfChamber HPChamber = InfChamber("HPChamber", 10*1e5);
   sys.AddEquation(HPChamber);
+
   InfChamber LPChamber = InfChamber("LPChamber", 1*1e5);
   sys.AddEquation(LPChamber);
-  ConstChamber chamber = ConstChamber("MidCh", 2*1e5, 1e-3);
-  sys.AddEquation(chamber);
-  Orifice upOrif = Orifice("UpOrif", 5*1e-6, HPChamber, chamber);
+
+  ConstChamber chamber1 = ConstChamber("MidCh1", 2*1e5, 1e-3);
+  sys.AddEquation(chamber1);
+
+  ConstChamber chamber2 = ConstChamber("MidCh2", 2*1e5, 1e-3);
+  sys.AddEquation(chamber2);
+
+  Orifice midOrif = Orifice("UpOrif", 5*1e-6, chamber1, chamber2);
+  sys.AddEquation(midOrif);
+
+  Orifice upOrif = Orifice("UpOrif", 5*1e-6, HPChamber, chamber1);
   sys.AddEquation(upOrif);
-  Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber, LPChamber);
+
+  Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber2, LPChamber);
   sys.AddEquation(downOrif);
 
   int noOfDiffEq = sys.noOfDiffEq;
