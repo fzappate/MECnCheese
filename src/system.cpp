@@ -81,6 +81,11 @@ N_Vector System::GetEqAbsTol()
     return eqAbsTol;
 }
 
+int System::GetNoOfDiffEq()
+{
+    return this->noOfDiffEq;
+}
+
 double System::GetRelTol()
 {
     return relTol;

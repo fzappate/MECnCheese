@@ -4,8 +4,8 @@
 
 class Equation
 {
-
 protected:
+
     // Properties
     std::string name;
     bool isDifferential;

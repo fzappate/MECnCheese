@@ -52,7 +52,6 @@ class Chamber : public Equation
 // Class InfChamber
 class InfChamber : public Chamber
 {
-
 public:
 
     InfChamber(std::string name,double pressure);
@@ -61,7 +60,6 @@ public:
 
     void CalculateRHS() override;
 };
-
 
 // Class Chamber
 class ConstChamber : public Chamber
@@ -72,8 +70,7 @@ class ConstChamber : public Chamber
 
 public:
     
-    ConstChamber(std::string name, double pressure, double volume);
-
+    ConstChamber(std::string name, double pressure, double volume);   
     
 
 };

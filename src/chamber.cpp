@@ -112,7 +112,7 @@ void InfChamber::CalculateRHS()
 
 };
 
-// Chamber
+// ConstChamber
 ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure), volume(volume)
 {
     this->SetIsDifferential(true);

@@ -75,7 +75,7 @@ int main()
   Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber2, LPChamber);
   sys.AddEquation(downOrif);
 
-  int noOfDiffEq = sys.noOfDiffEq;
+  int noOfDiffEq = sys.GetNoOfDiffEq();
   N_Vector y = sys.GetInitCondition();
   
 
@@ -199,7 +199,7 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
 
   // Extract RHS from system and store it in ydot
   std::vector<sunrealtype> RHS = sysDeref.GetDiffEqRHS();
-  sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
+  sunrealtype noOfDiffEq = sysDeref.GetNoOfDiffEq();
   for (int ii = 0; ii < noOfDiffEq; ii++)
   {    
     Ith(ydot, ii + 1) = RHS[ii];
