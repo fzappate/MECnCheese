@@ -13,23 +13,16 @@
 #include "./equation.h"
 #include "./system.h"
 
+// Define handy macros
 #define PI 3.1415926535897932
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
 // Problem Constants
-#define NEQ 1               // number of equations
-#define Y1 RCONST(1.0)      // initial y components
 #define RTOL RCONST(1.0e-4) // scalar relative tolerance
 #define ATOL RCONST(1.0e-8) // vector absolute tolerance components
-#define T0 RCONST(0.0)      // initial time
-#define T1 RCONST(0.01)     // first output time
-#define TMULT RCONST(10.0)  // output time factor
-#define NOUT 1000           // number of output times
-#define ZERO RCONST(0.0)
 
 // Functions Called by the Solver
-
 static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int mass_dumper(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
@@ -44,7 +37,11 @@ static int testFun(N_Vector y);
 int main()
 {
   // Create the SUNDIALS context
-  sunrealtype t, tout;
+  sunrealtype t;
+  sunrealtype tstart = 0;
+  sunrealtype tout = 0.01;
+  sunrealtype tEnd = 10;
+  
   // N_Vector y;
   N_Vector abstol;
   SUNMatrix A;
@@ -79,24 +76,13 @@ int main()
   sys.AddEquation(downOrif);
 
   int noOfDiffEq = sys.noOfDiffEq;
-
-  // Initial conditions
-  // y = N_VNew_Serial(NEQ, sunctx);
-  // if (check_retval((void *)y, "N_VNew_Serial", 0))
-  //   return (1);
-
-  //   Ith(y, 1) = 1.1;
-
-  // sunrealtype yExtract = Ith(y, 1);
-  // sunrealtype yExtract2= ( ( ( (N_VectorContent_Serial)(y->content) )->data )[1 - 1] );
-  // sunrealtype * yExtractCastToDoublePointer = ( ( (N_VectorContent_Serial)(y->content) )->data );
-  // sunrealtype yExtractCastToDouble = *yExtractCastToDoublePointer; // Dereference 
+  double fds = 1;
 
 
 
   N_Vector y = sys.GetInitCondition();
-  int b = testFun(y);
-  double checkY = Ith(y,1);
+  
+  
   // Absolute tolerance
   abstol = N_VNew_Serial(noOfDiffEq, sunctx);
   if (check_retval((void *)abstol, "N_VNew_Serial", 0))
@@ -121,7 +107,7 @@ int main()
   // Call CVodeInit to initialize the integrator memory and specify the
   // user's right hand side function in y'=f(t,y), the initial time T0, and
   // the initial dependent variable vector y.
-  retval = CVodeInit(cvode_mem, hydraulic_circuit, T0, y);
+  retval = CVodeInit(cvode_mem, hydraulic_circuit, tstart, y);
   if (check_retval(&retval, "CVodeInit", 1))
     return (1);
 
@@ -133,7 +119,7 @@ int main()
 
 #pragma region HideThis
   // Create dense SUNMatrix for use in linear solves
-  A = SUNDenseMatrix(NEQ, NEQ, sunctx);
+  A = SUNDenseMatrix(noOfDiffEq, noOfDiffEq, sunctx);
   if (check_retval((void *)A, "SUNDenseMatrix", 0))
     return (1);
 
@@ -155,7 +141,7 @@ int main()
   FID = fopen("hydraulic_circuit_statistics.csv", "w");
 
   iout = 0;
-  tout = T1;
+  
   std::string fileName = "hydraulic_circuit_results.csv";
   std::ofstream outputFile;
   outputFile.open(fileName);
@@ -179,7 +165,7 @@ int main()
       tout = tout + 0.01;
     }
 
-    if (iout == NOUT)
+    if (tout > tEnd)
       break;
   }
   fclose(FID);
@@ -197,12 +183,6 @@ int main()
   SUNContext_Free(&sunctx); /* Free the SUNDIALS context */
 
   return (retval);
-}
-static int testFun(N_Vector y)
-{
-  
-  int a = 3;
-  return a; 
 }
 
 static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
@@ -326,9 +306,9 @@ static int Jac(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix J,
   IJth(J, 2, 2) = RCONST(-1.0e4) * y3 - RCONST(6.0e7) * y2;
   IJth(J, 2, 3) = RCONST(-1.0e4) * y2;
 
-  IJth(J, 3, 1) = ZERO;
+  IJth(J, 3, 1) = 0.0;
   IJth(J, 3, 2) = RCONST(6.0e7) * y2;
-  IJth(J, 3, 3) = ZERO;
+  IJth(J, 3, 3) = 0.0;
 
   return (0);
 }
