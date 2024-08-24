@@ -67,20 +67,24 @@ N_Vector System::GetInitCondition()
     return initCondTemp;
 };
 
-// std::vector<double> System::CalculateSystemRHS()
-// {
-//     int noOfDiffEquations = diffEquations.size();
-//     std::vector<double> RHS;
-//     double RHStemp;
-
-//     for (int ii = 0; ii < noOfDiffEquations; ii++)
-//     {
-//         // RHStemp = diffEquations[ii].CalculateRHS();
-//         // RHS.push_back(RHStemp);
-//     };
+N_Vector System::GetEqAbsTol()
+{
+    int noOfDiffEq = diffEquations.size();
     
-//     return RHS;
-// };
+    N_Vector eqAbsTol = N_VNew_Serial(noOfDiffEq, sunctx);
+    for (int ii = 0; ii < noOfDiffEq; ii++)
+    {
+        Equation &eqTemp = *diffEquations[ii];
+        Ith(eqAbsTol,ii+1) = eqTemp.GetAbsTol();
+    };
+
+    return eqAbsTol;
+}
+
+double System::GetRelTol()
+{
+    return relTol;
+}
 
 void System::CalculateAuxEqRHS()
 {

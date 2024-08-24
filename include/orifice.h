@@ -48,6 +48,10 @@ public:
 
     void UpdateDepVar(double depVar) override;
 
+    double GetAbsTol() override;
+
+    double GetRelTol() override;
+
     void ZeroParameters() override;
     
     void CalculateRHS() override;

@@ -22,6 +22,16 @@ double Chamber::GetPressure()
     return pressure;
 };
 
+double Chamber::GetAbsTol()
+{
+    return aTol;
+}
+
+double Chamber::GetRelTol()
+{
+    return rTol;
+}
+
 void Chamber::SetIsDifferential(bool isDifferential)
 {
     this->isDifferential = isDifferential;
@@ -56,6 +66,7 @@ void Chamber::ZeroParameters()
     
     return;
 }
+
 void Chamber::CalculateRHS()
 {
 
