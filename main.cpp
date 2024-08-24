@@ -130,7 +130,8 @@ int main()
     retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
     if (check_retval(&retval, "CVode", 1))
       break;
-
+      
+    std::cout << "t: " << t << " p: " << Ith(y, 1) << std::endl;
     outputFile << tout << "\t" << Ith(y, 1) << std::endl;
 
     if (retval == CV_SUCCESS)
@@ -139,7 +140,9 @@ int main()
     }
 
     if (tout > tEnd)
+    {
       break;
+    }
   }
 
   outputFile.close();
@@ -169,23 +172,20 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   // which case CVODE will attempt to correct), or a negative value if it failed unrecoverably (in
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
-  double checkY = Ith(y,1);
-
-  std::cout << "t = " << t << "\nInto f function" << std::endl;
-
   // Cast the user_data void pointer to a pointer to system
   System * sysDerefPtr =  static_cast<System *>(user_data);
   // Dereference the pointer 
   System sysDeref = *sysDerefPtr;
 
-
+  // Set new depenedent variable and reset equation factors
   sysDeref.ResetDiffEq(y);
 
-  // Extract RHS from the system
+  // Calculate RHS from the system
   sysDeref.CalculateAuxEqRHS();
   sysDeref.CalculateDiffEqRHS();
-  std::vector<sunrealtype> RHS = sysDeref.GetDiffEqRHS();
 
+  // Extract RHS from system and store it in ydot
+  std::vector<sunrealtype> RHS = sysDeref.GetDiffEqRHS();
   sunrealtype noOfDiffEq = sysDeref.noOfDiffEq;
   for (int ii = 0; ii < noOfDiffEq; ii++)
   {    

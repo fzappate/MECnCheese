@@ -67,7 +67,6 @@ void Chamber::CalculateRHS()
 
 double Chamber::GetRHS()
 {
-    std::cout << "Chamber GetRHS" << std::endl;
     return this->dpdt;
 };
 
