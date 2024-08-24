@@ -23,7 +23,6 @@
 #define ATOL RCONST(1.0e-8) // vector absolute tolerance components
 
 // Functions Called by the Solver
-static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int mass_dumper(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static int solve_system(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
@@ -185,57 +184,6 @@ int main()
   return (retval);
 }
 
-static int f(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
-{
-  realtype y1, y2, y3, yd1, yd3;
-
-  y1 = Ith(y, 1);
-  y2 = Ith(y, 2);
-  y3 = Ith(y, 3);
-
-  yd1 = Ith(ydot, 1) = RCONST(-0.04) * y1 + RCONST(1.0e4) * y2 * y3;
-  yd3 = Ith(ydot, 3) = RCONST(3.0e7) * y2 * y2;
-  Ith(ydot, 2) = -yd1 - yd3;
-
-  return (0);
-}
-
-static int mass_dumper(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
-{
-  // This function computes the ODE right-hand side for a given value of the independent variable
-  //  and state vector
-  // Arguments:
-  // t – is the current value of the independent variable.
-  // y – is the current value of the dependent variable vector,
-  // ydot – is the output vector
-  // user_data – is the user_data pointer passed to CVodeSetUserData().
-  // Return value:
-  // A CVRhsFn should return 0 if successful, a positive value if a recoverable error occurred (in
-  // which case CVODE will attempt to correct), or a negative value if it failed unrecoverably (in
-  // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
-  realtype y1;
-  realtype y2;
-  realtype x1;
-  realtype x2;
-
-  y1 = Ith(y, 1);
-  y2 = Ith(y, 2);
-  x1 = Ith(y, 3);
-  x2 = Ith(y, 4);
-
-  realtype u = 10 * sin(t * 2 * PI);
-  realtype m = 1;
-  realtype c = 1;
-  realtype k = 5;
-
-  Ith(ydot, 1) = y2;
-  Ith(ydot, 2) = (u - c * y2 - k * y1) / m;
-  Ith(ydot, 3) = x2;
-  Ith(ydot, 4) = (u - c * x2 - k * x1) / m;
-
-  return (0);
-}
-
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
   // This function computes the ODE right-hand side for a given value of the independent variable
@@ -276,45 +224,6 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   return (0);
 }
 
-// g routine. Compute functions g_i(t,y) for i = 0,1.
-static int g(sunrealtype t, N_Vector y, sunrealtype *gout, void *user_data)
-{
-  realtype y1, y3;
-
-  y1 = Ith(y, 1);
-  y3 = Ith(y, 3);
-  gout[0] = y1 - RCONST(0.0001);
-  gout[1] = y3 - RCONST(0.01);
-
-  return (0);
-}
-
-//* Jacobian routine. Compute J(t,y) = df/dy. *
-static int Jac(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix J,
-               void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
-{
-  realtype y2, y3;
-
-  y2 = Ith(y, 2);
-  y3 = Ith(y, 3);
-
-  IJth(J, 1, 1) = RCONST(-0.04);
-  IJth(J, 1, 2) = RCONST(1.0e4) * y3;
-  IJth(J, 1, 3) = RCONST(1.0e4) * y2;
-
-  IJth(J, 2, 1) = RCONST(0.04);
-  IJth(J, 2, 2) = RCONST(-1.0e4) * y3 - RCONST(6.0e7) * y2;
-  IJth(J, 2, 3) = RCONST(-1.0e4) * y2;
-
-  IJth(J, 3, 1) = 0.0;
-  IJth(J, 3, 2) = RCONST(6.0e7) * y2;
-  IJth(J, 3, 3) = 0.0;
-
-  return (0);
-}
-
-
-
 static void PrintOutput(sunrealtype t, sunrealtype y1)
 {
 #if defined(SUNDIALS_EXTENDED_PRECISION)
@@ -328,16 +237,13 @@ static void PrintOutput(sunrealtype t, sunrealtype y1)
   return;
 }
 
-/*
- * Check function return value...
- *   opt == 0 means SUNDIALS function allocates memory so check if
- *            returned NULL pointer
- *   opt == 1 means SUNDIALS function returns an integer value so check if
- *            retval < 0
- *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
- */
-
+//  Check function return value
+//    opt == 0 means SUNDIALS function allocates memory so check if
+//             returned NULL pointer
+//    opt == 1 means SUNDIALS function returns an integer value so check if
+//             retval < 0
+//    opt == 2 means function allocates memory so check if returned
+//             NULL pointer 
 static int check_retval(void *returnvalue, const char *funcname, int opt)
 {
   int *retval;
