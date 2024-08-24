@@ -13,6 +13,9 @@ class Chamber : public Equation
     double volDer = 0;
     double dpdt = 0;
     double flowSum = 0;
+    double aTol = 1;
+    double rTol = 0.001;
+    
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
 
@@ -23,6 +26,10 @@ class Chamber : public Equation
     void SetPressure(double pressure);
 
     double GetPressure();
+
+    double GetAbsTol();
+
+    double GetRelTol();
 
     void SetIsDifferential(bool isDifferential) override;
 

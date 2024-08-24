@@ -9,6 +9,8 @@ protected:
     // Properties
     std::string name;
     bool isDifferential;
+    double rTol; 
+    double aTol;
 
 public:
 
@@ -29,4 +31,7 @@ public:
 
     virtual double GetInitialCondition() = 0;
 
+    virtual double GetAbsTol() = 0;
+
+    virtual double GetRelTol() = 0;
 };

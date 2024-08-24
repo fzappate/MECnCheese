@@ -68,11 +68,14 @@ int main()
   int noOfDiffEq = sys.noOfDiffEq;
   N_Vector y = sys.GetInitCondition();
   
+
   // Absolute tolerance
-  abstol = N_VNew_Serial(noOfDiffEq, sunctx);
-  if (check_retval((void *)abstol, "N_VNew_Serial", 0))
+  N_Vector absTol = sys.GetEqAbsTol();
+  if (check_retval((void *)absTol, "GetEqAbsTol", 0))
     return (1);
-  Ith(abstol, 1) = 0.001;
+
+  // Relative tolerance
+  double relTol = sys.GetRelTol();
 
   // Call CVodeCreate to create the solver memory and specify the
   // solver scheme
@@ -95,7 +98,7 @@ int main()
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
   // and vector absolute tolerances 
-  retval = CVodeSVtolerances(cvode_mem, RTOL, abstol);
+  retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
   if (check_retval(&retval, "CVodeSVtolerances", 1))
     return (1);
 

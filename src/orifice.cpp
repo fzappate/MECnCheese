@@ -137,6 +137,16 @@ double Orifice::GetRHS()
     return this->flowrate;
 };
 
+double Orifice::GetAbsTol()
+{
+    return 0.0;
+}
+
+double Orifice::GetRelTol()
+{
+    return 0.0;
+}
+
 double Orifice::GetInitialCondition()
 {
     return this->flowrate;
