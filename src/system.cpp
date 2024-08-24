@@ -1,5 +1,6 @@
 #include <vector>
 #include <nvector/nvector_serial.h>    // access to serial N_Vector
+#include <iostream>
 
 #include "system.h"
 #include "equation.h"
@@ -8,23 +9,37 @@
 
 System::System(SUNContext &sunctx): sunctx(sunctx){};
 
-void System::AddEquation(Equation& equation)
+void System::AddDiffEquation(DiffEquation& equation)
 {
 
     // Store initial condition in the system
 
     // Increase the proper counter by one
-    if (equation.GetIsDifferential())
+    if (equation.GetIsDifferential() == true)
     {
         diffEquations.push_back(&equation);
+        
         double initConditions = equation.GetInitialCondition();
         this->initConditions.push_back(initConditions);
         this->AddDiffEqCount();
     }
     else
     {
+        std::cout << "Trying to store an auxiliary equation in the differential equations system." << std::endl;
+    };
+};
+
+void System::AddAuxEquation(AuxEquation& equation)
+{
+    // Increase the proper counter by one
+    if (equation.GetIsDifferential() == false)
+    {        
         auxEquations.push_back(&equation);
-        this->AddLinEqCount();
+        this->AddAuxEqCount();
+    }
+    else
+    {
+        std::cout << "Trying to store a differential equation in the auxiliary equations system." << std::endl;
     };
 };
 
@@ -42,7 +57,7 @@ void System::AddDiffEqCount()
     this->noOfDiffEq++;
 };
 
-void System::AddLinEqCount()
+void System::AddAuxEqCount()
 {
     this->noOfAuxEq++;
 }
@@ -74,7 +89,7 @@ N_Vector System::GetEqAbsTol()
     N_Vector eqAbsTol = N_VNew_Serial(noOfDiffEq, sunctx);
     for (int ii = 0; ii < noOfDiffEq; ii++)
     {
-        Equation &eqTemp = *diffEquations[ii];
+        DiffEquation &eqTemp = *diffEquations[ii];
         Ith(eqAbsTol,ii+1) = eqTemp.GetAbsTol();
     };
 
@@ -92,7 +107,7 @@ void System::CalculateAuxEqRHS()
     
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
-        Equation &eqTemp = *auxEquations[ii];
+        AuxEquation &eqTemp = *auxEquations[ii];
         eqTemp.CalculateRHS();
     };
 };
@@ -102,7 +117,7 @@ void System::CalculateDiffEqRHS()
     int noOfDiffEquations = diffEquations.size();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation &eqTemp = *diffEquations[ii];
+        DiffEquation &eqTemp = *diffEquations[ii];
         eqTemp.CalculateRHS();
     };
 };
@@ -115,7 +130,7 @@ std::vector<double> System::GetDiffEqRHS()
     
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation &tempEq = *diffEquations[ii];
+        DiffEquation &tempEq = *diffEquations[ii];
 
         double rhs = tempEq.GetRHS();
         diffEqRHS.push_back(rhs);
@@ -131,7 +146,7 @@ void System::ResetDiffEq(N_Vector y)
     
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation &tempEq = *diffEquations[ii];
+        DiffEquation &tempEq = *diffEquations[ii];
         double tempDepVar = Ith(y,ii+1);
         
         tempEq.UpdateDepVar(tempDepVar);

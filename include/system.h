@@ -37,14 +37,14 @@
 class System{
 
     int noOfAuxEq = 0;
-    std::vector<Equation*> auxEquations;
-    std::vector<Equation*> diffEquations;
+    std::vector<AuxEquation*> auxEquations;
+    std::vector<DiffEquation*> diffEquations;
     std::vector<sunrealtype> initConditions;
     N_Vector N_VectInitConditions;
     SUNContext &sunctx;
     
     void AddDiffEqCount();
-    void AddLinEqCount();
+    void AddAuxEqCount();
 
 public:
 
@@ -54,7 +54,9 @@ public:
 
     System(SUNContext &sunctx);
 
-    void AddEquation(Equation& equation);
+    void AddDiffEquation(DiffEquation& equation);
+
+    void AddAuxEquation(AuxEquation& equation);
 
     void AddSUNContext(SUNContext &sunctx);
 

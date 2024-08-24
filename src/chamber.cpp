@@ -5,7 +5,7 @@
 #include "./chamber.h"
 
 // Chamber
-Chamber::Chamber(std::string name, double pressure) : Equation(name), pressure(pressure)
+Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
     return;
 };
@@ -31,17 +31,6 @@ double Chamber::GetRelTol()
 {
     return rTol;
 }
-
-void Chamber::SetIsDifferential(bool isDifferential)
-{
-    this->isDifferential = isDifferential;
-    return;
-}
-
-bool Chamber::GetIsDifferential()
-{
-    return isDifferential;
-};
 
 void Chamber::AddFlowIn(std::string flowName, double flowrate)
 {
@@ -86,16 +75,16 @@ double Chamber::GetInitialCondition()
     return this->pressure;
 };
 
-// InfChamber
-InfChamber::InfChamber(std::string name, double pressure) : Chamber(name, pressure)
+// PressureSource
+PressureSource::PressureSource(std::string name, double pressure) : AuxEquation(name)
 {
-    this->SetIsDifferential(false);
-    this->SetPressure(pressure);
+    
+    this->pressure = pressure;
 
     return;
 };
 
-void InfChamber::AddFlowIn(std::string flowName, double flowrate)
+void PressureSource::AddFlowIn(std::string flowName, double flowrate)
 {
     // Override the standard AddFlowIn to make sure that no flow is exchanghed
     // with infinite chambers
@@ -105,17 +94,7 @@ void InfChamber::AddFlowIn(std::string flowName, double flowrate)
     return;
 };
 
-void InfChamber::CalculateRHS()
+void PressureSource::CalculateRHS()
 {
-
     return;
-
-};
-
-// Chamber
-ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure), volume(volume)
-{
-    this->SetIsDifferential(true);
-    return;
-};
-
+}

@@ -4,7 +4,7 @@
 #include <vector>
 #include "./equation.h"
 
-class Chamber : public Equation 
+class Chamber : public DiffEquation 
 {
     protected:
     double bulkMod = 1.8*1.0E9;
@@ -31,10 +31,6 @@ class Chamber : public Equation
 
     double GetRelTol();
 
-    void SetIsDifferential(bool isDifferential) override;
-
-    bool GetIsDifferential() override;
-
     virtual void AddFlowIn(std::string name, double flow);
 
     void UpdateDepVar(double pressure) override;
@@ -49,17 +45,21 @@ class Chamber : public Equation
 
 };
 
-// Class InfChamber
-class InfChamber : public Chamber
+// Class PressureSource
+class PressureSource : public AuxEquation
 {
-
 public:
 
-    InfChamber(std::string name,double pressure);
+    double pressure;
+    std::vector<double> flowIn;
+    std::vector<std::string> flowInNames;
+
+    PressureSource(std::string name,double pressure);
     
-    void AddFlowIn(std::string name, double flow) override;
+    void AddFlowIn(std::string name, double flow);
 
     void CalculateRHS() override;
+
 };
 
 
@@ -68,7 +68,7 @@ class ConstChamber : public Chamber
 {
 
     double volume;
-    double volDer = 0;;
+    double volDer = 0;
 
 public:
     

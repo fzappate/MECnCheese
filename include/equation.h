@@ -2,24 +2,34 @@
 
 #include <string>
 
-class Equation
+class Equation 
 {
-
-protected:
+    protected:
     // Properties
     std::string name;
     bool isDifferential;
-    double rTol; 
-    double aTol;
 
-public:
-
+    public:
     // Methods
     Equation(std::string name);
 
-    virtual void SetIsDifferential(bool isDifferential) = 0;
+    bool GetIsDifferential()
+    {
+        return isDifferential;
+    };
+};
 
-    virtual bool GetIsDifferential() = 0;
+class DiffEquation : public Equation
+{
+protected:
+    // Properties
+    double rTol; 
+    double aTol;
+    const bool isDifferential = 1;
+
+public:
+    // Methods
+    DiffEquation(std::string name);
 
     virtual void UpdateDepVar(double depVar) = 0;
 
@@ -34,4 +44,18 @@ public:
     virtual double GetAbsTol() = 0;
 
     virtual double GetRelTol() = 0;
+
+};
+
+class AuxEquation : public Equation
+{
+protected:
+    const bool isDifferential = 0;
+
+public:
+    // Methods
+    AuxEquation(std::string name);
+
+    virtual void CalculateRHS() = 0;
+
 };

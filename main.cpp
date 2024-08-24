@@ -54,16 +54,16 @@ int main()
   // Create system
   System sys = System(sunctx);
 
-  InfChamber HPChamber = InfChamber("HPChamber", 10*1e5);
-  sys.AddEquation(HPChamber);
-  InfChamber LPChamber = InfChamber("LPChamber", 1*1e5);
-  sys.AddEquation(LPChamber);
+  PressureSource HPChamber = PressureSource("HPChamber", 10*1e5);
+  sys.AddAuxEquation(HPChamber);
+  PressureSource LPChamber = PressureSource("LPChamber", 1*1e5);
+  sys.AddAuxEquation(LPChamber);
   ConstChamber chamber = ConstChamber("MidCh", 2*1e5, 1e-3);
-  sys.AddEquation(chamber);
+  sys.AddDiffEquation(chamber);
   Orifice upOrif = Orifice("UpOrif", 5*1e-6, HPChamber, chamber);
-  sys.AddEquation(upOrif);
+  sys.AddAuxEquation(upOrif);
   Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber, LPChamber);
-  sys.AddEquation(downOrif);
+  sys.AddAuxEquation(downOrif);
 
   int noOfDiffEq = sys.noOfDiffEq;
   N_Vector y = sys.GetInitCondition();
