@@ -26,34 +26,13 @@
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 static void PrintOutput(sunrealtype t, sunrealtype y1);
 static int check_retval(void *returnvalue, const char *funcname, int opt);
+static int SolveSystem(System sys);
 
 int main()
 {
-  // Initialize the SUNDIALS variables
-  SUNContext sunctx;
-  N_Vector abstol;
-  abstol = NULL;
-  SUNMatrix A;
-  A = NULL;
-  SUNLinearSolver LS;
-  LS = NULL;
-  void *cvode_mem;
-  cvode_mem = NULL;
-
-  // Define constant 
-  sunrealtype t;
-  sunrealtype tstart = 0;
-  sunrealtype tout = 0.001;
-  sunrealtype tStep = tout;
-  sunrealtype tEnd = 2;
-
-  // Create SUNDIALS context
-  int retval = SUNContext_Create(NULL, &sunctx);
-  if (check_retval(&retval, "SUNContext_Create", 1))
-    return (1);
 
   // Create system
-  System sys = System(sunctx);
+  System sys = System();
 
   InfChamber HPChamber = InfChamber("HPChamber", 20*1e5);
   sys.AddEquation(HPChamber);
@@ -76,6 +55,38 @@ int main()
   Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber2, LPChamber);
   sys.AddEquation(downOrif);
 
+  int retval = SolveSystem(sys);
+
+}
+
+static int SolveSystem(System sys)
+{
+  // Define constant 
+  sunrealtype t;
+  sunrealtype tstart = 0;
+  sunrealtype tout = 0.001;
+  sunrealtype tStep = tout;
+  sunrealtype tEnd = 1;
+
+  // Initialize the SUNDIALS variables
+  SUNContext sunctx;
+  N_Vector abstol;
+  abstol = NULL;
+  SUNMatrix A;
+  A = NULL;
+  SUNLinearSolver LS;
+  LS = NULL;
+  void *cvode_mem;
+  cvode_mem = NULL;
+
+    // Create SUNDIALS context
+  int retval = SUNContext_Create(NULL, &sunctx);
+  if (check_retval(&retval, "SUNContext_Create", 1))
+    return (1);
+
+  sys.AddSUNContext(sunctx);
+
+  
   int noOfDiffEq = sys.GetNoOfDiffEq();
   N_Vector y = sys.GetInitCondition();
   
@@ -170,6 +181,7 @@ int main()
   SUNContext_Free(&sunctx); // Free the SUNDIALS context 
 
   return (retval);
+
 }
 
 static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)

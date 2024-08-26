@@ -6,7 +6,9 @@
 
 #define Ith(v, i) NV_Ith_S(v, i - 1)  
 
-System::System(SUNContext &sunctx): sunctx(sunctx){};
+System::System(){};
+
+System::System(SUNContext sunctx) : sunctx(sunctx){};
 
 void System::AddEquation(Equation& equation)
 {
@@ -30,11 +32,13 @@ void System::AddEquation(Equation& equation)
 
 void System::AddSUNContext(SUNContext &sunctx){
     sunctx = sunctx;
+    return;
 };
 
 SUNContext System::GetSUNContext(){
-    // SUNContext* sunctxPtr = sunctx;
+    
     return sunctx; 
+
 };
 
 void System::AddDiffEqCount()

@@ -18,7 +18,7 @@ protected:
     std::vector<Equation*> diffEquations;
     std::vector<sunrealtype> initConditions;
     N_Vector N_VectInitConditions;
-    SUNContext &sunctx;
+    SUNContext sunctx;
 
     // Methods
     void AddDiffEqCount();
@@ -26,7 +26,9 @@ protected:
 
 public:
 
-    System(SUNContext &sunctx);
+    System();
+
+    System(SUNContext sunctx);
 
     void AddEquation(Equation& equation);
 
