@@ -70,8 +70,6 @@ void Chamber::ZeroParameters()
 void Chamber::CalculateRHS()
 {
 
-    this->dpdt = bulkMod / volume * (flowSum - volDer);
-
     return;
 
 };
@@ -113,9 +111,19 @@ void InfChamber::CalculateRHS()
 };
 
 // ConstChamber
-ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure), volume(volume)
+ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure)
 {
+    this->volume = volume;
+    this->volDer = 0;
     this->SetIsDifferential(true);
     return;
 };
 
+void ConstChamber::CalculateRHS()
+{
+
+    this->dpdt = bulkMod / volume * (flowSum - volDer);
+
+    return;
+
+};

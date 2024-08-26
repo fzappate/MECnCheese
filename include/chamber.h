@@ -8,10 +8,10 @@ class Chamber : public Equation
 {
     protected:
     double bulkMod = 1.8*1.0E9;
-    double pressure = 1; 
-    double volume = 1;
-    double volDer = 0;
-    double dpdt = 0;
+    double pressure; 
+    double volume;
+    double volDer;
+    double dpdt;
     double flowSum = 0;
     double aTol = 1;
     double rTol = 0.001;
@@ -41,7 +41,7 @@ class Chamber : public Equation
 
     void ZeroParameters() override;
 
-    void CalculateRHS() override;
+    virtual void CalculateRHS();
 
     double GetRHS() override;
 
@@ -65,12 +65,12 @@ public:
 class ConstChamber : public Chamber
 {
 
-    double volume;
-    double volDer = 0;;
 
 public:
     
     ConstChamber(std::string name, double pressure, double volume);   
+
+    void CalculateRHS() override;
     
 
 };

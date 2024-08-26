@@ -43,8 +43,9 @@ int main()
   // Define constant 
   sunrealtype t;
   sunrealtype tstart = 0;
-  sunrealtype tout = 0.01;
-  sunrealtype tEnd = 5;
+  sunrealtype tout = 0.001;
+  sunrealtype tStep = tout;
+  sunrealtype tEnd = 2;
 
   // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
@@ -54,16 +55,16 @@ int main()
   // Create system
   System sys = System(sunctx);
 
-  InfChamber HPChamber = InfChamber("HPChamber", 10*1e5);
+  InfChamber HPChamber = InfChamber("HPChamber", 20*1e5);
   sys.AddEquation(HPChamber);
 
   InfChamber LPChamber = InfChamber("LPChamber", 1*1e5);
   sys.AddEquation(LPChamber);
 
-  ConstChamber chamber1 = ConstChamber("MidCh1", 2*1e5, 1e-3);
+  ConstChamber chamber1 = ConstChamber("MidCh1", 2*1e5, 10);
   sys.AddEquation(chamber1);
 
-  ConstChamber chamber2 = ConstChamber("MidCh2", 2*1e5, 1e-3);
+  ConstChamber chamber2 = ConstChamber("MidCh2", 2*1e5, 10);
   sys.AddEquation(chamber2);
 
   Orifice midOrif = Orifice("UpOrif", 5*1e-6, chamber1, chamber2);
@@ -144,12 +145,12 @@ int main()
     if (check_retval(&retval, "CVode", 1))
       break;
       
-    std::cout << "t: " << t << " p: " << Ith(y, 1) << std::endl;
-    outputFile << tout << "\t" << Ith(y, 1) << std::endl;
+    std::cout << "t: " << t << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
+    outputFile << tout << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
 
     if (retval == CV_SUCCESS)
     {
-      tout = tout + 0.01;
+      tout = tout + tStep;
     }
 
     if (tout > tEnd)
