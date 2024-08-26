@@ -9,8 +9,6 @@ protected:
     // Properties
     std::string name;
     bool isDifferential;
-    double rTol; 
-    double aTol;
 
 public:
 
