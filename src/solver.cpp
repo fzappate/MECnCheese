@@ -152,20 +152,20 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
   // Cast the user_data void pointer to a pointer to system
-  System * sysDerefPtr =  static_cast<System *>(user_data);
+  System * sysPtr =  static_cast<System *>(user_data);
   // Dereference the pointer 
-  System sysDeref = *sysDerefPtr;
+  System sys = *sysPtr;
 
   // Set new depenedent variable and reset equation factors
-  sysDeref.ResetDiffEq(y);
+  sys.ResetDiffEq(y);
 
   // Calculate RHS from the system
-  sysDeref.CalculateAuxEqRHS();
-  sysDeref.CalculateDiffEqRHS();
+  sys.CalculateAuxEqRHS();
+  sys.CalculateDiffEqRHS();
 
   // Extract RHS from system and store it in ydot
-  std::vector<sunrealtype> RHS = sysDeref.GetDiffEqRHS();
-  sunrealtype noOfDiffEq = sysDeref.GetNoOfDiffEq();
+  std::vector<sunrealtype> RHS = sys.GetDiffEqRHS();
+  sunrealtype noOfDiffEq = sys.GetNoOfDiffEq();
   for (int ii = 0; ii < noOfDiffEq; ii++)
   {    
     Ith(ydot, ii + 1) = RHS[ii];

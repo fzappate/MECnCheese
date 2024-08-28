@@ -2,11 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
-#include <sundials/sundials_math.h>    // Import math functions
-#include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.
-#include <nvector/nvector_serial.h>    // access to serial N_Vector
-#include <sunmatrix/sunmatrix_dense.h> // access to dense SUNMatrix
-#include <sunlinsol/sunlinsol_dense.h> // access to dense SUNLinearSolver
 
 #include "./orifice.h"
 #include "./chamber.h"
@@ -18,10 +13,6 @@
 #define PI 3.1415926535897932
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
-
-// Problem Constants
-#define RTOL RCONST(1.0e-4) // scalar relative tolerance
-#define ATOL RCONST(1.0e-8) // vector absolute tolerance components
 
 int main()
 {
