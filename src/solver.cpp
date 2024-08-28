@@ -1,77 +1,33 @@
-#include <math.h>
+#pragma once
+
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
+
 #include <sundials/sundials_math.h>    // Import math functions
 #include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.
 #include <nvector/nvector_serial.h>    // access to serial N_Vector
 #include <sunmatrix/sunmatrix_dense.h> // access to dense SUNMatrix
 #include <sunlinsol/sunlinsol_dense.h> // access to dense SUNLinearSolver
 
-#include "./orifice.h"
-#include "./chamber.h"
-#include "./equation.h"
-#include "./system.h"
 #include "./solver.h"
 
-// Define handy macros
-#define PI 3.1415926535897932
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-// Problem Constants
-#define RTOL RCONST(1.0e-4) // scalar relative tolerance
-#define ATOL RCONST(1.0e-8) // vector absolute tolerance components
-
-// Functions Called by the Solver
-static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
-static void PrintOutput(sunrealtype t, sunrealtype y1);
-static int check_retval(void *returnvalue, const char *funcname, int opt);
-static int SolveSystem(System sys);
-
-int main()
+Solver::Solver(double stepTime, double endTime) : stepTime(startTime), endTime(endTime) 
 {
-
-  // Create system
-  System sys = System();
-
-  InfChamber HPChamber = InfChamber("HPChamber", 20*1e5);
-  sys.AddEquation(HPChamber);
-
-  InfChamber LPChamber = InfChamber("LPChamber", 1*1e5);
-  sys.AddEquation(LPChamber);
-
-  ConstChamber chamber1 = ConstChamber("MidCh1", 2*1e5, 10);
-  sys.AddEquation(chamber1);
-
-  ConstChamber chamber2 = ConstChamber("MidCh2", 2*1e5, 10);
-  sys.AddEquation(chamber2);
-
-  Orifice midOrif = Orifice("UpOrif", 5*1e-6, chamber1, chamber2);
-  sys.AddEquation(midOrif);
-
-  Orifice upOrif = Orifice("UpOrif", 5*1e-6, HPChamber, chamber1);
-  sys.AddEquation(upOrif);
-
-  Orifice downOrif = Orifice("DownOrif", 5*1e-6, chamber2, LPChamber);
-  sys.AddEquation(downOrif);
-
-  
-  Solver solver = Solver(0.001,1.0);
-  int retVal = solver.SolveSystem(sys);
-
-  return retVal;
-  
+    outTime = stepTime;
+    return;
 }
 
-static int SolveSystem(System sys)
+int Solver::SolveSystem(System sys)
 {
-  // Define constant 
-  sunrealtype t;
-  sunrealtype tstart = 0;
-  sunrealtype tout = 0.001;
-  sunrealtype tStep = tout;
-  sunrealtype tEnd = 1;
+// Define constant 
+  double t;
+  double tstart = 0;
+  double tout = 0.001;
+  double tStep = tout;
+  double tEnd = 1;
 
   // Initialize the SUNDIALS variables
   SUNContext sunctx;
@@ -86,7 +42,7 @@ static int SolveSystem(System sys)
 
     // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
-  if (check_retval(&retval, "SUNContext_Create", 1))
+  if (CheckReturnValue(&retval, "SUNContext_Create", 1))
     return (1);
 
   sys.AddSUNContext(sunctx);
@@ -98,7 +54,7 @@ static int SolveSystem(System sys)
 
   // Absolute tolerance
   N_Vector absTol = sys.GetEqAbsTol();
-  if (check_retval((void *)absTol, "GetEqAbsTol", 0))
+  if (CheckReturnValue((void *)absTol, "GetEqAbsTol", 0))
     return (1);
 
   // Relative tolerance
@@ -107,41 +63,41 @@ static int SolveSystem(System sys)
   // Call CVodeCreate to create the solver memory and specify the
   // solver scheme
   cvode_mem = CVodeCreate(CV_BDF, sunctx);
-  if (check_retval((void *)cvode_mem, "CVodeCreate", 0))
+  if (CheckReturnValue((void *)cvode_mem, "CVodeCreate", 0))
     return (1);
 
   // Give user data to the solver function 
   System *sysPtr = &sys;
   retval = CVodeSetUserData(cvode_mem,sysPtr);
-  if (check_retval(&retval, "CVodeSetUserData", 1))
+  if (CheckReturnValue(&retval, "CVodeSetUserData", 1))
     return (1);
 
   // Call CVodeInit to initialize the integrator memory and specify the
   // user's right hand side function in y'=f(t,y), the initial time T0, and
   // the initial dependent variable vector y
-  retval = CVodeInit(cvode_mem, hydraulic_circuit, tstart, y);
-  if (check_retval(&retval, "CVodeInit", 1))
+  retval = CVodeInit(cvode_mem, fFunction, tstart, y);
+  if (CheckReturnValue(&retval, "CVodeInit", 1))
     return (1);
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
   // and vector absolute tolerances 
   retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
-  if (check_retval(&retval, "CVodeSVtolerances", 1))
+  if (CheckReturnValue(&retval, "CVodeSVtolerances", 1))
     return (1);
 
   // Create dense SUNMatrix for use in linear solves
   A = SUNDenseMatrix(noOfDiffEq, noOfDiffEq, sunctx);
-  if (check_retval((void *)A, "SUNDenseMatrix", 0))
+  if (CheckReturnValue((void *)A, "SUNDenseMatrix", 0))
     return (1);
 
   // Create dense SUNLinearSolver object for use by CVode
   LS = SUNLinSol_Dense(y, A, sunctx);
-  if (check_retval((void *)LS, "SUNLinSol_Dense", 0))
+  if (CheckReturnValue((void *)LS, "SUNLinSol_Dense", 0))
     return (1);
 
   // Attach the matrix and linear solver
   retval = CVodeSetLinearSolver(cvode_mem, LS, A);
-  if (check_retval(&retval, "CVodeSetLinearSolver", 1))
+  if (CheckReturnValue(&retval, "CVodeSetLinearSolver", 1))
     return (1);
 
   // In loop, call CVode, print results, and test for error.
@@ -158,7 +114,7 @@ static int SolveSystem(System sys)
   {
 
     retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
-    if (check_retval(&retval, "CVode", 1))
+    if (CheckReturnValue(&retval, "CVode", 1))
       break;
       
     std::cout << "t: " << t << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
@@ -189,9 +145,9 @@ static int SolveSystem(System sys)
 
 }
 
-static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
+int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
-  // This function computes the ODE right-hand side for a given value of the independent variable
+    // This function computes the ODE right-hand side for a given value of the independent variable
   //  and state vector
   // Arguments:
   // t – is the current value of the independent variable.
@@ -226,27 +182,7 @@ static int hydraulic_circuit(sunrealtype t, N_Vector y, N_Vector ydot, void *use
   return (0);
 }
 
-static void PrintOutput(sunrealtype t, sunrealtype y1)
-{
-#if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("At t = %0.4Le      y =%14.6Le  \n", t, y1);
-#elif defined(SUNDIALS_DOUBLE_PRECISION)
-  printf("At t = %0.4e      y =%14.6e \n", t, y1);
-#else
-  printf("At t = %0.4e      y =%14.6e \n", t, y1);
-#endif
-
-  return;
-}
-
-//  Check function return value
-//    opt == 0 means SUNDIALS function allocates memory so check if
-//             returned NULL pointer
-//    opt == 1 means SUNDIALS function returns an integer value so check if
-//             retval < 0
-//    opt == 2 means function allocates memory so check if returned
-//             NULL pointer 
-static int check_retval(void *returnvalue, const char *funcname, int opt)
+int Solver::CheckReturnValue(void *returnvalue, const char *funcname, int opt)
 {
   int *retval;
 
