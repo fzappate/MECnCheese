@@ -14,7 +14,7 @@
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-Solver::Solver(double stepTime, double endTime) : stepTime(startTime), endTime(endTime) 
+Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime) 
 {
     outTime = stepTime;
     return;
@@ -22,14 +22,8 @@ Solver::Solver(double stepTime, double endTime) : stepTime(startTime), endTime(e
 
 int Solver::SolveSystem(System sys)
 {
-// Define constant 
-  double t;
-  double tstart = 0;
-  double tout = 0.001;
-  double tStep = tout;
-  double tEnd = 1;
-
   // Initialize the SUNDIALS variables
+  double t;
   SUNContext sunctx;
   N_Vector abstol;
   abstol = NULL;
@@ -39,18 +33,16 @@ int Solver::SolveSystem(System sys)
   LS = NULL;
   void *cvode_mem;
   cvode_mem = NULL;
+  
+  int noOfDiffEq = sys.GetNoOfDiffEq();
+  N_Vector y = sys.GetInitCondition();
 
-    // Create SUNDIALS context
+  // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
   if (CheckReturnValue(&retval, "SUNContext_Create", 1))
     return (1);
 
   sys.AddSUNContext(sunctx);
-
-  
-  int noOfDiffEq = sys.GetNoOfDiffEq();
-  N_Vector y = sys.GetInitCondition();
-  
 
   // Absolute tolerance
   N_Vector absTol = sys.GetEqAbsTol();
@@ -75,7 +67,7 @@ int Solver::SolveSystem(System sys)
   // Call CVodeInit to initialize the integrator memory and specify the
   // user's right hand side function in y'=f(t,y), the initial time T0, and
   // the initial dependent variable vector y
-  retval = CVodeInit(cvode_mem, fFunction, tstart, y);
+  retval = CVodeInit(cvode_mem, fFunction, startTime, y);
   if (CheckReturnValue(&retval, "CVodeInit", 1))
     return (1);
 
@@ -102,9 +94,9 @@ int Solver::SolveSystem(System sys)
 
   // In loop, call CVode, print results, and test for error.
   // Break out of loop when NOUT preset output times have been reached.
-  printf(" \n3-hydraulic_circuit problem\n\n");
+  printf(" \nSolving the system\n\n");
 
-  std::string fileName = "hydraulic_circuit_results.csv";
+  std::string fileName = "Results.csv";
   std::ofstream outputFile;
   outputFile.open(fileName);
   outputFile << "Writing this to a file.\n";
@@ -113,19 +105,19 @@ int Solver::SolveSystem(System sys)
   while (1)
   {
 
-    retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
+    retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     if (CheckReturnValue(&retval, "CVode", 1))
       break;
       
-    std::cout << "t: " << t << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
-    outputFile << tout << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
+    std::cout << "t: " << outTime << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
+    outputFile << outTime << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
 
     if (retval == CV_SUCCESS)
     {
-      tout = tout + tStep;
+      outTime = outTime + stepTime;
     }
 
-    if (tout > tEnd)
+    if (outTime > endTime)
     {
       break;
     }
