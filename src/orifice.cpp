@@ -1,6 +1,7 @@
 #include <math.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <corecrt_math_defines.h>
 
 #include "./equation.h"
@@ -152,3 +153,40 @@ double Orifice::GetInitialCondition()
     return this->flowrate;
 
 };
+
+void Orifice::PrintHeader(std::ofstream& outputFile)
+{
+    if(printStruct.printCf == 1)
+    {
+    outputFile << name << "_Cf, ";
+    }
+    if(printStruct.printArea == 1)
+    {
+        outputFile << name << "_Area, ";
+    }
+    if(printStruct.printFlowrate == 1)
+    {
+        outputFile << name << "_Flowrate, ";
+    }
+
+
+    return;
+}
+
+void Orifice::PrintVariables(std::ofstream& outputFile)
+{
+    if(printStruct.printCf == 1)
+    {
+    outputFile << Cf << ",";
+    }
+    if(printStruct.printArea == 1)
+    {
+        outputFile << area << ",";
+    }
+    if(printStruct.printFlowrate == 1)
+    {
+        outputFile << flowrate << ",";
+    }
+
+    return;
+}   

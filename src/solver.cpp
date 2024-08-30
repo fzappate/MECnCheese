@@ -10,6 +10,7 @@
 #include <sunlinsol/sunlinsol_dense.h> // access to dense SUNLinearSolver
 
 #include "./solver.h"
+#include "./printer.h"
 
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
@@ -96,11 +97,15 @@ int Solver::SolveSystem(System sys)
   // Break out of loop when NOUT preset output times have been reached.
   printf(" \nSolving the system\n\n");
 
-  std::string fileName = "Results.csv";
-  std::ofstream outputFile;
-  outputFile.open(fileName);
-  outputFile << "Writing this to a file.\n";
-  outputFile << "Time,p,\n";
+  Printer printer = Printer(sys);
+  printer.OpenFile();
+  printer.PrintResultsHeader();
+
+  // std::string fileName = "Results.csv";
+  // std::ofstream outputFile;
+  // outputFile.open(fileName);
+  // outputFile << "Writing this to a file.\n";
+  // outputFile << "Time,p,\n";
 
   while (1)
   {
@@ -110,7 +115,8 @@ int Solver::SolveSystem(System sys)
       break;
       
     std::cout << "t: " << outTime << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
-    outputFile << outTime << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
+    printer.PrintResults();
+    // outputFile << outTime << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
 
     if (retval == CV_SUCCESS)
     {
@@ -123,7 +129,7 @@ int Solver::SolveSystem(System sys)
     }
   }
 
-  outputFile.close();
+  // outputFile.close();
 
   // Free memory
   N_VDestroy(y);            // Free y vector

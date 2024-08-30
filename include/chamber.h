@@ -1,8 +1,11 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 #include <vector>
 #include "./equation.h"
+
+
 
 class Chamber : public Equation 
 {
@@ -18,6 +21,16 @@ class Chamber : public Equation
     
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
+
+    struct PrintStruct
+    {
+        bool printBulkMod = 1;
+        bool printPress = 1;
+        bool printVolume = 1;
+        bool printVolDer = 1;
+        bool printFlowSum = 1;
+    };
+    PrintStruct printStruct;
 
     public:
 
@@ -46,6 +59,10 @@ class Chamber : public Equation
     double GetRHS() override;
 
     double GetInitialCondition() override;
+
+    void PrintHeader(std::ofstream& outputFile) override;
+
+    void PrintVariables(std::ofstream& outputFile) override;
 
 };
 

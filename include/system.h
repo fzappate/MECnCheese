@@ -19,6 +19,8 @@ protected:
     std::vector<sunrealtype> initConditions;
     N_Vector N_VectInitConditions;
     SUNContext sunctx;
+    
+    bool startedPrinting = 0;
 
     // Methods
     void AddDiffEqCount();
@@ -36,11 +38,17 @@ public:
 
     SUNContext GetSUNContext();
 
+    std::vector<Equation*> GetAuxEquations();
+
+    std::vector<Equation*> GetDiffEquations();
+
     N_Vector GetInitCondition();
 
     N_Vector GetEqAbsTol();
 
     int GetNoOfDiffEq();
+
+    int GetNoOfAuxEq();
     
     double GetRelTol();
 
@@ -51,5 +59,7 @@ public:
     std::vector<double> GetDiffEqRHS();
 
     void ResetDiffEq(N_Vector y);
+
+
 
 };

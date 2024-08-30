@@ -14,6 +14,14 @@ class Orifice: public Equation
     Chamber &upChamber;
     Chamber &downChamber;
 
+    struct PrintStruct
+    {
+        bool printArea = 1;
+        bool printCf = 1;
+        bool printFlowrate = 1;
+    };
+    PrintStruct printStruct;
+
 public:
 
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
@@ -59,4 +67,8 @@ public:
     double GetRHS() override;
 
     double GetInitialCondition() override;
+
+    void PrintHeader(std::ofstream& outputFile) override;
+
+    void PrintVariables(std::ofstream& outputFile) override;
 };
