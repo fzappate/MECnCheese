@@ -32,4 +32,8 @@ public:
     virtual double GetAbsTol() = 0;
 
     virtual double GetRelTol() = 0;
+
+    virtual void PrintHeader(std::ofstream& outputFile) = 0;
+
+    virtual void PrintVariables(std::ofstream& outputFile) = 0;
 };

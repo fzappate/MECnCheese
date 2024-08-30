@@ -1,4 +1,9 @@
+#pragma once
+
 #include <vector>
+#include <iostream>
+#include <fstream>
+
 #include <nvector/nvector_serial.h>    // access to serial N_Vector
 
 #include "system.h"
@@ -40,6 +45,16 @@ SUNContext System::GetSUNContext(){
     return sunctx; 
 
 };
+
+std::vector<Equation*> System::GetAuxEquations()
+{
+    return auxEquations;
+}
+
+std::vector<Equation*> System::GetDiffEquations()
+{
+    return diffEquations;
+}
 
 void System::AddDiffEqCount()
 {
@@ -88,6 +103,11 @@ N_Vector System::GetEqAbsTol()
 int System::GetNoOfDiffEq()
 {
     return this->noOfDiffEq;
+}
+
+int System::GetNoOfAuxEq()
+{
+    return this->noOfAuxEq;
 }
 
 double System::GetRelTol()
@@ -151,3 +171,4 @@ void System::ResetDiffEq(N_Vector y)
     return;
 
 }
+
