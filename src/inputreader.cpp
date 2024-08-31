@@ -6,11 +6,21 @@
 
 #include "./inputreader.h"
 
-InputReader::InputReader(){};
+InputReader::InputReader()
+{
+    ReadInput();
+    return;
+};
+
+InputReader::InputReader(std::string filename) : filename(filename)
+{
+    ReadInput();
+    return;
+};
 
 void InputReader::ReadInput()
 {
-    std::ifstream inputFile("Input.md"); 
+    std::ifstream inputFile(filename); 
   
     // Check if the file is successfully opened 
     if (!inputFile.is_open()) { 
@@ -30,7 +40,7 @@ void InputReader::ReadInput()
       {
         // Remove the dash
         RemoveCharacter(line,'-');
-        
+
         // Break down the line in tokens 
         std::stringstream ss(line);
         std::string token; 
@@ -58,8 +68,6 @@ void InputReader::ReadInput()
       {
         continue;
       }
-
-      std::cout << line << std::endl; // Print the current line 
     } 
   
     // Close the file 
@@ -134,6 +142,10 @@ double InputReader::ConvertUnits(std::string unit)
     {
         convFactor = 1e-3;
     }
+    else if (unit == "L")
+    {
+        convFactor = 1e-3;
+    }
     else if (unit == "cm^3")
     {
         convFactor = 1e-6;
@@ -160,7 +172,7 @@ double InputReader::ConvertUnits(std::string unit)
     }
     else 
     {
-        std::cout << "Unit not found." << std::endl;
+        std::cout << "Unit: " << unit << " not found." << std::endl;
     }
     return convFactor;
 }

@@ -5,13 +5,15 @@
 class InputReader
 {
     private:
-
+    std::string filename = "Inputs.md";
     std::vector<double> variables;
     std::vector<std::string> variableNames;
     
     public:
 
     InputReader();
+
+    InputReader(std::string filename);
 
     void ReadInput();
 

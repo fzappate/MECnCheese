@@ -101,12 +101,6 @@ int Solver::SolveSystem(System sys)
   printer.OpenFile();
   printer.PrintResultsHeader();
 
-  // std::string fileName = "Results.csv";
-  // std::ofstream outputFile;
-  // outputFile.open(fileName);
-  // outputFile << "Writing this to a file.\n";
-  // outputFile << "Time,p,\n";
-
   while (1)
   {
 
