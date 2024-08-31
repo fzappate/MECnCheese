@@ -10,7 +10,7 @@ InputReader::InputReader(){};
 
 void InputReader::ReadInput()
 {
-    std::ifstream inputFile("Input.txt"); 
+    std::ifstream inputFile("Input.md"); 
   
     // Check if the file is successfully opened 
     if (!inputFile.is_open()) { 
@@ -22,40 +22,41 @@ void InputReader::ReadInput()
     std::string line; 
     while (getline(inputFile, line)) { 
 
-      // Remove leading and trailing spaces
-      RightTrim(line);
-      LeftTrim(line);
+      // Remove spaces
+      RemoveCharacter(line,' ');
 
-      // Make sure the line is not a comment
-      if (line[0] == '#')
+      // Make sure the line is a variable
+      if (line[0] == '-')
       {
-          continue;
-      }
+        // Remove the dash
+        RemoveCharacter(line,'-');
+        
+        // Break down the line in tokens 
+        std::stringstream ss(line);
+        std::string token; 
+        std::vector<std::string> tokens; 
+        char delimiter = ',';
 
-      // Break down the line in tokens 
-      std::stringstream ss(line);
-      std::string token; 
-      std::vector<std::string> tokens; 
-      char delimiter = ' ';
+        while (getline(ss, token, delimiter)) 
+        { 
+            tokens.push_back(token); 
+        } 
 
-      while (getline(ss, token, delimiter)) { 
-        tokens.push_back(token); 
-      } 
+        // Make sure that the line respects the proper format
+        if(tokens.size()==3)
+        {
+            std::string name = tokens[0];
+            std::string unit = tokens[1];
+            double convFactor = ConvertUnits(unit);
+            double value = std::stod(tokens[2])*convFactor;
 
-      // Make sure that the line respects the proper format
-      if(tokens.size()==3)
-      {
-      std::string name = tokens[0];
-      std::string unit = tokens[1];
-      double convFactor = ConvertUnits(unit);
-      double value = std::stod(tokens[2])*convFactor;
-
-      variableNames.push_back(name);
-      variables.push_back(value);
+            variableNames.push_back(name);
+            variables.push_back(value);
+        }
       }
       else
       {
-        return;
+        continue;
       }
 
       std::cout << line << std::endl; // Print the current line 
@@ -79,6 +80,13 @@ void InputReader::LeftTrim(std::string &s)
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
     }));
+    return;
+}
+
+void InputReader::RemoveCharacter(std::string& str, char c)
+{
+    str.erase(std::remove(str.begin(), str.end(), c), str.end()); 
+    
     return;
 }
 

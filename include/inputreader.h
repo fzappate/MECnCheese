@@ -19,6 +19,8 @@ class InputReader
 
     void LeftTrim(std::string &s);
 
+    void RemoveCharacter(std::string& str, char c);
+
     double ConvertUnits(std::string unit);
 
     double SearchVarInVarList(std::string var);
