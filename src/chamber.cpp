@@ -90,23 +90,23 @@ void Chamber::PrintHeader(std::ofstream& outputFile)
 {
     if(printStruct.printBulkMod == 1)
     {
-    outputFile << name << "_Bulk Modulus, ";
+    outputFile << name << ":Bulk Modulus, ";
     }
     if(printStruct.printBulkMod == 1)
     {
-        outputFile << name << "_Pressure, ";
+        outputFile << name << ":Pressure, ";
     }
     if(printStruct.printBulkMod == 1)
     {
-        outputFile << name << "_Volume, ";
+        outputFile << name << ":Volume, ";
     }
     if(printStruct.printBulkMod == 1)
     {
-        outputFile << name << "_Volume Derivative, ";
+        outputFile << name << ":Volume Derivative, ";
     }
     if(printStruct.printBulkMod == 1)
     {
-        outputFile << name << "_Flow Sum, ";
+        outputFile << name << ":Flow Sum, ";
     }
 
     

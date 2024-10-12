@@ -158,15 +158,15 @@ void Orifice::PrintHeader(std::ofstream& outputFile)
 {
     if(printStruct.printCf == 1)
     {
-    outputFile << name << "_Cf, ";
+    outputFile << name << ":Cf, ";
     }
     if(printStruct.printArea == 1)
     {
-        outputFile << name << "_Area, ";
+        outputFile << name << ":Area, ";
     }
     if(printStruct.printFlowrate == 1)
     {
-        outputFile << name << "_Flowrate, ";
+        outputFile << name << ":Flowrate, ";
     }
 
 
