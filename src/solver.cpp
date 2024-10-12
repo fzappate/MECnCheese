@@ -109,7 +109,7 @@ int Solver::SolveSystem(System sys)
       break;
       
     std::cout << "t: " << outTime << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
-    printer.PrintResults();
+    printer.PrintResults(outTime);
     // outputFile << outTime << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
 
     if (retval == CV_SUCCESS)

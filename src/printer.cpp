@@ -17,6 +17,7 @@ void Printer::OpenFile()
 
 void Printer::PrintResultsHeader()
 {
+    outputFile << "Time, ";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
     std::vector<Equation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
@@ -40,8 +41,9 @@ void Printer::PrintResultsHeader()
 
 }
 
-void Printer::PrintResults()
+void Printer::PrintResults(double time)
 {
+    outputFile << time << ",";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
     std::vector<Equation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
