@@ -17,7 +17,7 @@ void Printer::OpenFile()
 
 void Printer::PrintResultsHeader()
 {
-    outputFile << "Time, ";
+    outputFile << "Simulation:Time:s, ";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
     std::vector<Equation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
