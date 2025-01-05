@@ -7,7 +7,7 @@
 
 
 
-class Chamber : public Equation 
+class Chamber : public DiffEquation 
 {
     protected:
     double bulkMod = 1.8*1.0E9;
@@ -40,25 +40,23 @@ class Chamber : public Equation
 
     double GetPressure();
 
-    double GetAbsTol();
-
-    double GetRelTol();
-
-    void SetIsDifferential(bool isDifferential) override;
-
-    bool GetIsDifferential() override;
-
     virtual void AddFlowIn(std::string name, double flow);
+
+    // Base class methods
+
+    void CalculateRHS() override;
+    
+    double GetRHS() override;
 
     void UpdateDepVar(double pressure) override;
 
     void ZeroParameters() override;
 
-    virtual void CalculateRHS();
-
-    double GetRHS() override;
-
     double GetInitialCondition() override;
+
+    double GetAbsTol() override;
+
+    double GetRelTol() override;
 
     void PrintHeader(std::ofstream& outputFile) override;
 

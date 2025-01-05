@@ -7,7 +7,7 @@
 #include "./chamber.h"
 
 // Chamber
-Chamber::Chamber(std::string name, double pressure) : Equation(name), pressure(pressure)
+Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
     return;
 };
@@ -24,33 +24,22 @@ double Chamber::GetPressure()
     return pressure;
 };
 
-double Chamber::GetAbsTol()
-{
-    return aTol;
-}
-
-double Chamber::GetRelTol()
-{
-    return rTol;
-}
-
-void Chamber::SetIsDifferential(bool isDifferential)
-{
-    this->isDifferential = isDifferential;
-    return;
-}
-
-bool Chamber::GetIsDifferential()
-{
-    return isDifferential;
-};
-
 void Chamber::AddFlowIn(std::string flowName, double flowrate)
 {
     this->flowSum = this->flowSum+flowrate;
     this->flowIn.push_back(flowrate);
     this->flowInNames.push_back(flowName);
     return;
+};
+
+void Chamber::CalculateRHS()
+{
+    return;
+};
+
+double Chamber::GetRHS()
+{
+    return this->dpdt;
 };
 
 void Chamber::UpdateDepVar(double pressure)
@@ -69,22 +58,20 @@ void Chamber::ZeroParameters()
     return;
 }
 
-void Chamber::CalculateRHS()
-{
-
-    return;
-
-};
-
-double Chamber::GetRHS()
-{
-    return this->dpdt;
-};
-
 double Chamber::GetInitialCondition()
 {
     return this->pressure;
 };
+
+double Chamber::GetAbsTol()
+{
+    return aTol;
+}
+
+double Chamber::GetRelTol()
+{
+    return rTol;
+}
 
 void Chamber::PrintHeader(std::ofstream& outputFile)
 {
@@ -144,7 +131,6 @@ void Chamber::PrintVariables(std::ofstream& outputFile)
 // InfChamber
 InfChamber::InfChamber(std::string name, double pressure) : Chamber(name, pressure)
 {
-    this->SetIsDifferential(false);
     this->SetPressure(pressure);
 
     return;
@@ -162,17 +148,16 @@ void InfChamber::AddFlowIn(std::string flowName, double flowrate)
 
 void InfChamber::CalculateRHS()
 {
-
+    this->dpdt = 0;
     return;
-
 };
+
 
 // ConstChamber
 ConstChamber::ConstChamber(std::string name, double pressure, double volume) : Chamber(name, pressure)
 {
     this->volume = volume;
     this->volDer = 0;
-    this->SetIsDifferential(true);
     return;
 };
 
