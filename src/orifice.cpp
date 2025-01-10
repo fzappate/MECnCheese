@@ -9,24 +9,13 @@
 #include "./chamber.h"
 
 // Constructors
-Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : Equation(name), area(area), upChamber(upCh), downChamber(downCh)
+Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffEquation(name), area(area), upChamber(upCh), downChamber(downCh)
 {
     
     isDifferential = false;
 
     return;
 };
-
-void Orifice::SetIsDifferential(bool isDifferential)
-{
-    this->isDifferential = false;
-    return;
-}
-
-bool Orifice::GetIsDifferential()
-{
-    return this->isDifferential;
-}
 
 void Orifice::SetArea(double area)
 {
@@ -114,16 +103,6 @@ void Orifice::UpdateChambersFlow(){
     return;
 };
 
-void Orifice::UpdateDepVar(double depVar)
-{
-    return;
-};
-
-void Orifice::ZeroParameters()
-{
-    return;
-};
-
 void Orifice::CalculateRHS()
 {
     // Calculate and update the flowrate
@@ -136,22 +115,6 @@ double Orifice::GetRHS()
 {
     std::cout << "Orifice GetRHS" << std::endl;
     return this->flowrate;
-};
-
-double Orifice::GetAbsTol()
-{
-    return 0.0;
-}
-
-double Orifice::GetRelTol()
-{
-    return 0.0;
-}
-
-double Orifice::GetInitialCondition()
-{
-    return this->flowrate;
-
 };
 
 void Orifice::PrintHeader(std::ofstream& outputFile)

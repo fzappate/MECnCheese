@@ -6,7 +6,7 @@
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice: public Equation
+class Orifice: public NonDiffEquation
 {
     double area;
     double Cf = 0.678;
@@ -25,10 +25,6 @@ class Orifice: public Equation
 public:
 
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
-
-    void SetIsDifferential(bool isDifferential) override;
-
-    bool GetIsDifferential() override;
 
     void SetArea(double area);
 
@@ -54,19 +50,9 @@ public:
 
     void UpdateChambersFlow();
 
-    void UpdateDepVar(double depVar) override;
-
-    double GetAbsTol() override;
-
-    double GetRelTol() override;
-
-    void ZeroParameters() override;
-    
     void CalculateRHS() override;
 
     double GetRHS() override;
-
-    double GetInitialCondition() override;
 
     void PrintHeader(std::ofstream& outputFile) override;
 
