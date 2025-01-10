@@ -14,8 +14,8 @@ protected:
     int noOfAuxEq = 0;
     int noOfDiffEq = 0;
     double relTol = 0.001;
-    std::vector<Equation*> auxEquations;
-    std::vector<Equation*> diffEquations;
+    std::vector<NonDiffEquation*> nonDiffEquations;
+    std::vector<DiffEquation*> diffEquations;
     std::vector<sunrealtype> initConditions;
     N_Vector N_VectInitConditions;
     SUNContext sunctx;
@@ -32,15 +32,19 @@ public:
 
     System(SUNContext sunctx);
 
-    void AddEquation(Equation& equation);
+    // void AddEquation(Equation& equation);
+
+    void AddEquation(DiffEquation& equation);
+
+    void AddEquation(NonDiffEquation& equation);
 
     void AddSUNContext(SUNContext &sunctx);
 
     SUNContext GetSUNContext();
 
-    std::vector<Equation*> GetAuxEquations();
+    std::vector<NonDiffEquation*> GetNonDiffEquations();
 
-    std::vector<Equation*> GetDiffEquations();
+    std::vector<DiffEquation*> GetDiffEquations();
 
     N_Vector GetInitCondition();
 
