@@ -90,7 +90,7 @@ N_Vector System::GetInitCondition()
 
     sunrealtype temp;
     // Ith(initCondTemp,1) = this->initConditions[ii];
-    for (int ii = 0; ii<noOfDiffEq; ii++)
+    for (int ii = 0; ii<this->noOfDiffEq; ii++)
     {
         temp = this->initConditions[ii]; // ok
         Ith(initCondTemp,ii+1) = this->initConditions[ii];
@@ -169,7 +169,7 @@ std::vector<double> System::GetDiffEqRHS()
 
 void System::ResetDiffEq(N_Vector y)
 {
-    int noOfDiffEquations = diffEquations.size();
+    int noOfDiffEquations = this->diffEquations.size();
 
     
     for (int ii = 0; ii < noOfDiffEquations; ii++)
