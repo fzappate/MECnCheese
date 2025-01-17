@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip> 
 #include <fstream>
 
 #include <sundials/sundials_math.h>    // Import math functions
@@ -107,9 +108,13 @@ int Solver::SolveSystem(System sys)
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     if (CheckReturnValue(&retval, "CVode", 1))
       break;
-      
-    std::cout << "t: " << outTime << " p1: " << Ith(y, 1) << " p2: " << Ith(y, 2) << std::endl;
-    printer.PrintResults();
+    double bar = 1e-5;
+    // std::setw(3); // Sets the field width to n characters.
+    // std::cout.precision(2);
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1)*bar << " || LPChamber: " << Ith(y, 2)*bar;
+    std::cout << " || inletChamber: " << Ith(y, 3)*bar << " || variableChamber: " << Ith(y, 4)*bar << " || outletChamber: " << Ith(y, 5)*bar << std::endl;
+    printer.PrintResults(outTime);
     // outputFile << outTime << "\t" << Ith(y, 1) << "\t" << Ith(y, 2) << std::endl;
 
     if (retval == CV_SUCCESS)
@@ -153,8 +158,28 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 
   // Cast the user_data void pointer to a pointer to system
   System * sysPtr =  static_cast<System *>(user_data);
-  // Dereference the pointer 
+
+  // Dereference the pointer to the system
   System sys = *sysPtr;
+
+  // THIS IS JUST TO MONITOR y
+  // SOLUTION 1 ==================
+  // // // Dereference the suncontext 
+  // // SUNContext sunctx = sys.GetSUNContext();
+  // // // Create an N_Vector with 5 elements
+  // // N_Vector vec = N_VNew_Serial(sys.GetNoOfDiffEq(),sunctx);
+  // // // Dereference and set values using NV_DATA_S
+  // // realtype* data = NV_DATA_S(vec);  // realtype is usually double
+  // // for (int i = 0; i < 5; ++i) {
+  // //     data[i] = static_cast<realtype>(i + 1);  // Assign values
+  // // }
+  // // N_VDestroy(vec);
+  // SOLUTION 2 ==================
+  std::vector<double> yValues = std::vector<double>(5);
+  for (int i = 0; i < 5; ++i) {
+      yValues[i] = Ith(y, i + 1);  // Assign values
+  }
+  // END OF MONITORING y
 
   // Set new depenedent variable and reset equation factors
   sys.ResetDiffEq(y);

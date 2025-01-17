@@ -17,8 +17,9 @@ void Printer::OpenFile()
 
 void Printer::PrintResultsHeader()
 {
+    outputFile << "Simulation:Time:s, ";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
-    std::vector<Equation*> diffEquations = sys.GetDiffEquations();
+    std::vector<DiffEquation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         Equation &tempEq = *diffEquations[ii];
@@ -27,7 +28,7 @@ void Printer::PrintResultsHeader()
 
 
     int noOfAuxEquations = sys.GetNoOfAuxEq();
-    std::vector<Equation*> auxEquations = sys.GetAuxEquations();
+    std::vector<NonDiffEquation*> auxEquations = sys.GetNonDiffEquations();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
         Equation &tempEq = *auxEquations[ii];
@@ -40,10 +41,11 @@ void Printer::PrintResultsHeader()
 
 }
 
-void Printer::PrintResults()
+void Printer::PrintResults(double time)
 {
+    outputFile << time << ",";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
-    std::vector<Equation*> diffEquations = sys.GetDiffEquations();
+    std::vector<DiffEquation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         Equation &tempEq = *diffEquations[ii];
@@ -52,7 +54,7 @@ void Printer::PrintResults()
 
 
     int noOfAuxEquations = sys.GetNoOfAuxEq();
-    std::vector<Equation*> auxEquations = sys.GetAuxEquations();
+    std::vector<NonDiffEquation*> auxEquations = sys.GetNonDiffEquations();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
         Equation &tempEq = *auxEquations[ii];

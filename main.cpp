@@ -11,13 +11,16 @@ int main()
   InputReader input = InputReader("Input.md");
   double HPChamber_Pressure = input.ImportVarAsDouble("HPChamber_Pressure");
   double LPChamber_Pressure = input.ImportVarAsDouble("LPChamber_Pressure");
-  double chamber1_Pressure = input.ImportVarAsDouble("chamber1_Pressure");
-  double chamber1_Volume = input.ImportVarAsDouble("chamber1_Volume");
-  double chamber2_Pressure = input.ImportVarAsDouble("chamber2_Pressure");
-  double chamber2_Volume = input.ImportVarAsDouble("chamber2_Volume");
-  double upOrifArea = input.ImportVarAsDouble("upOrifArea");
-  double midOrifArea = input.ImportVarAsDouble("midOrifArea");
-  double downOrifArea = input.ImportVarAsDouble("downOrifArea");
+  double inletChamber_Pressure = input.ImportVarAsDouble("inletChamber_Pressure");
+  double inletChamber_Volume = input.ImportVarAsDouble("inletChamber_Volume");
+  double variableChamber_Pressure = input.ImportVarAsDouble("variableChamber_Pressure");
+  double variableChamber_Volume = input.ImportVarAsDouble("variableChamber_Volume");
+  double outletChamber_Pressure = input.ImportVarAsDouble("outletChamber_Pressure");
+  double outletChamber_Volume = input.ImportVarAsDouble("outletChamber_Volume");
+  double inletPort_Area = input.ImportVarAsDouble("inletPort_Area");
+  double inletOrif_Area = input.ImportVarAsDouble("inletOrif_Area");
+  double outletOrif_Area = input.ImportVarAsDouble("outletOrif_Area");
+  double outletPort_Area = input.ImportVarAsDouble("outletPort_Area");
 
   // Create system
   System sys = System();
@@ -30,33 +33,44 @@ int main()
                                     LPChamber_Pressure);
   sys.AddEquation(LPChamber);
 
-  ConstChamber chamber1 = ConstChamber( "MidCh1", 
-                                        chamber1_Pressure, 
-                                        chamber1_Volume);
-  sys.AddEquation(chamber1);
+  ConstChamber inletChamber = ConstChamber( "inletChamber", 
+                                        inletChamber_Pressure, 
+                                        inletChamber_Volume);
+  sys.AddEquation(inletChamber);
 
-  ConstChamber chamber2 = ConstChamber("MidCh2", 
-                                        chamber2_Pressure, 
-                                        chamber2_Volume);
-  sys.AddEquation(chamber2);
+  ConstChamber variableChamber = ConstChamber( "variableChamber", 
+                                        inletChamber_Pressure, 
+                                        inletChamber_Volume);
+  sys.AddEquation(variableChamber);
 
-  Orifice midOrif = Orifice("UpOrif", 
-                            midOrifArea, 
-                            chamber1, 
-                            chamber2);
-  sys.AddEquation(midOrif);
+  ConstChamber outletChamber = ConstChamber("outletChamber", 
+                                        outletChamber_Pressure, 
+                                        outletChamber_Volume);
+  sys.AddEquation(outletChamber);
 
-  Orifice upOrif = Orifice("UpOrif", 
-                            upOrifArea, 
+  Orifice inletPort = Orifice("inletPort", 
+                            inletPort_Area, 
                             HPChamber, 
-                            chamber1);
-  sys.AddEquation(upOrif);
+                            inletChamber);
+  sys.AddEquation(inletPort);
 
-  Orifice downOrif = Orifice("DownOrif", 
-                              downOrifArea, 
-                              chamber2, 
+  Orifice inletOrif = Orifice("inletOrif", 
+                            inletOrif_Area, 
+                            inletChamber, 
+                            variableChamber);
+  sys.AddEquation(inletOrif);
+
+  Orifice outletOrif = Orifice("outletOrif", 
+                              outletOrif_Area, 
+                              variableChamber, 
+                              outletChamber);
+  sys.AddEquation(outletOrif);
+
+  Orifice outletPort = Orifice("outletPort", 
+                              outletPort_Area, 
+                              outletChamber, 
                               LPChamber);
-  sys.AddEquation(downOrif);
+  sys.AddEquation(outletPort);
 
   // Solve system 
   Solver solver = Solver(0.01,1.0);
