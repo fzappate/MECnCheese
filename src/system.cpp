@@ -26,7 +26,7 @@ void System::AddEquation(DiffEquation &equation)
 void System::AddEquation(NonDiffEquation &equation)
 {
     nonDiffEquations.push_back(&equation);
-    this->AddLinEqCount();
+    this->AddNonDiffEqCount();
 };
 
 void System::AddSUNContext(SUNContext &sunctx)
@@ -56,7 +56,7 @@ void System::AddDiffEqCount()
     this->noOfDiffEq++;
 };
 
-void System::AddLinEqCount()
+void System::AddNonDiffEqCount()
 {
     this->noOfAuxEq++;
 }

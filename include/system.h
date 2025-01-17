@@ -24,7 +24,7 @@ protected:
 
     // Methods
     void AddDiffEqCount();
-    void AddLinEqCount();
+    void AddNonDiffEqCount();
 
 public:
     System();
