@@ -4,38 +4,18 @@
 #include <iostream>
 #include <fstream>
 
-#include <nvector/nvector_serial.h>    // access to serial N_Vector
+#include <nvector/nvector_serial.h> // access to serial N_Vector
 
 #include "system.h"
 #include "equation.h"
 
-#define Ith(v, i) NV_Ith_S(v, i - 1)  
+#define Ith(v, i) NV_Ith_S(v, i - 1)
 
-System::System(){};
+System::System() {};
 
-System::System(SUNContext sunctx) : sunctx(sunctx){};
+System::System(SUNContext sunctx) : sunctx(sunctx) {};
 
-// void System::AddEquation(Equation& equation)
-// {
-
-//     // Store initial condition in the system
-
-//     // Increase the proper counter by one
-//     if (equation.GetIsDifferential())
-//     {
-//         diffEquations.push_back(&equation);
-//         double initConditions = equation.GetInitialCondition();
-//         this->initConditions.push_back(initConditions);
-//         this->AddDiffEqCount();
-//     }
-//     else
-//     {
-//         auxEquations.push_back(&equation);
-//         this->AddLinEqCount();
-//     };
-// };
-
-void System::AddEquation(DiffEquation& equation)
+void System::AddEquation(DiffEquation &equation)
 {
     diffEquations.push_back(&equation);
     double initConditions = equation.GetInitialCondition();
@@ -43,29 +23,30 @@ void System::AddEquation(DiffEquation& equation)
     this->AddDiffEqCount();
 };
 
-void System::AddEquation(NonDiffEquation& equation)
+void System::AddEquation(NonDiffEquation &equation)
 {
     nonDiffEquations.push_back(&equation);
     this->AddLinEqCount();
 };
 
-void System::AddSUNContext(SUNContext &sunctx){
+void System::AddSUNContext(SUNContext &sunctx)
+{
     sunctx = sunctx;
     return;
 };
 
-SUNContext System::GetSUNContext(){
-    
-    return sunctx; 
+SUNContext System::GetSUNContext()
+{
 
+    return sunctx;
 };
 
-std::vector<NonDiffEquation*> System::GetNonDiffEquations()
+std::vector<NonDiffEquation *> System::GetNonDiffEquations()
 {
     return nonDiffEquations;
 }
 
-std::vector<DiffEquation*> System::GetDiffEquations()
+std::vector<DiffEquation *> System::GetDiffEquations()
 {
     return diffEquations;
 }
@@ -90,25 +71,24 @@ N_Vector System::GetInitCondition()
 
     sunrealtype temp;
     // Ith(initCondTemp,1) = this->initConditions[ii];
-    for (int ii = 0; ii<this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
         temp = this->initConditions[ii]; // ok
-        Ith(initCondTemp,ii+1) = this->initConditions[ii];
-
+        Ith(initCondTemp, ii + 1) = this->initConditions[ii];
     };
-     
+
     return initCondTemp;
 };
 
 N_Vector System::GetEqAbsTol()
 {
     int noOfDiffEq = diffEquations.size();
-    
+
     N_Vector eqAbsTol = N_VNew_Serial(noOfDiffEq, sunctx);
     for (int ii = 0; ii < noOfDiffEq; ii++)
     {
         DiffEquation &eqTemp = *diffEquations[ii];
-        Ith(eqAbsTol,ii+1) = eqTemp.GetAbsTol();
+        Ith(eqAbsTol, ii + 1) = eqTemp.GetAbsTol();
     };
 
     return eqAbsTol;
@@ -132,7 +112,7 @@ double System::GetRelTol()
 void System::CalculateAuxEqRHS()
 {
     int noOfAuxEquations = nonDiffEquations.size();
-    
+
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
         Equation &eqTemp = *nonDiffEquations[ii];
@@ -153,9 +133,9 @@ void System::CalculateDiffEqRHS()
 std::vector<double> System::GetDiffEqRHS()
 {
     std::vector<double> diffEqRHS;
-    
+
     int noOfDiffEquations = diffEquations.size();
-    
+
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         Equation &tempEq = *diffEquations[ii];
@@ -171,18 +151,14 @@ void System::ResetDiffEq(N_Vector y)
 {
     int noOfDiffEquations = this->diffEquations.size();
 
-    
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         DiffEquation &tempEq = *diffEquations[ii];
-        double tempDepVar = Ith(y,ii+1);
-        
+        double tempDepVar = Ith(y, ii + 1);
+
         tempEq.UpdateDepVar(tempDepVar);
         tempEq.ZeroParameters();
-
     };
 
     return;
-
 }
-
