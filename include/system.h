@@ -13,6 +13,9 @@ protected:
     // Properties
     int noOfAuxEq = 0;
     int noOfDiffEq = 0;
+    // Index assigned to the next dependent variable in the system
+    // System has depVarIndex-1 dependent variables
+    int sysDepVarIndex = 0; 
     double relTol = 0.001;
     std::vector<NonDiffEquation *> nonDiffEquations;
     std::vector<DiffEquation *> diffEquations;

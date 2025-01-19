@@ -3,6 +3,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include <nvector/nvector_serial.h> // access to serial N_Vector
+
 #include "./equation.h"
 
 
@@ -10,6 +13,7 @@
 class Chamber : public DiffEquation 
 {
     protected:
+    int noOfEq = 1;
     double bulkMod = 1.8*1.0E9;
     double pressure; 
     double volume;
@@ -48,11 +52,13 @@ class Chamber : public DiffEquation
     
     double GetRHS() override;
 
-    void UpdateDepVar(double pressure) override;
+    int SetDepVarIndex(int sysDepVarIndex) override;
+
+    void UpdateDepVar(std::vector<sunrealtype> &yValues) override;
 
     void ZeroParameters() override;
 
-    double GetInitialCondition() override;
+    std::vector<double> GetInitialCondition() override;
 
     double GetAbsTol() override;
 
