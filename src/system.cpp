@@ -4,68 +4,62 @@
 #include <iostream>
 #include <fstream>
 
-#include <nvector/nvector_serial.h>    // access to serial N_Vector
+#include <nvector/nvector_serial.h> // access to serial N_Vector
 
 #include "system.h"
 #include "equation.h"
 
-#define Ith(v, i) NV_Ith_S(v, i - 1)  
+#define Ith(v, i) NV_Ith_S(v, i - 1)
 
-System::System(){};
+System::System() {};
 
-System::System(SUNContext sunctx) : sunctx(sunctx){};
+System::System(SUNContext sunctx) : sunctx(sunctx) {};
 
-// void System::AddEquation(Equation& equation)
-// {
-
-//     // Store initial condition in the system
-
-//     // Increase the proper counter by one
-//     if (equation.GetIsDifferential())
-//     {
-//         diffEquations.push_back(&equation);
-//         double initConditions = equation.GetInitialCondition();
-//         this->initConditions.push_back(initConditions);
-//         this->AddDiffEqCount();
-//     }
-//     else
-//     {
-//         auxEquations.push_back(&equation);
-//         this->AddLinEqCount();
-//     };
-// };
-
-void System::AddEquation(DiffEquation& equation)
+void System::AddEquation(DiffEquation &equation)
 {
+    // Save the equation in the container diffEquations
     diffEquations.push_back(&equation);
-    double initConditions = equation.GetInitialCondition();
-    this->initConditions.push_back(initConditions);
+
+    // Assign a system index to the object dependent variables
+    int depVarUpdatedIndex = equation.SetDepVarIndex(this->sysDepVarIndex);
+
+    // Increment the sysDepVarIndex by the number of dependent variables in the equation
+    this->sysDepVarIndex = depVarUpdatedIndex;
+
+    //Get the initial conditions of the equation in the form of a vector
+    std::vector<double> eqInitConditions = equation.GetInitialCondition();
+
+    // Append them in the initConditions vector
+    this->initConditions.insert(this->initConditions.end(), eqInitConditions.begin(), eqInitConditions.end());
+
+    // Increment the number of differential equations
     this->AddDiffEqCount();
 };
 
-void System::AddEquation(NonDiffEquation& equation)
+void System::AddEquation(NonDiffEquation &equation)
 {
     nonDiffEquations.push_back(&equation);
-    this->AddLinEqCount();
+    this->AddNonDiffEqCount();
 };
 
-void System::AddSUNContext(SUNContext &sunctx){
+void System::AddSUNContext(SUNContext &sunctx)
+{
     sunctx = sunctx;
     return;
 };
 
-SUNContext System::GetSUNContext(){
-    
-    return sunctx; 
+SUNContext System::GetSUNContext()
+{
 
+    return sunctx;
 };
 
-std::vector<NonDiffEquation*> System::GetNonDiffEquations()
+std::vector<NonDiffEquation *> System::GetNonDiffEquations()
 {
     return nonDiffEquations;
 }
 
-std::vector<DiffEquation*> System::GetDiffEquations()
+std::vector<DiffEquation *> System::GetDiffEquations()
 {
     return diffEquations;
 }
@@ -75,40 +69,40 @@ void System::AddDiffEqCount()
     this->noOfDiffEq++;
 };
 
-void System::AddLinEqCount()
+void System::AddNonDiffEqCount()
 {
     this->noOfAuxEq++;
 }
 
 N_Vector System::GetInitCondition()
 {
-    N_Vector initCondTemp;
-    initCondTemp = NULL;
+    N_Vector initCondOut = NULL;
+    
     // Instead of N_VNew use N_VMake
     // https://sundials.readthedocs.io/en/latest/cvode/Usage/index.html
-    initCondTemp = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
+    initCondOut = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
 
     sunrealtype temp;
-    // Ith(initCondTemp,1) = this->initConditions[ii];
-    for (int ii = 0; ii<this->noOfDiffEq; ii++)
+    
+    // for (double initCondTemp : this->initConditions)
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        temp = this->initConditions[ii]; // ok
-        Ith(initCondTemp,ii+1) = this->initConditions[ii];
-
+        double initCondTemp = this->initConditions[ii];
+        Ith(initCondOut, ii + 1) = initCondTemp;
     };
-     
-    return initCondTemp;
+
+    return initCondOut;
 };
 
 N_Vector System::GetEqAbsTol()
 {
     int noOfDiffEq = diffEquations.size();
-    
+
     N_Vector eqAbsTol = N_VNew_Serial(noOfDiffEq, sunctx);
     for (int ii = 0; ii < noOfDiffEq; ii++)
     {
         DiffEquation &eqTemp = *diffEquations[ii];
-        Ith(eqAbsTol,ii+1) = eqTemp.GetAbsTol();
+        Ith(eqAbsTol, ii + 1) = eqTemp.GetAbsTol();
     };
 
     return eqAbsTol;
@@ -132,7 +126,7 @@ double System::GetRelTol()
 void System::CalculateAuxEqRHS()
 {
     int noOfAuxEquations = nonDiffEquations.size();
-    
+
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
         Equation &eqTemp = *nonDiffEquations[ii];
@@ -153,9 +147,9 @@ void System::CalculateDiffEqRHS()
 std::vector<double> System::GetDiffEqRHS()
 {
     std::vector<double> diffEqRHS;
-    
+
     int noOfDiffEquations = diffEquations.size();
-    
+
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         Equation &tempEq = *diffEquations[ii];
@@ -169,20 +163,31 @@ std::vector<double> System::GetDiffEqRHS()
 
 void System::ResetDiffEq(N_Vector y)
 {
+
+    // EXTRACT THE DEPENDENT VARIABLE FROM Y
+    // Exract the size of y 
+    size_t n = N_VGetLength_Serial(y);
+
+    // Access the raw data pointer of the N_Vector
+    sunrealtype *yData = N_VGetArrayPointer_Serial(y);
+
+    // Copy the data into a std::vector
+    std::vector<sunrealtype> yValues(n);
+    for (size_t i = 0; i < n; ++i) 
+    {
+        yValues[i] = yData[i];
+    }
+
+    // UPDATE THE OBJECTS OF THE SYSTEM
     int noOfDiffEquations = this->diffEquations.size();
 
-    
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
         DiffEquation &tempEq = *diffEquations[ii];
-        double tempDepVar = Ith(y,ii+1);
-        
-        tempEq.UpdateDepVar(tempDepVar);
-        tempEq.ZeroParameters();
 
+        tempEq.UpdateDepVar(yValues);
+        tempEq.ZeroParameters();
     };
 
     return;
-
 }
-

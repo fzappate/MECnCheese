@@ -3,6 +3,8 @@
 #include <string>
 #include <fstream>
 
+#include <nvector/nvector_serial.h> // access to serial N_Vector
+
 #include "./equation.h"
 #include "./chamber.h"
 
@@ -42,10 +44,18 @@ double Chamber::GetRHS()
     return this->dpdt;
 };
 
-void Chamber::UpdateDepVar(double pressure)
+int Chamber::SetDepVarIndex(int sysDepVarIndex)
+{   
+
+    this->depVarIndexInSys.push_back(sysDepVarIndex);
+    sysDepVarIndex++;
+    return sysDepVarIndex;
+};
+
+void Chamber::UpdateDepVar(std::vector<sunrealtype> &yValues)
 {
 
-    this->pressure = pressure;
+    this->pressure = yValues[this->depVarIndexInSys[0]];
     return; 
 }
 
@@ -58,9 +68,11 @@ void Chamber::ZeroParameters()
     return;
 }
 
-double Chamber::GetInitialCondition()
+std::vector<double> Chamber::GetInitialCondition()
 {
-    return this->pressure;
+    std::vector<double> initCond;
+    initCond.push_back(pressure);
+    return initCond;
 };
 
 double Chamber::GetAbsTol()

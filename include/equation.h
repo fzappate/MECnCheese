@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+#include <nvector/nvector_serial.h> // access to serial N_Vector
+
 
 class Equation
 {
@@ -25,13 +29,27 @@ public:
 class DiffEquation : public Equation
 {
     public:
+
+    // Number of dependent variables in the equation
+    int noOfDepVar = -1;
+
+    // Indeces assigned to the equation dependent variables in the system
+    std::vector<int> depVarIndexInSys;
+
+    // Constructor
     DiffEquation(std::string name);
 
-    virtual void UpdateDepVar(double depVar) = 0;
+    // Set the index the dependent variables of the equation has in the system 
+    virtual int SetDepVarIndex(int sysDepVarIndex) = 0;
 
+    // Update the dependent variables of the equation with the values in y
+    virtual void UpdateDepVar(std::vector<sunrealtype> &yValues) = 0;
+
+    // Zero the summation (forces, flows etc.) parameters of the equation
     virtual void ZeroParameters() = 0;
 
-    virtual double GetInitialCondition() = 0;
+    // Get the deendent variable of the equation 
+    virtual std::vector<double> GetInitialCondition() = 0;
 
     virtual double GetAbsTol() = 0;
 

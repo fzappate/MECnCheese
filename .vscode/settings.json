@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.txt": "markdown",
         "fstream": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -55,6 +56,7 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "string": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "iomanip": "cpp"
     }
 }
