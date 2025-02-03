@@ -11,6 +11,7 @@
 // Chamber
 Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
+    this->yValues.push_back(pressure);
     return;
 };
 
@@ -114,13 +115,17 @@ void Chamber::PrintHeader(std::ofstream& outputFile)
 
 void Chamber::PrintVariables(std::ofstream& outputFile)
 {
+
+    // Dereference the pointer that points to the pressure of the chamber
+    sunrealtype &press = *yValuesPnt[0];
+
     if(printStruct.printBulkMod == 1)
     {
     outputFile << bulkMod << ",";
     }
     if(printStruct.printPress == 1)
     {
-        outputFile << pressure << ",";
+        outputFile << press << ",";
     }
     if(printStruct.printVolume == 1)
     {

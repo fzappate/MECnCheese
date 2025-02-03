@@ -37,7 +37,7 @@ int Solver::SolveSystem(System sys)
   cvode_mem = NULL;
   
   int noOfDiffEq = sys.GetNoOfDiffEq();
-  N_Vector y = sys.GetInitCondition();
+  N_Vector y = sys.GetY();
 
   // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
@@ -97,6 +97,9 @@ int Solver::SolveSystem(System sys)
   // In loop, call CVode, print results, and test for error.
   // Break out of loop when NOUT preset output times have been reached.
   printf(" \nSolving the system\n\n");
+
+  // Impose a maximum timestep of stepTime
+  CVodeSetMaxStep(cvode_mem, stepTime);
 
   Printer printer = Printer(sys);
   printer.OpenFile();

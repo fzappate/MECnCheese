@@ -191,3 +191,33 @@ void System::ResetDiffEq(N_Vector y)
 
     return;
 }
+
+void System::MoveDepVarIntoNVector(){
+
+    // Create the N_Vector y
+    y = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
+
+    // Extract the pointer to the elements of the N_Vector y
+    realtype *yData = N_VGetArrayPointer_Serial(y);
+
+    // Iterate on the objects of the system 
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    {
+        DiffEquation &tempEq = *diffEquations[ii];
+
+        // Iterate on the equation of the object
+        for (int jj = 0; jj < tempEq.yValues.size(); jj++)
+        {
+            // Assign the value of the dependent variable to the N_Vector
+            yData[tempEq.depVarIndexInSys[jj]] = tempEq.yValues[jj];
+            // Save in the object the pointer to the dependent variable in the N_Vector
+            tempEq.yValuesPnt.push_back(&yData[tempEq.depVarIndexInSys[jj]]);
+        };
+        
+    };
+};
+
+N_Vector System::GetY()
+{
+    return this->y;
+};

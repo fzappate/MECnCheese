@@ -72,6 +72,9 @@ int main()
                               LPChamber);
   sys.AddEquation(outletPort);
 
+  // Move sys dependent variables into N_Vector
+  sys.MoveDepVarIntoNVector();
+  
   // Solve system 
   Solver solver = Solver(0.01,1.0);
   int retVal = solver.SolveSystem(sys);

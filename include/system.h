@@ -20,7 +20,7 @@ protected:
     std::vector<NonDiffEquation *> nonDiffEquations;
     std::vector<DiffEquation *> diffEquations;
     std::vector<sunrealtype> initConditions;
-    N_Vector N_VectInitConditions;
+    N_Vector y;
     SUNContext sunctx;
 
     bool startedPrinting = 0;
@@ -63,4 +63,8 @@ public:
     std::vector<double> GetDiffEqRHS();
 
     void ResetDiffEq(N_Vector y);
+
+    void MoveDepVarIntoNVector();
+
+    N_Vector GetY();
 };

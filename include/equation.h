@@ -30,8 +30,11 @@ class DiffEquation : public Equation
 {
     public:
 
-    // Number of dependent variables in the equation
-    int noOfDepVar = -1;
+    // Store here the inital value of the object's dependent variables
+    std::vector<sunrealtype> yValues;
+
+    // Store here the pointer to the object's dependent variables into the N_Vector y
+    std::vector<sunrealtype*> yValuesPnt;
 
     // Indeces assigned to the equation dependent variables in the system
     std::vector<int> depVarIndexInSys;

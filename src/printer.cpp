@@ -48,7 +48,7 @@ void Printer::PrintResults(double time)
     std::vector<DiffEquation*> diffEquations = sys.GetDiffEquations();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation &tempEq = *diffEquations[ii];
+        DiffEquation &tempEq = *diffEquations[ii];
         tempEq.PrintVariables(outputFile);
     };
 
@@ -57,7 +57,7 @@ void Printer::PrintResults(double time)
     std::vector<NonDiffEquation*> auxEquations = sys.GetNonDiffEquations();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
-        Equation &tempEq = *auxEquations[ii];
+        NonDiffEquation &tempEq = *auxEquations[ii];
         tempEq.PrintVariables(outputFile);
     };
 
