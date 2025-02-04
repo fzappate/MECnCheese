@@ -12,6 +12,7 @@
 Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
     this->yValues.push_back(pressure);
+    this->yDotValues.push_back(0.0);
     return;
 };
 
@@ -165,7 +166,12 @@ void InfChamber::AddFlowIn(std::string flowName, double flowrate)
 
 void InfChamber::CalculateRHS()
 {
+    // Calculate and store the depenedent variable in the object
     this->dpdt = 0;
+
+    // Updatet the dependent variable in y
+    *yDotValuesPnt[0] = this->dpdt;
+
     return;
 };
 
@@ -180,9 +186,11 @@ ConstChamber::ConstChamber(std::string name, double pressure, double volume) : C
 
 void ConstChamber::CalculateRHS()
 {
-
+    // Calculate and store the depenedent variable in the object
     this->dpdt = bulkMod / volume * (flowSum - volDer);
 
+    // Updatet the dependent variable in y
+    *yDotValuesPnt[0] = this->dpdt;
     return;
 
 };

@@ -136,6 +136,7 @@ void System::CalculateAuxEqRHS()
 
 void System::CalculateDiffEqRHS()
 {
+
     int noOfDiffEquations = diffEquations.size();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
@@ -215,6 +216,36 @@ void System::MoveDepVarIntoNVector(){
         };
         
     };
+};
+
+void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
+{
+    // Extract the pointer to the elements of the N_Vector ydot
+    realtype *yDotData = N_VGetArrayPointer_Serial(ydot);
+
+    // Iterate on the objects of the system 
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    {
+        DiffEquation &tempEq = *diffEquations[ii];
+
+        // Iterate on the equation of the object
+        for (int jj = 0; jj < tempEq.yDotValues.size(); jj++)
+        {
+            // Save in the object the pointer to the dependent variable derivative in the N_Vector
+            tempEq.yDotValuesPnt.push_back(&yDotData[tempEq.depVarIndexInSys[jj]]);
+        };
+        
+    };
+};
+
+sunbooleantype System::GetYDotInitialized()
+{
+    return this->yDotInitialized;
+};
+
+void System::SetYDotInitialized(sunbooleantype value)
+{
+    this->yDotInitialized = value;
 };
 
 N_Vector System::GetY()

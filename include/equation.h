@@ -33,11 +33,17 @@ class DiffEquation : public Equation
     // Store here the inital value of the object's dependent variables
     std::vector<sunrealtype> yValues;
 
+    // Store here the inital value of the object's dependent variables
+    std::vector<sunrealtype> yDotValues;
+
     // Store here the pointer to the object's dependent variables into the N_Vector y
     std::vector<sunrealtype*> yValuesPnt;
 
+    // Store here the pointer to the object's dependent variables into the N_Vector y
+    std::vector<sunrealtype*> yDotValuesPnt;
+
     // Indeces assigned to the equation dependent variables in the system
-    std::vector<int> depVarIndexInSys;
+    std::vector<sunindextype> depVarIndexInSys;
 
     // Constructor
     DiffEquation(std::string name);

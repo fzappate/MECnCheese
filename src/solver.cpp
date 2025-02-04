@@ -160,29 +160,44 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   System * sysPtr =  static_cast<System *>(user_data);
 
   // Dereference the pointer to the system
-  System sys = *sysPtr;
+  // System sys = *sysPtr;
 
-  // THIS IS JUST TO MONITOR y WHILE DEBUGGING
-  std::vector<double> yValues = std::vector<double>(5);
-  for (int i = 0; i < 5; ++i) {
-      yValues[i] = Ith(y, i + 1);  // Assign values
+  sunrealtype y1 = Ith(y, 1); 
+  sunrealtype y2 = Ith(y, 2); 
+  sunrealtype y3 = Ith(y, 3); 
+  sunrealtype y4 = Ith(y, 4); 
+  sunrealtype y5 = Ith(y, 5); 
+
+  if (sysPtr->GetYDotInitialized() == 0)
+  {
+    // Initialize the dependent variable pointers
+    sysPtr->ConnectYDotToDepVarDerivatives(ydot);
+
+    sysPtr->SetYDotInitialized(1);
   }
-  // END OF MONITORING y
 
   // Set new depenedent variable and reset equation factors
-  sys.ResetDiffEq(y);
+  sysPtr->ResetDiffEq(y);
 
   // Calculate RHS from the system
-  sys.CalculateAuxEqRHS();
-  sys.CalculateDiffEqRHS();
+  sysPtr->CalculateAuxEqRHS();
+  sysPtr->CalculateDiffEqRHS();
 
-  // Extract RHS from system and store it in ydot
-  std::vector<sunrealtype> RHS = sys.GetDiffEqRHS();
-  sunrealtype noOfDiffEq = sys.GetNoOfDiffEq();
-  for (int ii = 0; ii < noOfDiffEq; ii++)
-  {    
-    Ith(ydot, ii + 1) = RHS[ii];
-  };
+  sunrealtype yDot1 = Ith(ydot, 1); 
+  sunrealtype yDot2 = Ith(ydot, 2); 
+  sunrealtype yDot3 = Ith(ydot, 3); 
+  sunrealtype yDot4 = Ith(ydot, 4); 
+  sunrealtype yDot5 = Ith(ydot, 5); 
+
+
+
+  // // Extract RHS from system and store it in ydot
+  // std::vector<sunrealtype> RHS = sys.GetDiffEqRHS();
+  // sunrealtype noOfDiffEq = sys.GetNoOfDiffEq();
+  // for (int ii = 0; ii < noOfDiffEq; ii++)
+  // {    
+  //   Ith(ydot, ii + 1) = RHS[ii]; 
+  // };
 
   return (0);
 }
