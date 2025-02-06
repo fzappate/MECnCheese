@@ -228,6 +228,8 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
     {
         DiffEquation &tempEq = *diffEquations[ii];
 
+        // Clear the vector of pointers to the dependent variable derivative in the N_Vector
+        tempEq.yDotValuesPnt.clear();
         // Iterate on the equation of the object
         for (int jj = 0; jj < tempEq.yDotValues.size(); jj++)
         {

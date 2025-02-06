@@ -173,7 +173,7 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
     // Initialize the dependent variable pointers
     sysPtr->ConnectYDotToDepVarDerivatives(ydot);
 
-    sysPtr->SetYDotInitialized(1);
+    sysPtr->SetYDotInitialized(0);
   }
 
   // Set new depenedent variable and reset equation factors
@@ -188,16 +188,6 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sunrealtype yDot3 = Ith(ydot, 3); 
   sunrealtype yDot4 = Ith(ydot, 4); 
   sunrealtype yDot5 = Ith(ydot, 5); 
-
-
-
-  // // Extract RHS from system and store it in ydot
-  // std::vector<sunrealtype> RHS = sys.GetDiffEqRHS();
-  // sunrealtype noOfDiffEq = sys.GetNoOfDiffEq();
-  // for (int ii = 0; ii < noOfDiffEq; ii++)
-  // {    
-  //   Ith(ydot, ii + 1) = RHS[ii]; 
-  // };
 
   return (0);
 }
