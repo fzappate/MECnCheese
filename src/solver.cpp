@@ -130,7 +130,7 @@ int Solver::SolveSystem(System sys)
     {
       auto nowTime = std::chrono::high_resolution_clock::now();
       auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTimer);
-      std::cout << "Time elapsed: " << elapsed.count() << " milliseconds" << std::endl;
+      std::cout << "Simulation time: " << elapsed.count() << " ms" << std::endl;
       break;
     }
   }
@@ -164,22 +164,11 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // Cast the user_data void pointer to a pointer to system
   System * sysPtr =  static_cast<System *>(user_data);
 
-  // Dereference the pointer to the system
-  // System sys = *sysPtr;
-
   sunrealtype y1 = Ith(y, 1); 
   sunrealtype y2 = Ith(y, 2); 
   sunrealtype y3 = Ith(y, 3); 
   sunrealtype y4 = Ith(y, 4); 
   sunrealtype y5 = Ith(y, 5); 
-
-  // std::cout << sysPtr->ydot << std::endl;
-  // std::cout << &ydot << std::endl;
-  // std::cout << ydot << std::endl;
-  // sysPtr->ydot = &ydot;
-
-  // N_Vector* ydotPnt = N_VGetArrayPointer_Serial(ydot);
-  // if (sysPtr->GetYDotInitialized() == 0)
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
   if ( sysPtr->ydot != &ydot)
