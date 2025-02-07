@@ -168,12 +168,22 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sunrealtype y4 = Ith(y, 4); 
   sunrealtype y5 = Ith(y, 5); 
 
-  if (sysPtr->GetYDotInitialized() == 0)
+  // std::cout << sysPtr->ydot << std::endl;
+  // std::cout << &ydot << std::endl;
+  // std::cout << ydot << std::endl;
+  // sysPtr->ydot = &ydot;
+
+  // N_Vector* ydotPnt = N_VGetArrayPointer_Serial(ydot);
+  // if (sysPtr->GetYDotInitialized() == 0)
+
+  // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
+  if ( sysPtr->ydot != &ydot)
   {
+    // Save the current ydot pointer in the system
+     sysPtr->ydot = &ydot;
+
     // Initialize the dependent variable pointers
     sysPtr->ConnectYDotToDepVarDerivatives(ydot);
-
-    sysPtr->SetYDotInitialized(0);
   }
 
   // Set new depenedent variable and reset equation factors

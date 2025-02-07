@@ -18,11 +18,11 @@ protected:
     // System has depVarIndex-1 dependent variables
     int sysDepVarIndex = 0; 
     double relTol = 0.001;
-    bool yDotInitialized = 0;
-    std::vector<NonDiffEquation *> nonDiffEquations;
-    std::vector<DiffEquation *> diffEquations;
+    std::vector<NonDiffEquation*> nonDiffEquations;
+    std::vector<DiffEquation*> diffEquations;
     std::vector<sunrealtype> initConditions;
     N_Vector y;
+
     SUNContext sunctx;
 
     bool startedPrinting = 0;
@@ -32,6 +32,7 @@ protected:
     void AddNonDiffEqCount();
 
 public:
+    N_Vector* ydot = nullptr;
 
 
     System();
@@ -73,8 +74,6 @@ public:
     void System::ConnectYDotToDepVarDerivatives(N_Vector ydot);
 
     sunbooleantype GetYDotInitialized();
-
-    void SetYDotInitialized(sunbooleantype value);
     
     N_Vector GetY();
 

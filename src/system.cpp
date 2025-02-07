@@ -240,15 +240,6 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
     };
 };
 
-sunbooleantype System::GetYDotInitialized()
-{
-    return this->yDotInitialized;
-};
-
-void System::SetYDotInitialized(sunbooleantype value)
-{
-    this->yDotInitialized = value;
-};
 
 N_Vector System::GetY()
 {
