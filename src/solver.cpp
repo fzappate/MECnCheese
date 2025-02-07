@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip> 
 #include <fstream>
+#include <chrono>
 
 #include <sundials/sundials_math.h>    // Import math functions
 #include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.
@@ -105,6 +106,7 @@ int Solver::SolveSystem(System sys)
   printer.OpenFile();
   printer.PrintResultsHeader();
 
+  auto startTimer = std::chrono::high_resolution_clock::now();
   while (1)
   {
 
@@ -126,6 +128,9 @@ int Solver::SolveSystem(System sys)
 
     if (outTime > endTime)
     {
+      auto nowTime = std::chrono::high_resolution_clock::now();
+      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTimer);
+      std::cout << "Time elapsed: " << elapsed.count() << " milliseconds" << std::endl;
       break;
     }
   }
