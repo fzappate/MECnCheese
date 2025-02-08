@@ -42,11 +42,7 @@ void Chamber::CalculateRHS()
     return;
 };
 
-void Chamber::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
-{   
-    this->depVarIndexInSys[objDepVarIndex] = sysDepVarIndex;
-    return;
-};
+
 
 void Chamber::ZeroParameters()
 {

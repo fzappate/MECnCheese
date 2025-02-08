@@ -49,8 +49,6 @@ class Chamber : public DiffEquation
     // Base class methods
 
     void CalculateRHS() override;
-    
-    void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) override;
 
     void ZeroParameters() override;
 

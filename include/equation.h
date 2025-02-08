@@ -52,11 +52,11 @@ class DiffEquation : public Equation
     // Constructor
     DiffEquation(std::string name);
 
-    // Set the index the dependent variables of the equation has in the system 
-    virtual void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) = 0;
-
     // Zero the summation (forces, flows etc.) parameters of the equation
     virtual void ZeroParameters() = 0;
+
+    // Set the index the dependent variables of the equation has in the system 
+    void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex);
 
     // Get absolute tolerance of the equations of the object
     sunrealtype GetAbsTol(sunindextype index);
