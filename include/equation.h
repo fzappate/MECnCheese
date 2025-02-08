@@ -46,6 +46,9 @@ class DiffEquation : public Equation
     // Indeces assigned to the equation dependent variables in the system
     std::vector<sunindextype> depVarIndexInSys;
 
+    // Relative tolerance of the object's equation 
+    std::vector<sunrealtype> absTol;
+
     // Constructor
     DiffEquation(std::string name);
 
@@ -56,7 +59,7 @@ class DiffEquation : public Equation
     virtual void ZeroParameters() = 0;
 
     // Get absolute tolerance of the equations of the object
-    virtual double GetAbsTol() = 0;
+    sunrealtype GetAbsTol(sunindextype index);
 
 };
 

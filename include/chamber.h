@@ -40,7 +40,7 @@ class Chamber : public DiffEquation
 
     Chamber( std::string name, double pressure);
 
-    void SetPressure(double pressure);
+    // void SetPressure(double pressure);
 
     double GetPressure();
 
@@ -53,8 +53,6 @@ class Chamber : public DiffEquation
     void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) override;
 
     void ZeroParameters() override;
-
-    double GetAbsTol() override;
 
     void PrintHeader(std::ofstream& outputFile) override;
 

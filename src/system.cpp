@@ -70,8 +70,13 @@ N_Vector System::GetEqAbsTol()
     // Save the absolute tolerance of the differential equations in eqAbsTol
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffEquation &eqTemp = *diffEquations[ii];
-        eqAbsTolData[ii] = eqTemp.GetAbsTol();
+        DiffEquation &tempEq = *diffEquations[ii];
+        
+        // Iterate on the equations of the object
+        for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
+        {
+            eqAbsTolData[ii] = tempEq.GetAbsTol(jj);
+        };
     };
 
     return eqAbsTol;

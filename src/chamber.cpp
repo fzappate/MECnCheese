@@ -14,18 +14,12 @@ Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressu
     // Set initial conditions
     this->yValuesInit.push_back(pressure);
     this->yDotValuesInit.push_back(0.0);
+    this->absTol.push_back(0.001);
 
     // Initialize the pointers that connect to the dependent variables in the system
     this->yValuesPnt = std::vector<sunrealtype*>(1, nullptr);
     this->yDotValuesPnt = std::vector<sunrealtype*>(1, nullptr);
     this->depVarIndexInSys = std::vector<sunindextype>(1, -1);
-
-    return;
-};
-
-void Chamber::SetPressure(double press)
-{
-    pressure = press;
 
     return;
 };
@@ -48,7 +42,6 @@ void Chamber::CalculateRHS()
     return;
 };
 
-
 void Chamber::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
 {   
     this->depVarIndexInSys[objDepVarIndex] = sysDepVarIndex;
@@ -64,30 +57,25 @@ void Chamber::ZeroParameters()
     return;
 }
 
-double Chamber::GetAbsTol()
-{
-    return aTol;
-}
-
 void Chamber::PrintHeader(std::ofstream& outputFile)
 {
     if(printStruct.printBulkMod == 1)
     {
     outputFile << name << ":Bulk Modulus:Pa*s, ";
     }
-    if(printStruct.printBulkMod == 1)
+    if(printStruct.printPress == 1)
     {
         outputFile << name << ":Pressure:Pa, ";
     }
-    if(printStruct.printBulkMod == 1)
+    if(printStruct.printVolume == 1)
     {
         outputFile << name << ":Volume:m^3, ";
     }
-    if(printStruct.printBulkMod == 1)
+    if(printStruct.printVolDer == 1)
     {
         outputFile << name << ":Volume Derivative:m^3/s, ";
     }
-    if(printStruct.printBulkMod == 1)
+    if(printStruct.printFlowSum == 1)
     {
         outputFile << name << ":Flow Sum:m^3/s, ";
     }
@@ -131,8 +119,6 @@ void Chamber::PrintVariables(std::ofstream& outputFile)
 // InfChamber
 InfChamber::InfChamber(std::string name, double pressure) : Chamber(name, pressure)
 {
-    this->SetPressure(pressure);
-
     return;
 };
 
