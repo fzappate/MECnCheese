@@ -195,13 +195,13 @@ void System::ConnectYToDepVar(){
         DiffEquation &tempEq = *diffEquations[ii];
 
         // Iterate on the equations of the object
-        for (int jj = 0; jj < tempEq.yValues.size(); jj++)
+        for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
         {
             // Save the index of the object dependent variables in the system
             tempEq.SetDepVarIndex(jj,noOfEq);
 
             // Assign the value of the dependent variable to the N_Vector
-            yData[noOfEq] = tempEq.yValues[jj];
+            yData[noOfEq] = tempEq.yValuesInit[jj];
 
             // Save in the object the pointer to the dependent variable in the N_Vector
             tempEq.yValuesPnt[jj] = &yData[noOfEq];
@@ -225,7 +225,7 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
         DiffEquation &tempEq = *diffEquations[ii];
 
         // Iterate on the equation of the object
-        for (int jj = 0; jj < tempEq.yDotValues.size(); jj++)
+        for (int jj = 0; jj < tempEq.yDotValuesInit.size(); jj++)
         {
             // Save in the object the pointer to the dependent variable derivative in the N_Vector
             tempEq.yDotValuesPnt[jj] = &yDotData[tempEq.depVarIndexInSys[jj]];

@@ -12,14 +12,14 @@
 Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
     // Set initial conditions
-    this->yValues.push_back(pressure);
-    this->yDotValues.push_back(0.0);
+    this->yValuesInit.push_back(pressure);
+    this->yDotValuesInit.push_back(0.0);
 
     // Initialize the pointers that connect to the dependent variables in the system
     this->yValuesPnt = std::vector<sunrealtype*>(1, nullptr);
     this->yDotValuesPnt = std::vector<sunrealtype*>(1, nullptr);
     this->depVarIndexInSys = std::vector<sunindextype>(1, -1);
-    
+
     return;
 };
 
