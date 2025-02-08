@@ -19,19 +19,19 @@ void Printer::PrintResultsHeader()
 {
     outputFile << "Simulation:Time:s, ";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
-    std::vector<DiffEquation*> diffEquations = sys.GetDiffEquations();
+    std::vector<DiffObject*> diffEquations = sys.GetDiffObjects();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        Equation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffEquations[ii];
         tempEq.PrintHeader(outputFile);
     };
 
 
     int noOfAuxEquations = sys.GetNoOfAuxEq();
-    std::vector<NonDiffEquation*> auxEquations = sys.GetNonDiffEquations();
+    std::vector<NonDiffObject*> auxEquations = sys.GetNonDiffObjects();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
-        Equation &tempEq = *auxEquations[ii];
+        NonDiffObject &tempEq = *auxEquations[ii];
         tempEq.PrintHeader(outputFile);
     };
 
@@ -45,19 +45,19 @@ void Printer::PrintResults(double time)
 {
     outputFile << time << ",";
     int noOfDiffEquations = sys.GetNoOfDiffEq();
-    std::vector<DiffEquation*> diffEquations = sys.GetDiffEquations();
+    std::vector<DiffObject*> diffObjects = sys.GetDiffObjects();
     for (int ii = 0; ii < noOfDiffEquations; ii++)
     {
-        DiffEquation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffObjects[ii];
         tempEq.PrintVariables(outputFile);
     };
 
 
     int noOfAuxEquations = sys.GetNoOfAuxEq();
-    std::vector<NonDiffEquation*> auxEquations = sys.GetNonDiffEquations();
+    std::vector<NonDiffObject*> auxEquations = sys.GetNonDiffObjects();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
-        NonDiffEquation &tempEq = *auxEquations[ii];
+        NonDiffObject &tempEq = *auxEquations[ii];
         tempEq.PrintVariables(outputFile);
     };
 

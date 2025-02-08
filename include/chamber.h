@@ -10,7 +10,7 @@
 
 
 
-class Chamber : public DiffEquation 
+class Chamber : public DiffObject 
 {
     protected:
     int noOfEq = 1;

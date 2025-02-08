@@ -2,19 +2,19 @@
 #include <iostream>
 #include "./equation.h"
 
-Equation::Equation(std::string name) : name(name){};
+Object::Object(std::string name) : name(name) {};
 
-DiffEquation::DiffEquation(std::string name) : Equation(name){};
+DiffObject::DiffObject(std::string name) : Object(name) {};
 
-sunrealtype DiffEquation::GetAbsTol(sunindextype index)
+sunrealtype DiffObject::GetAbsTol(sunindextype index)
 {
     return this->absTol[index];
 };
 
-void DiffEquation::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
-{   
+void DiffObject::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
+{
     this->depVarIndexInSys[objDepVarIndex] = sysDepVarIndex;
     return;
 };
 
-NonDiffEquation::NonDiffEquation(std::string name) : Equation(name){};
+NonDiffObject::NonDiffObject(std::string name) : Object(name) {};

@@ -23,10 +23,10 @@ protected:
     double relTol = 0.001;
 
     // Pointers to the non-differential object in the system
-    std::vector<NonDiffEquation *> nonDiffEquations;
+    std::vector<NonDiffObject *> nonDiffObjects;
 
     // Pointers to the differential object in the system
-    std::vector<DiffEquation *> diffEquations;
+    std::vector<DiffObject *> diffObjects;
 
     // Initial conditions of the system
     std::vector<sunrealtype> initConditions;
@@ -48,16 +48,16 @@ public:
     System(SUNContext sunctx);
 
     // Save differential object pointer in the system
-    void AddEquation(DiffEquation &equation);
+    void AddObject(DiffObject &equation);
 
     // Save non-differential object pointer in the system
-    void AddEquation(NonDiffEquation &equation);
+    void AddObject(NonDiffObject &equation);
 
     // Get vector of pointers to non-differential objects
-    std::vector<NonDiffEquation *> GetNonDiffEquations();
+    std::vector<NonDiffObject *> GetNonDiffObjects();
 
     // Get vector of pointers to differential objects
-    std::vector<DiffEquation *> GetDiffEquations();
+    std::vector<DiffObject *> GetDiffObjects();
 
     // Get the number of differential equations in the system
     int GetNoOfDiffEq();

@@ -9,7 +9,7 @@
 #include "./chamber.h"
 
 // Chamber
-Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
+Chamber::Chamber(std::string name, double pressure) : DiffObject(name), pressure(pressure)
 {
     // Set initial conditions
     this->yValuesInit.push_back(pressure);
@@ -41,8 +41,6 @@ void Chamber::CalculateRHS()
 {
     return;
 };
-
-
 
 void Chamber::ZeroParameters()
 {

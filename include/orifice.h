@@ -6,7 +6,7 @@
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice: public NonDiffEquation
+class Orifice: public NonDiffObject
 {
     double area;
     double Cf = 0.678;

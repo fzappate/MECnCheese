@@ -27,50 +27,50 @@ int main()
 
   InfChamber HPChamber = InfChamber("HPChamber", 
                                     HPChamber_Pressure);
-  sys.AddEquation(HPChamber);
+  sys.AddObject(HPChamber);
 
   InfChamber LPChamber = InfChamber("LPChamber", 
                                     LPChamber_Pressure);
-  sys.AddEquation(LPChamber);
+  sys.AddObject(LPChamber);
 
   ConstChamber inletChamber = ConstChamber( "inletChamber", 
                                         inletChamber_Pressure, 
                                         inletChamber_Volume);
-  sys.AddEquation(inletChamber);
+  sys.AddObject(inletChamber);
 
   ConstChamber variableChamber = ConstChamber( "variableChamber", 
                                         inletChamber_Pressure, 
                                         inletChamber_Volume);
-  sys.AddEquation(variableChamber);
+  sys.AddObject(variableChamber);
 
   ConstChamber outletChamber = ConstChamber("outletChamber", 
                                         outletChamber_Pressure, 
                                         outletChamber_Volume);
-  sys.AddEquation(outletChamber);
+  sys.AddObject(outletChamber);
 
   Orifice inletPort = Orifice("inletPort", 
                             inletPort_Area, 
                             HPChamber, 
                             inletChamber);
-  sys.AddEquation(inletPort);
+  sys.AddObject(inletPort);
 
   Orifice inletOrif = Orifice("inletOrif", 
                             inletOrif_Area, 
                             inletChamber, 
                             variableChamber);
-  sys.AddEquation(inletOrif);
+  sys.AddObject(inletOrif);
 
   Orifice outletOrif = Orifice("outletOrif", 
                               outletOrif_Area, 
                               variableChamber, 
                               outletChamber);
-  sys.AddEquation(outletOrif);
+  sys.AddObject(outletOrif);
 
   Orifice outletPort = Orifice("outletPort", 
                               outletPort_Area, 
                               outletChamber, 
                               LPChamber);
-  sys.AddEquation(outletPort);
+  sys.AddObject(outletPort);
 
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();

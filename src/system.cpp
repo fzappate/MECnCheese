@@ -15,22 +15,25 @@ System::System() {};
 
 System::System(SUNContext sunctx) : sunctx(sunctx) {};
 
-void System::AddEquation(DiffEquation &equation)
+void System::AddObject(DiffObject &object)
 {
     // Save the differential equation reference in the system
-    diffEquations.push_back(&equation);
+    this->diffObjects.push_back(&object);
 
     // Increment the number of differential equations
     this->noOfDiffEq++;
+
+    return;
 };
 
-void System::AddEquation(NonDiffEquation &equation)
+void System::AddObject(NonDiffObject &object)
 {
     // Save the non-differential equation reference in the system
-    nonDiffEquations.push_back(&equation);
+    this->nonDiffObjects.push_back(&object);
 
     // Increment the number of non-differential equations
     this->noOfAuxEq++;
+
     return;
 };
 
@@ -47,16 +50,16 @@ SUNContext System::GetSUNContext()
     return sunctx;
 };
 
-std::vector<NonDiffEquation *> System::GetNonDiffEquations()
+std::vector<NonDiffObject *> System::GetNonDiffObjects()
 {
     // Return the non-differential equations saved in the system
-    return nonDiffEquations;
+    return this->nonDiffObjects;
 };
 
-std::vector<DiffEquation *> System::GetDiffEquations()
+std::vector<DiffObject *> System::GetDiffObjects()
 {
     // Return the differential equations saved in the system
-    return diffEquations;
+    return this->diffObjects;
 };
 
 N_Vector System::GetEqAbsTol()
@@ -70,7 +73,7 @@ N_Vector System::GetEqAbsTol()
     // Save the absolute tolerance of the differential equations in eqAbsTol
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffEquation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffObjects[ii];
         
         // Iterate on the equations of the object
         for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
@@ -99,22 +102,19 @@ double System::GetRelTol()
 
 void System::CalculateAuxEqRHS()
 {
-    int noOfAuxEquations = nonDiffEquations.size();
 
-    for (int ii = 0; ii < noOfAuxEquations; ii++)
+    for (int ii = 0; ii < this->noOfAuxEq; ii++)
     {
-        Equation &eqTemp = *nonDiffEquations[ii];
+        NonDiffObject &eqTemp = *nonDiffObjects[ii];
         eqTemp.CalculateRHS();
     };
 };
 
 void System::CalculateDiffEqRHS()
 {
-
-    int noOfDiffEquations = diffEquations.size();
-    for (int ii = 0; ii < noOfDiffEquations; ii++)
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        Equation &eqTemp = *diffEquations[ii];
+        DiffObject &eqTemp = *diffObjects[ii];
         eqTemp.CalculateRHS();
     };
 };
@@ -124,7 +124,7 @@ void System::ResetDiffEq(N_Vector y)
     // Zero the summation parameters of the equations of the differential objects
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffEquation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffObjects[ii];
         tempEq.ZeroParameters();
     };
 
@@ -145,7 +145,7 @@ void System::ConnectYToDepVar()
     // Iterate on the objects of the system
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffEquation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffObjects[ii];
 
         // Iterate on the equations of the object
         for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
@@ -174,7 +174,7 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
     // Iterate on the objects of the system
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffEquation &tempEq = *diffEquations[ii];
+        DiffObject &tempEq = *diffObjects[ii];
 
         // Iterate on the equation of the object
         for (int jj = 0; jj < tempEq.yDotValuesInit.size(); jj++)

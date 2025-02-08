@@ -9,7 +9,7 @@
 #include "./chamber.h"
 
 // Constructors
-Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffEquation(name), area(area), upChamber(upCh), downChamber(downCh)
+Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffObject(name), area(area), upChamber(upCh), downChamber(downCh)
 {
     
     isDifferential = false;
