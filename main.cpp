@@ -75,8 +75,10 @@ int main()
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();
   
-  // Solve system 
+  // Initialize system 
   Solver solver = Solver(0.01,1.0);
+
+  // Solve system
   int retVal = solver.SolveSystem(sys);
 
   return retVal;

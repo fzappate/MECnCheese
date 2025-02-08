@@ -20,12 +20,6 @@ void System::AddEquation(DiffEquation &equation)
     // Save the equation in the container diffEquations
     diffEquations.push_back(&equation);
 
-    // Assign a system index to the object dependent variables
-    // int depVarUpdatedIndex = equation.SetDepVarIndex(this->sysDepVarIndex);
-
-    // Increment the sysDepVarIndex by the number of dependent variables in the equation
-    // this->sysDepVarIndex = depVarUpdatedIndex;
-
     //Get the initial conditions of the equation in the form of a vector
     std::vector<double> eqInitConditions = equation.GetInitialCondition();
 
@@ -33,13 +27,15 @@ void System::AddEquation(DiffEquation &equation)
     this->initConditions.insert(this->initConditions.end(), eqInitConditions.begin(), eqInitConditions.end());
 
     // Increment the number of differential equations
-    this->AddDiffEqCount();
+    this->noOfDiffEq++;
+    
 };
 
 void System::AddEquation(NonDiffEquation &equation)
 {
     nonDiffEquations.push_back(&equation);
-    this->AddNonDiffEqCount();
+    this->noOfAuxEq++;
+    return;
 };
 
 void System::AddSUNContext(SUNContext &sunctx)
@@ -62,16 +58,6 @@ std::vector<NonDiffEquation *> System::GetNonDiffEquations()
 std::vector<DiffEquation *> System::GetDiffEquations()
 {
     return diffEquations;
-}
-
-void System::AddDiffEqCount()
-{
-    this->noOfDiffEq++;
-};
-
-void System::AddNonDiffEqCount()
-{
-    this->noOfAuxEq++;
 }
 
 N_Vector System::GetInitCondition()
@@ -251,4 +237,15 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
 N_Vector System::GetY()
 {
     return this->y;
+};
+
+N_Vector System::GetYDot()
+{
+    return this->ydot;
+};
+
+void System::SetYDot(N_Vector ydot)
+{
+    this->ydot = ydot;
+    return;
 };

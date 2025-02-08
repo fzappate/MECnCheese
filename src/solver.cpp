@@ -171,10 +171,10 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sunrealtype y5 = Ith(y, 5); 
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
-  if ( sysPtr->ydot != &ydot)
+  if ( sysPtr->GetYDot() != ydot)
   {
     // Save the current ydot pointer in the system
-     sysPtr->ydot = &ydot;
+     sysPtr->SetYDot(ydot);
 
     // Initialize the dependent variable pointers
     sysPtr->ConnectYDotToDepVarDerivatives(ydot);
