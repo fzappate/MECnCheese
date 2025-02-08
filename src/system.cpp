@@ -21,10 +21,10 @@ void System::AddEquation(DiffEquation &equation)
     diffEquations.push_back(&equation);
 
     // Assign a system index to the object dependent variables
-    int depVarUpdatedIndex = equation.SetDepVarIndex(this->sysDepVarIndex);
+    // int depVarUpdatedIndex = equation.SetDepVarIndex(this->sysDepVarIndex);
 
     // Increment the sysDepVarIndex by the number of dependent variables in the equation
-    this->sysDepVarIndex = depVarUpdatedIndex;
+    // this->sysDepVarIndex = depVarUpdatedIndex;
 
     //Get the initial conditions of the equation in the form of a vector
     std::vector<double> eqInitConditions = equation.GetInitialCondition();
@@ -193,7 +193,7 @@ void System::ResetDiffEq(N_Vector y)
     return;
 }
 
-void System::MoveDepVarIntoNVector(){
+void System::ConnectYToDepVar(){
 
     // Create the N_Vector y
     y = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
@@ -201,21 +201,31 @@ void System::MoveDepVarIntoNVector(){
     // Extract the pointer to the elements of the N_Vector y
     realtype *yData = N_VGetArrayPointer_Serial(y);
 
+    sunindextype noOfEq = 0;
+
     // Iterate on the objects of the system 
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
         DiffEquation &tempEq = *diffEquations[ii];
 
-        // Iterate on the equation of the object
+        // Iterate on the equations of the object
         for (int jj = 0; jj < tempEq.yValues.size(); jj++)
         {
+            // Save the index of the object dependent variables in the system
+            tempEq.SetDepVarIndex(jj,noOfEq);
+
             // Assign the value of the dependent variable to the N_Vector
-            yData[tempEq.depVarIndexInSys[jj]] = tempEq.yValues[jj];
+            yData[noOfEq] = tempEq.yValues[jj];
+
             // Save in the object the pointer to the dependent variable in the N_Vector
-            tempEq.yValuesPnt.push_back(&yData[tempEq.depVarIndexInSys[jj]]);
+            tempEq.yValuesPnt[jj] = &yData[noOfEq];
+
+            // Increment the number of equations
+            noOfEq++;
         };
         
     };
+    std::cout << "Equations added to the system: " << noOfEq << std::endl;
 };
 
 void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
@@ -228,15 +238,12 @@ void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
     {
         DiffEquation &tempEq = *diffEquations[ii];
 
-        // Clear the vector of pointers to the dependent variable derivative in the N_Vector
-        tempEq.yDotValuesPnt.clear();
         // Iterate on the equation of the object
         for (int jj = 0; jj < tempEq.yDotValues.size(); jj++)
         {
             // Save in the object the pointer to the dependent variable derivative in the N_Vector
-            tempEq.yDotValuesPnt.push_back(&yDotData[tempEq.depVarIndexInSys[jj]]);
+            tempEq.yDotValuesPnt[jj] = &yDotData[tempEq.depVarIndexInSys[jj]];
         };
-        
     };
 };
 

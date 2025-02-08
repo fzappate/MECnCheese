@@ -73,7 +73,7 @@ int main()
   sys.AddEquation(outletPort);
 
   // Move sys dependent variables into N_Vector
-  sys.MoveDepVarIntoNVector();
+  sys.ConnectYToDepVar();
   
   // Solve system 
   Solver solver = Solver(0.01,1.0);

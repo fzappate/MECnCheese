@@ -11,8 +11,15 @@
 // Chamber
 Chamber::Chamber(std::string name, double pressure) : DiffEquation(name), pressure(pressure)
 {
+    // Set initial conditions
     this->yValues.push_back(pressure);
     this->yDotValues.push_back(0.0);
+
+    // Initialize the pointers that connect to the dependent variables in the system
+    this->yValuesPnt = std::vector<sunrealtype*>(1, nullptr);
+    this->yDotValuesPnt = std::vector<sunrealtype*>(1, nullptr);
+    this->depVarIndexInSys = std::vector<sunindextype>(1, -1);
+    
     return;
 };
 
@@ -46,12 +53,10 @@ double Chamber::GetRHS()
     return this->dpdt;
 };
 
-int Chamber::SetDepVarIndex(int sysDepVarIndex)
+void Chamber::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
 {   
-
-    this->depVarIndexInSys.push_back(sysDepVarIndex);
-    sysDepVarIndex++;
-    return sysDepVarIndex;
+    this->depVarIndexInSys[objDepVarIndex] = sysDepVarIndex;
+    return;
 };
 
 void Chamber::UpdateDepVar(std::vector<sunrealtype> &yValues)

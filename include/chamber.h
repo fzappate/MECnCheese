@@ -52,7 +52,7 @@ class Chamber : public DiffEquation
     
     double GetRHS() override;
 
-    int SetDepVarIndex(int sysDepVarIndex) override;
+    void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) override;
 
     void UpdateDepVar(std::vector<sunrealtype> &yValues) override;
 

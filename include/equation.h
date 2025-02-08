@@ -49,7 +49,7 @@ class DiffEquation : public Equation
     DiffEquation(std::string name);
 
     // Set the index the dependent variables of the equation has in the system 
-    virtual int SetDepVarIndex(int sysDepVarIndex) = 0;
+    virtual void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) = 0;
 
     // Update the dependent variables of the equation with the values in y
     virtual void UpdateDepVar(std::vector<sunrealtype> &yValues) = 0;

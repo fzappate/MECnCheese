@@ -69,7 +69,7 @@ public:
 
     void ResetDiffEq(N_Vector y);
 
-    void MoveDepVarIntoNVector();
+    void ConnectYToDepVar();
 
     void System::ConnectYDotToDepVarDerivatives(N_Vector ydot);
 
