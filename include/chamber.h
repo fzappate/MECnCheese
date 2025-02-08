@@ -50,19 +50,11 @@ class Chamber : public DiffEquation
 
     void CalculateRHS() override;
     
-    double GetRHS() override;
-
     void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) override;
-
-    void UpdateDepVar(std::vector<sunrealtype> &yValues) override;
 
     void ZeroParameters() override;
 
-    std::vector<double> GetInitialCondition() override;
-
     double GetAbsTol() override;
-
-    double GetRelTol() override;
 
     void PrintHeader(std::ofstream& outputFile) override;
 

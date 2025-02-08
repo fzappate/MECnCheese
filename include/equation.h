@@ -17,12 +17,13 @@ public:
     // Methods
     Equation(std::string name);
 
+    // Calculate RHS of the equation 
     virtual void CalculateRHS() = 0;
 
-    virtual double GetRHS() = 0;
-
+    // Print heder of the object in the output file
     virtual void PrintHeader(std::ofstream &outputFile) = 0;
 
+    // Print variables of the object in the output file
     virtual void PrintVariables(std::ofstream &outputFile) = 0;
 };
 
@@ -51,22 +52,17 @@ class DiffEquation : public Equation
     // Set the index the dependent variables of the equation has in the system 
     virtual void SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex) = 0;
 
-    // Update the dependent variables of the equation with the values in y
-    virtual void UpdateDepVar(std::vector<sunrealtype> &yValues) = 0;
-
     // Zero the summation (forces, flows etc.) parameters of the equation
     virtual void ZeroParameters() = 0;
 
-    // Get the deendent variable of the equation 
-    virtual std::vector<double> GetInitialCondition() = 0;
-
+    // Get absolute tolerance of the equations of the object
     virtual double GetAbsTol() = 0;
 
-    virtual double GetRelTol() = 0;
 };
 
 class NonDiffEquation : public Equation
 {
     public:
+    // Constructor
     NonDiffEquation(std::string name);
 };

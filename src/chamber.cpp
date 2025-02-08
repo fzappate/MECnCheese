@@ -48,23 +48,12 @@ void Chamber::CalculateRHS()
     return;
 };
 
-double Chamber::GetRHS()
-{
-    return this->dpdt;
-};
 
 void Chamber::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDepVarIndex)
 {   
     this->depVarIndexInSys[objDepVarIndex] = sysDepVarIndex;
     return;
 };
-
-void Chamber::UpdateDepVar(std::vector<sunrealtype> &yValues)
-{
-
-    this->pressure = yValues[this->depVarIndexInSys[0]];
-    return; 
-}
 
 void Chamber::ZeroParameters()
 {
@@ -75,21 +64,9 @@ void Chamber::ZeroParameters()
     return;
 }
 
-std::vector<double> Chamber::GetInitialCondition()
-{
-    std::vector<double> initCond;
-    initCond.push_back(pressure);
-    return initCond;
-};
-
 double Chamber::GetAbsTol()
 {
     return aTol;
-}
-
-double Chamber::GetRelTol()
-{
-    return rTol;
 }
 
 void Chamber::PrintHeader(std::ofstream& outputFile)

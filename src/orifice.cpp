@@ -111,12 +111,6 @@ void Orifice::CalculateRHS()
     return;
 };
 
-double Orifice::GetRHS()
-{
-    std::cout << "Orifice GetRHS" << std::endl;
-    return this->flowrate;
-};
-
 void Orifice::PrintHeader(std::ofstream& outputFile)
 {
     if(printStruct.printCf == 1)

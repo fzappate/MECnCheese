@@ -52,8 +52,6 @@ public:
 
     void CalculateRHS() override;
 
-    double GetRHS() override;
-
     void PrintHeader(std::ofstream& outputFile) override;
 
     void PrintVariables(std::ofstream& outputFile) override;
