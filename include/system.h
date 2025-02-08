@@ -32,16 +32,15 @@ protected:
     std::vector<sunrealtype> initConditions;
 
     // N_Vector y used as initial conditions in the solver
-    N_Vector y;
-
-    // SUNContext used to run the simulation
-    SUNContext sunctx;
+    N_Vector yInitCond;
 
     // Save ydot to detect when it changes
     N_Vector ydot;
 
-public:
+    // SUNContext used to run the simulation
+    SUNContext sunctx;
 
+public:
     // Default constructor
     System();
 
@@ -54,47 +53,51 @@ public:
     // Save non-differential object pointer in the system
     void AddEquation(NonDiffEquation &equation);
 
-    // Save the SUNDIALS context in the system
-    void AddSUNContext(SUNContext &sunctx);
-
-    // Get the SUNDIALS context stored in the system
-    SUNContext GetSUNContext();
-
     // Get vector of pointers to non-differential objects
     std::vector<NonDiffEquation *> GetNonDiffEquations();
 
     // Get vector of pointers to differential objects
     std::vector<DiffEquation *> GetDiffEquations();
 
-    // Get the initial conditions of the system
-    N_Vector GetInitCondition();
-
-    N_Vector GetEqAbsTol();
-
+    // Get the number of differential equations in the system
     int GetNoOfDiffEq();
 
+    // Get the number of non-differential equations in the system
     int GetNoOfAuxEq();
 
-    double GetRelTol();
-
-    void CalculateDiffEqRHS();
-
-    void CalculateAuxEqRHS();
-
-    std::vector<double> GetDiffEqRHS();
-
-    void ResetDiffEq(N_Vector y);
-
+    // Connect the dependent variables of the differential objects to the N_Vector y
     void ConnectYToDepVar();
 
+    // Connect the ydot vector to the derivatives of the dependent variables of the differential objects
     void System::ConnectYDotToDepVarDerivatives(N_Vector ydot);
 
-    // Set y vector
-    N_Vector GetY();
+    // Save the SUNDIALS context in the system
+    void AddSUNContext(SUNContext &sunctx);
+
+    // Get the SUNDIALS context stored in the system
+    SUNContext GetSUNContext();
+
+    // Calculate the right hand side of the equations of the differential objects
+    void CalculateDiffEqRHS();
+
+    // Calculate the right hand side of the equations of the non-differential objects
+    void CalculateAuxEqRHS();
+
+    // Reset the differential equations parameters
+    void ResetDiffEq(N_Vector y);
+
+    // Get the y vector
+    N_Vector GetYInitCond();
 
     // Get the ydot vector
     N_Vector GetYDot();
 
     // Set the ydot vector
     void SetYDot(N_Vector ydot);
+
+    // Get the absolute tolerance of the equations of the differential objects
+    N_Vector GetEqAbsTol();
+
+    // Get the relative tolerance of the system
+    double GetRelTol();
 };

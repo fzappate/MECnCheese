@@ -38,7 +38,7 @@ int Solver::SolveSystem(System sys)
   cvode_mem = NULL;
   
   int noOfDiffEq = sys.GetNoOfDiffEq();
-  N_Vector y = sys.GetY();
+  N_Vector y = sys.GetYInitCond();
 
   // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);

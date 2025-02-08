@@ -32,7 +32,7 @@ void Chamber::SetPressure(double press)
 
 double Chamber::GetPressure()
 {
-    return pressure;
+    return *yValuesPnt[0];
 };
 
 void Chamber::AddFlowIn(std::string flowName, double flowrate)
