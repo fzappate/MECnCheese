@@ -11,15 +11,18 @@
 // Chamber
 Chamber::Chamber(std::string name, double pressure) : DiffObject(name), pressure(pressure)
 {
+    // Set how many dependent variables the object has
+    this->nDepVar = 1;
+
     // Set initial conditions
     this->yValuesInit.push_back(pressure);
     this->yDotValuesInit.push_back(0.0);
     this->absTol.push_back(0.001);
 
     // Initialize the pointers that connect to the dependent variables in the system
-    this->yValuesPnt = std::vector<sunrealtype*>(1, nullptr);
-    this->yDotValuesPnt = std::vector<sunrealtype*>(1, nullptr);
-    this->depVarIndexInSys = std::vector<sunindextype>(1, -1);
+    this->yValuesPnt = std::vector<sunrealtype*>(this->nDepVar, nullptr);
+    this->yDotValuesPnt = std::vector<sunrealtype*>(this->nDepVar, nullptr);
+    this->depVarIndexInSys = std::vector<sunindextype>(this->nDepVar, -1);
 
     return;
 };

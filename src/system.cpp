@@ -76,7 +76,7 @@ N_Vector System::GetObjAbsTol()
         DiffObject &tempEq = *diffObjects[ii];
         
         // Iterate on the equations of the object
-        for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
         {
             eqAbsTolData[ii] = tempEq.GetAbsTol(jj);
         };
@@ -148,16 +148,17 @@ void System::ConnectYToDepVar()
         DiffObject &tempEq = *diffObjects[ii];
 
         // Iterate on the equations of the object
-        for (int jj = 0; jj < tempEq.yValuesInit.size(); jj++)
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
         {
             // Save the index of the object dependent variables in the system
             tempEq.SetDepVarIndex(jj, noOfEq);
 
             // Assign the value of the dependent variable to the N_Vector
-            yData[noOfEq] = tempEq.yValuesInit[jj];
+            yData[noOfEq] = tempEq.GetYValuesInit(jj);
+            
 
             // Save in the object the pointer to the dependent variable in the N_Vector
-            tempEq.yValuesPnt[jj] = &yData[noOfEq];
+            tempEq.SetYValuesPnt(jj, &yData[noOfEq]);
 
             // Increment the number of equations
             noOfEq++;
@@ -171,16 +172,16 @@ void System::ConnectYDotToDepVarDeriv(N_Vector ydot)
     // Extract the pointer to the elements of the N_Vector ydot
     realtype *yDotData = N_VGetArrayPointer_Serial(ydot);
 
-    // Iterate on the objects of the system
+    // Iterate on the differential objects of the system
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        DiffObject &tempEq = *diffObjects[ii];
-
+        DiffObject &tempEq = *this->diffObjects[ii];
+        
         // Iterate on the equation of the object
-        for (int jj = 0; jj < tempEq.yDotValuesInit.size(); jj++)
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
         {
             // Save in the object the pointer to the dependent variable derivative in the N_Vector
-            tempEq.yDotValuesPnt[jj] = &yDotData[tempEq.depVarIndexInSys[jj]];
+            tempEq.SetYDotValuesPnt(jj, &yDotData[tempEq.GetDepVarIndex(jj)]);
         };
     };
 };

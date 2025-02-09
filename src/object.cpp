@@ -17,4 +17,31 @@ void DiffObject::SetDepVarIndex(sunindextype objDepVarIndex, sunindextype sysDep
     return;
 };
 
+sunrealtype DiffObject::GetYValuesInit(sunindextype index)
+{
+    return this->yValuesInit[index];    
+};
+
+void DiffObject::SetYValuesPnt(sunindextype index, sunrealtype* yValuePnt)
+{
+    this->yValuesPnt[index] = yValuePnt;
+    return;
+};
+
+void DiffObject::SetYDotValuesPnt(sunindextype index, sunrealtype* yDotValuePnt)
+{
+    this->yDotValuesPnt[index] = yDotValuePnt;
+    return;
+};
+
+sunindextype DiffObject::GetDepVarIndex(sunindextype index)
+{
+    return this->depVarIndexInSys[index];
+};
+
+sunindextype DiffObject::GetNoOfDepVar()
+{
+    return this->nDepVar;
+};
+
 NonDiffObject::NonDiffObject(std::string name) : Object(name) {};
