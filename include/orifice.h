@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "./equation.h"
+#include "./object.h"
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice: public NonDiffEquation
+class Orifice: public NonDiffObject
 {
     double area;
     double Cf = 0.678;

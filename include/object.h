@@ -6,7 +6,7 @@
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
 
-class Equation
+class Object
 {
 protected:
     // Properties
@@ -14,8 +14,8 @@ protected:
     bool isDifferential;
 
 public:
-    // Methods
-    Equation(std::string name);
+    // Constructor
+    Object(std::string name);
 
     // Calculate RHS of the equation 
     virtual void CalculateRHS() = 0;
@@ -27,7 +27,7 @@ public:
     virtual void PrintVariables(std::ofstream &outputFile) = 0;
 };
 
-class DiffEquation : public Equation
+class DiffObject : public Object
 {
     public:
 
@@ -50,7 +50,7 @@ class DiffEquation : public Equation
     std::vector<sunrealtype> absTol;
 
     // Constructor
-    DiffEquation(std::string name);
+    DiffObject(std::string name);
 
     // Zero the summation (forces, flows etc.) parameters of the equation
     virtual void ZeroParameters() = 0;
@@ -63,9 +63,9 @@ class DiffEquation : public Equation
 
 };
 
-class NonDiffEquation : public Equation
+class NonDiffObject : public Object
 {
     public:
     // Constructor
-    NonDiffEquation(std::string name);
+    NonDiffObject(std::string name);
 };

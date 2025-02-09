@@ -5,7 +5,7 @@
 #include <cvode/cvode.h>            // prototypes for CVODE fcts., consts.
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
-#include "equation.h"
+#include "./object.h"
 
 class System
 {
@@ -23,10 +23,10 @@ protected:
     double relTol = 0.001;
 
     // Pointers to the non-differential object in the system
-    std::vector<NonDiffEquation *> nonDiffEquations;
+    std::vector<NonDiffObject *> nonDiffObjects;
 
     // Pointers to the differential object in the system
-    std::vector<DiffEquation *> diffEquations;
+    std::vector<DiffObject *> diffObjects;
 
     // Initial conditions of the system
     std::vector<sunrealtype> initConditions;
@@ -48,28 +48,28 @@ public:
     System(SUNContext sunctx);
 
     // Save differential object pointer in the system
-    void AddEquation(DiffEquation &equation);
+    void AddObject(DiffObject &equation);
 
     // Save non-differential object pointer in the system
-    void AddEquation(NonDiffEquation &equation);
+    void AddObject(NonDiffObject &equation);
 
     // Get vector of pointers to non-differential objects
-    std::vector<NonDiffEquation *> GetNonDiffEquations();
+    std::vector<NonDiffObject *> GetNonDiffObjects();
 
     // Get vector of pointers to differential objects
-    std::vector<DiffEquation *> GetDiffEquations();
+    std::vector<DiffObject *> GetDiffObjects();
 
     // Get the number of differential equations in the system
-    int GetNoOfDiffEq();
+    int GetNoOfDiffObj();
 
     // Get the number of non-differential equations in the system
-    int GetNoOfAuxEq();
+    int GetNoOfAuxObj();
 
     // Connect the dependent variables of the differential objects to the N_Vector y
     void ConnectYToDepVar();
 
     // Connect the ydot vector to the derivatives of the dependent variables of the differential objects
-    void System::ConnectYDotToDepVarDerivatives(N_Vector ydot);
+    void System::ConnectYDotToDepVarDeriv(N_Vector ydot);
 
     // Save the SUNDIALS context in the system
     void AddSUNContext(SUNContext &sunctx);
@@ -96,7 +96,7 @@ public:
     void SetYDot(N_Vector ydot);
 
     // Get the absolute tolerance of the equations of the differential objects
-    N_Vector GetEqAbsTol();
+    N_Vector GetObjAbsTol();
 
     // Get the relative tolerance of the system
     double GetRelTol();
