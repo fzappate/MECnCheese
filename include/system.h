@@ -60,16 +60,16 @@ public:
     std::vector<DiffObject *> GetDiffObjects();
 
     // Get the number of differential equations in the system
-    int GetNoOfDiffEq();
+    int GetNoOfDiffObj();
 
     // Get the number of non-differential equations in the system
-    int GetNoOfAuxEq();
+    int GetNoOfAuxObj();
 
     // Connect the dependent variables of the differential objects to the N_Vector y
     void ConnectYToDepVar();
 
     // Connect the ydot vector to the derivatives of the dependent variables of the differential objects
-    void System::ConnectYDotToDepVarDerivatives(N_Vector ydot);
+    void System::ConnectYDotToDepVarDeriv(N_Vector ydot);
 
     // Save the SUNDIALS context in the system
     void AddSUNContext(SUNContext &sunctx);
@@ -96,7 +96,7 @@ public:
     void SetYDot(N_Vector ydot);
 
     // Get the absolute tolerance of the equations of the differential objects
-    N_Vector GetEqAbsTol();
+    N_Vector GetObjAbsTol();
 
     // Get the relative tolerance of the system
     double GetRelTol();

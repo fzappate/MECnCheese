@@ -37,7 +37,7 @@ int Solver::SolveSystem(System sys)
   void *cvode_mem;
   cvode_mem = NULL;
   
-  int noOfDiffEq = sys.GetNoOfDiffEq();
+  int noOfDiffEq = sys.GetNoOfDiffObj();
   N_Vector y = sys.GetYInitCond();
 
   // Create SUNDIALS context
@@ -48,7 +48,7 @@ int Solver::SolveSystem(System sys)
   sys.AddSUNContext(sunctx);
 
   // Absolute tolerance
-  N_Vector absTol = sys.GetEqAbsTol();
+  N_Vector absTol = sys.GetObjAbsTol();
   if (CheckReturnValue((void *)absTol, "GetEqAbsTol", 0))
     return (1);
 
@@ -177,7 +177,7 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
      sysPtr->SetYDot(ydot);
 
     // Initialize the dependent variable pointers
-    sysPtr->ConnectYDotToDepVarDerivatives(ydot);
+    sysPtr->ConnectYDotToDepVarDeriv(ydot);
   }
 
   // Set new depenedent variable and reset equation factors

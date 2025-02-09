@@ -62,7 +62,7 @@ std::vector<DiffObject *> System::GetDiffObjects()
     return this->diffObjects;
 };
 
-N_Vector System::GetEqAbsTol()
+N_Vector System::GetObjAbsTol()
 {
     // Create the N_Vector eqAbsTol
     N_Vector eqAbsTol = N_VNew_Serial(this->noOfDiffEq, sunctx);
@@ -85,12 +85,12 @@ N_Vector System::GetEqAbsTol()
     return eqAbsTol;
 };
 
-int System::GetNoOfDiffEq()
+int System::GetNoOfDiffObj()
 {
     return this->noOfDiffEq;
 };
 
-int System::GetNoOfAuxEq()
+int System::GetNoOfAuxObj()
 {
     return this->noOfAuxEq;
 }
@@ -166,7 +166,7 @@ void System::ConnectYToDepVar()
     std::cout << "Equations added to the system: " << noOfEq << std::endl;
 };
 
-void System::ConnectYDotToDepVarDerivatives(N_Vector ydot)
+void System::ConnectYDotToDepVarDeriv(N_Vector ydot)
 {
     // Extract the pointer to the elements of the N_Vector ydot
     realtype *yDotData = N_VGetArrayPointer_Serial(ydot);
