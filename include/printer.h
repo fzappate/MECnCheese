@@ -23,6 +23,5 @@ public:
 
     void PrintResultsHeader();
 
-    void PrintResults(double time); 
-
+    void PrintResults(double time);
 };

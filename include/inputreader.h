@@ -4,13 +4,12 @@
 
 class InputReader
 {
-    private:
+private:
     std::string filename = "Inputs.md";
     std::vector<double> variables;
     std::vector<std::string> variableNames;
-    
-    public:
 
+public:
     InputReader();
 
     InputReader(std::string filename);
@@ -21,7 +20,7 @@ class InputReader
 
     void LeftTrim(std::string &s);
 
-    void RemoveCharacter(std::string& str, char c);
+    void RemoveCharacter(std::string &str, char c);
 
     double ConvertUnits(std::string unit);
 
@@ -32,5 +31,4 @@ class InputReader
     int ImportVarAsInt(std::string var);
 
     bool ImportVarAsBool(std::string var);
-
 };

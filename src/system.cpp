@@ -74,7 +74,7 @@ N_Vector System::GetObjAbsTol()
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
         DiffObject &tempEq = *diffObjects[ii];
-        
+
         // Iterate on the equations of the object
         for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
         {
@@ -155,7 +155,6 @@ void System::ConnectYToDepVar()
 
             // Assign the value of the dependent variable to the N_Vector
             yData[noOfEq] = tempEq.GetYValuesInit(jj);
-            
 
             // Save in the object the pointer to the dependent variable in the N_Vector
             tempEq.SetYValuesPnt(jj, &yData[noOfEq]);
@@ -176,7 +175,7 @@ void System::ConnectYDotToDepVarDeriv(N_Vector ydot)
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
         DiffObject &tempEq = *this->diffObjects[ii];
-        
+
         // Iterate on the equation of the object
         for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
         {

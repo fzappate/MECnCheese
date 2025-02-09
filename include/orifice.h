@@ -6,7 +6,7 @@
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice: public NonDiffObject
+class Orifice : public NonDiffObject
 {
     double area;
     double Cf = 0.678;
@@ -23,7 +23,6 @@ class Orifice: public NonDiffObject
     PrintStruct printStruct;
 
 public:
-
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
 
     void SetArea(double area);
@@ -52,7 +51,7 @@ public:
 
     void CalculateRHS() override;
 
-    void PrintHeader(std::ofstream& outputFile) override;
+    void PrintHeader(std::ofstream &outputFile) override;
 
-    void PrintVariables(std::ofstream& outputFile) override;
+    void PrintVariables(std::ofstream &outputFile) override;
 };

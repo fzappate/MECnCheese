@@ -8,20 +8,18 @@
 
 #include "./object.h"
 
-
-
-class Chamber : public DiffObject 
+class Chamber : public DiffObject
 {
-    protected:
-    double bulkMod = 1.8*1.0E9;
-    double pressure; 
+protected:
+    double bulkMod = 1.8 * 1.0E9;
+    double pressure;
     double volume;
     double volDer;
     double dpdt;
     double flowSum = 0;
     double aTol = 1;
     double rTol = 0.001;
-    
+
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
 
@@ -35,9 +33,8 @@ class Chamber : public DiffObject
     };
     PrintStruct printStruct;
 
-    public:
-
-    Chamber( std::string name, double pressure);
+public:
+    Chamber(std::string name, double pressure);
 
     // void SetPressure(double pressure);
 
@@ -51,19 +48,17 @@ class Chamber : public DiffObject
 
     void ZeroParameters() override;
 
-    void PrintHeader(std::ofstream& outputFile) override;
+    void PrintHeader(std::ofstream &outputFile) override;
 
-    void PrintVariables(std::ofstream& outputFile) override;
-
+    void PrintVariables(std::ofstream &outputFile) override;
 };
 
 // Class InfChamber
 class InfChamber : public Chamber
 {
 public:
+    InfChamber(std::string name, double pressure);
 
-    InfChamber(std::string name,double pressure);
-    
     void AddFlowIn(std::string name, double flow) override;
 
     void CalculateRHS() override;
@@ -73,13 +68,8 @@ public:
 class ConstChamber : public Chamber
 {
 
-
 public:
-    
-    ConstChamber(std::string name, double pressure, double volume);   
+    ConstChamber(std::string name, double pressure, double volume);
 
     void CalculateRHS() override;
-    
-
 };
-

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <iomanip> 
+#include <iomanip>
 #include <fstream>
 #include <chrono>
 
@@ -17,10 +17,10 @@
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime) 
+Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime)
 {
-    outTime = stepTime;
-    return;
+  outTime = stepTime;
+  return;
 }
 
 int Solver::SolveSystem(System sys)
@@ -36,7 +36,7 @@ int Solver::SolveSystem(System sys)
   LS = NULL;
   void *cvode_mem;
   cvode_mem = NULL;
-  
+
   int noOfDiffEq = sys.GetNoOfDiffObj();
   N_Vector y = sys.GetYInitCond();
 
@@ -61,9 +61,9 @@ int Solver::SolveSystem(System sys)
   if (CheckReturnValue((void *)cvode_mem, "CVodeCreate", 0))
     return (1);
 
-  // Give user data to the solver function 
+  // Give user data to the solver function
   System *sysPtr = &sys;
-  retval = CVodeSetUserData(cvode_mem,sysPtr);
+  retval = CVodeSetUserData(cvode_mem, sysPtr);
   if (CheckReturnValue(&retval, "CVodeSetUserData", 1))
     return (1);
 
@@ -75,7 +75,7 @@ int Solver::SolveSystem(System sys)
     return (1);
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
-  // and vector absolute tolerances 
+  // and vector absolute tolerances
   retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
   if (CheckReturnValue(&retval, "CVodeSVtolerances", 1))
     return (1);
@@ -113,11 +113,11 @@ int Solver::SolveSystem(System sys)
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     if (CheckReturnValue(&retval, "CVode", 1))
       break;
-      
+
     double bar = 1e-5;
     std::cout << std::fixed << std::setprecision(3);
-    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1)*bar << " || LPChamber: " << Ith(y, 2)*bar;
-    std::cout << " || inletChamber: " << Ith(y, 3)*bar << " || variableChamber: " << Ith(y, 4)*bar << " || outletChamber: " << Ith(y, 5)*bar << std::endl;
+    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1) * bar << " || LPChamber: " << Ith(y, 2) * bar;
+    std::cout << " || inletChamber: " << Ith(y, 3) * bar << " || variableChamber: " << Ith(y, 4) * bar << " || outletChamber: " << Ith(y, 5) * bar << std::endl;
 
     printer.PrintResults(outTime);
 
@@ -139,17 +139,16 @@ int Solver::SolveSystem(System sys)
   N_VDestroy(y);            // Free y vector
   N_VDestroy(abstol);       // Free abstol vector
   CVodeFree(&cvode_mem);    // Free CVODE memory
-  SUNLinSolFree(LS);        // Free the linear solver memory 
-  SUNMatDestroy(A);         // Free the matrix memory 
-  SUNContext_Free(&sunctx); // Free the SUNDIALS context 
+  SUNLinSolFree(LS);        // Free the linear solver memory
+  SUNMatDestroy(A);         // Free the matrix memory
+  SUNContext_Free(&sunctx); // Free the SUNDIALS context
 
   return (retval);
-
 }
 
 int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
-    // This function computes the ODE right-hand side for a given value of the independent variable
+  // This function computes the ODE right-hand side for a given value of the independent variable
   //  and state vector
   // Arguments:
   // t – is the current value of the independent variable.
@@ -162,19 +161,19 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
   // Cast the user_data void pointer to a pointer to system
-  System * sysPtr =  static_cast<System *>(user_data);
+  System *sysPtr = static_cast<System *>(user_data);
 
-  sunrealtype y1 = Ith(y, 1); 
-  sunrealtype y2 = Ith(y, 2); 
-  sunrealtype y3 = Ith(y, 3); 
-  sunrealtype y4 = Ith(y, 4); 
-  sunrealtype y5 = Ith(y, 5); 
+  sunrealtype y1 = Ith(y, 1);
+  sunrealtype y2 = Ith(y, 2);
+  sunrealtype y3 = Ith(y, 3);
+  sunrealtype y4 = Ith(y, 4);
+  sunrealtype y5 = Ith(y, 5);
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
-  if ( sysPtr->GetYDot() != ydot)
+  if (sysPtr->GetYDot() != ydot)
   {
     // Save the current ydot pointer in the system
-     sysPtr->SetYDot(ydot);
+    sysPtr->SetYDot(ydot);
 
     // Initialize the dependent variable pointers
     sysPtr->ConnectYDotToDepVarDeriv(ydot);
@@ -187,11 +186,11 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sysPtr->CalculateAuxEqRHS();
   sysPtr->CalculateDiffEqRHS();
 
-  sunrealtype yDot1 = Ith(ydot, 1); 
-  sunrealtype yDot2 = Ith(ydot, 2); 
-  sunrealtype yDot3 = Ith(ydot, 3); 
-  sunrealtype yDot4 = Ith(ydot, 4); 
-  sunrealtype yDot5 = Ith(ydot, 5); 
+  sunrealtype yDot1 = Ith(ydot, 1);
+  sunrealtype yDot2 = Ith(ydot, 2);
+  sunrealtype yDot3 = Ith(ydot, 3);
+  sunrealtype yDot4 = Ith(ydot, 4);
+  sunrealtype yDot5 = Ith(ydot, 5);
 
   return (0);
 }
