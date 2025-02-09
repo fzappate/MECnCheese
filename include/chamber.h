@@ -6,7 +6,7 @@
 
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
-#include "./equation.h"
+#include "./object.h"
 
 
 

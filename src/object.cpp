@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "./equation.h"
+#include "./object.h"
 
 Object::Object(std::string name) : name(name) {};
 

@@ -1,6 +1,5 @@
 #include "./orifice.h"
 #include "./chamber.h"
-#include "./equation.h"
 #include "./system.h"
 #include "./solver.h"
 #include "./inputreader.h"

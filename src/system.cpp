@@ -7,7 +7,7 @@
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
 #include "system.h"
-#include "equation.h"
+#include "object.h"
 
 #define Ith(v, i) NV_Ith_S(v, i - 1)
 

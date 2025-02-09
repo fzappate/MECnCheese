@@ -1,5 +1,5 @@
 #pragma once
-#include "./equation.h"
+#include "./object.h"
 #include "./printer.h"
 
 Printer::Printer(){};
