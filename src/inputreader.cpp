@@ -20,81 +20,83 @@ InputReader::InputReader(std::string filename) : filename(filename)
 
 void InputReader::ReadInput()
 {
-    std::ifstream inputFile(filename); 
-  
-    // Check if the file is successfully opened 
-    if (!inputFile.is_open()) { 
-        std::cout << "Error opening the file!" << std::endl; 
-        return; 
-    } 
-  
-    // Read each line of the file and print it to the standard output stream 
-    std::string line; 
-    while (getline(inputFile, line)) { 
+    std::ifstream inputFile(filename);
 
-      // Remove spaces
-      RemoveCharacter(line,' ');
+    // Check if the file is successfully opened
+    if (!inputFile.is_open())
+    {
+        std::cout << "Error opening the file!" << std::endl;
+        return;
+    }
 
-      // Make sure the line is a variable
-      if (line[0] == '-')
-      {
-        // Remove the dash
-        RemoveCharacter(line,'-');
+    // Read each line of the file and print it to the standard output stream
+    std::string line;
+    while (getline(inputFile, line))
+    {
 
-        // Break down the line in tokens 
-        std::stringstream ss(line);
-        std::string token; 
-        std::vector<std::string> tokens; 
-        char delimiter = ',';
+        // Remove spaces
+        RemoveCharacter(line, ' ');
 
-        while (getline(ss, token, delimiter)) 
-        { 
-            tokens.push_back(token); 
-        } 
-
-        // Make sure that the line respects the proper format
-        if(tokens.size()==3)
+        // Make sure the line is a variable
+        if (line[0] == '-')
         {
-            std::string name = tokens[0];
-            std::string unit = tokens[1];
-            double convFactor = ConvertUnits(unit);
-            double value = std::stod(tokens[2])*convFactor;
+            // Remove the dash
+            RemoveCharacter(line, '-');
 
-            variableNames.push_back(name);
-            variables.push_back(value);
+            // Break down the line in tokens
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+            char delimiter = ',';
+
+            while (getline(ss, token, delimiter))
+            {
+                tokens.push_back(token);
+            }
+
+            // Make sure that the line respects the proper format
+            if (tokens.size() == 3)
+            {
+                std::string name = tokens[0];
+                std::string unit = tokens[1];
+                double convFactor = ConvertUnits(unit);
+                double value = std::stod(tokens[2]) * convFactor;
+
+                variableNames.push_back(name);
+                variables.push_back(value);
+            }
         }
-      }
-      else
-      {
-        continue;
-      }
-    } 
-  
-    // Close the file 
-    inputFile.close(); 
+        else
+        {
+            continue;
+        }
+    }
+
+    // Close the file
+    inputFile.close();
     return;
 };
 
 void InputReader::RightTrim(std::string &s)
 {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+                         { return !std::isspace(ch); })
+                .base(),
+            s.end());
     return;
 }
 
 void InputReader::LeftTrim(std::string &s)
 {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+                                    { return !std::isspace(ch); }));
     return;
 }
 
-void InputReader::RemoveCharacter(std::string& str, char c)
+void InputReader::RemoveCharacter(std::string &str, char c)
 {
-    str.erase(std::remove(str.begin(), str.end(), c), str.end()); 
-    
+    str.erase(std::remove(str.begin(), str.end(), c), str.end());
+
     return;
 }
 
@@ -170,7 +172,7 @@ double InputReader::ConvertUnits(std::string unit)
     {
         convFactor = 1e5;
     }
-    else 
+    else
     {
         std::cout << "Unit: " << unit << " not found." << std::endl;
     }
@@ -179,15 +181,15 @@ double InputReader::ConvertUnits(std::string unit)
 
 double InputReader::SearchVarInVarList(std::string var)
 {
-    for(int ii = 0; ii<variables.size(); ii++)
+    for (int ii = 0; ii < variables.size(); ii++)
     {
-        if(variableNames[ii] == var)
+        if (variableNames[ii] == var)
         {
             return variables[ii];
         }
     }
 
-    std::cout<< "Variable " << var <<" not found." << std::endl;
+    std::cout << "Variable " << var << " not found." << std::endl;
     return 0;
 }
 
@@ -199,17 +201,14 @@ double InputReader::ImportVarAsDouble(std::string varName)
 
 int InputReader::ImportVarAsInt(std::string varName)
 {
-    double res = SearchVarInVarList(varName); 
+    double res = SearchVarInVarList(varName);
     int castRes = static_cast<int>(res);
     return castRes;
-
 }
 
 bool InputReader::ImportVarAsBool(std::string varName)
 {
-    double res = SearchVarInVarList(varName); 
+    double res = SearchVarInVarList(varName);
     bool castRes = static_cast<bool>(res);
     return castRes;
 }
-
-

@@ -3,7 +3,7 @@
 list(APPEND MEC_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/chamber.cpp
     ${CMAKE_CURRENT_LIST_DIR}/orifice.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/equation.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/object.cpp
     ${CMAKE_CURRENT_LIST_DIR}/system.cpp
     ${CMAKE_CURRENT_LIST_DIR}/solver.cpp
     ${CMAKE_CURRENT_LIST_DIR}/printer.cpp

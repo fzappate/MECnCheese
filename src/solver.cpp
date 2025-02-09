@@ -1,8 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include <iomanip> 
+#include <iomanip>
 #include <fstream>
+#include <chrono>
 
 #include <sundials/sundials_math.h>    // Import math functions
 #include <cvode/cvode.h>               // prototypes for CVODE fcts., consts.
@@ -16,10 +17,10 @@
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime) 
+Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime)
 {
-    outTime = stepTime;
-    return;
+  outTime = stepTime;
+  return;
 }
 
 int Solver::SolveSystem(System sys)
@@ -35,9 +36,9 @@ int Solver::SolveSystem(System sys)
   LS = NULL;
   void *cvode_mem;
   cvode_mem = NULL;
-  
-  int noOfDiffEq = sys.GetNoOfDiffEq();
-  N_Vector y = sys.GetInitCondition();
+
+  int noOfDiffEq = sys.GetNoOfDiffObj();
+  N_Vector y = sys.GetYInitCond();
 
   // Create SUNDIALS context
   int retval = SUNContext_Create(NULL, &sunctx);
@@ -47,7 +48,7 @@ int Solver::SolveSystem(System sys)
   sys.AddSUNContext(sunctx);
 
   // Absolute tolerance
-  N_Vector absTol = sys.GetEqAbsTol();
+  N_Vector absTol = sys.GetObjAbsTol();
   if (CheckReturnValue((void *)absTol, "GetEqAbsTol", 0))
     return (1);
 
@@ -60,9 +61,9 @@ int Solver::SolveSystem(System sys)
   if (CheckReturnValue((void *)cvode_mem, "CVodeCreate", 0))
     return (1);
 
-  // Give user data to the solver function 
+  // Give user data to the solver function
   System *sysPtr = &sys;
-  retval = CVodeSetUserData(cvode_mem,sysPtr);
+  retval = CVodeSetUserData(cvode_mem, sysPtr);
   if (CheckReturnValue(&retval, "CVodeSetUserData", 1))
     return (1);
 
@@ -74,7 +75,7 @@ int Solver::SolveSystem(System sys)
     return (1);
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
-  // and vector absolute tolerances 
+  // and vector absolute tolerances
   retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
   if (CheckReturnValue(&retval, "CVodeSVtolerances", 1))
     return (1);
@@ -98,21 +99,25 @@ int Solver::SolveSystem(System sys)
   // Break out of loop when NOUT preset output times have been reached.
   printf(" \nSolving the system\n\n");
 
+  // Impose a maximum timestep of stepTime
+  CVodeSetMaxStep(cvode_mem, stepTime);
+
   Printer printer = Printer(sys);
   printer.OpenFile();
   printer.PrintResultsHeader();
 
+  auto startTimer = std::chrono::high_resolution_clock::now();
   while (1)
   {
 
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     if (CheckReturnValue(&retval, "CVode", 1))
       break;
-      
+
     double bar = 1e-5;
     std::cout << std::fixed << std::setprecision(3);
-    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1)*bar << " || LPChamber: " << Ith(y, 2)*bar;
-    std::cout << " || inletChamber: " << Ith(y, 3)*bar << " || variableChamber: " << Ith(y, 4)*bar << " || outletChamber: " << Ith(y, 5)*bar << std::endl;
+    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1) * bar << " || LPChamber: " << Ith(y, 2) * bar;
+    std::cout << " || inletChamber: " << Ith(y, 3) * bar << " || variableChamber: " << Ith(y, 4) * bar << " || outletChamber: " << Ith(y, 5) * bar << std::endl;
 
     printer.PrintResults(outTime);
 
@@ -123,6 +128,9 @@ int Solver::SolveSystem(System sys)
 
     if (outTime > endTime)
     {
+      auto nowTime = std::chrono::high_resolution_clock::now();
+      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTimer);
+      std::cout << "Simulation time: " << elapsed.count() << " ms" << std::endl;
       break;
     }
   }
@@ -131,17 +139,16 @@ int Solver::SolveSystem(System sys)
   N_VDestroy(y);            // Free y vector
   N_VDestroy(abstol);       // Free abstol vector
   CVodeFree(&cvode_mem);    // Free CVODE memory
-  SUNLinSolFree(LS);        // Free the linear solver memory 
-  SUNMatDestroy(A);         // Free the matrix memory 
-  SUNContext_Free(&sunctx); // Free the SUNDIALS context 
+  SUNLinSolFree(LS);        // Free the linear solver memory
+  SUNMatDestroy(A);         // Free the matrix memory
+  SUNContext_Free(&sunctx); // Free the SUNDIALS context
 
   return (retval);
-
 }
 
 int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
-    // This function computes the ODE right-hand side for a given value of the independent variable
+  // This function computes the ODE right-hand side for a given value of the independent variable
   //  and state vector
   // Arguments:
   // t – is the current value of the independent variable.
@@ -154,32 +161,36 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
   // Cast the user_data void pointer to a pointer to system
-  System * sysPtr =  static_cast<System *>(user_data);
+  System *sysPtr = static_cast<System *>(user_data);
 
-  // Dereference the pointer to the system
-  System sys = *sysPtr;
+  sunrealtype y1 = Ith(y, 1);
+  sunrealtype y2 = Ith(y, 2);
+  sunrealtype y3 = Ith(y, 3);
+  sunrealtype y4 = Ith(y, 4);
+  sunrealtype y5 = Ith(y, 5);
 
-  // THIS IS JUST TO MONITOR y WHILE DEBUGGING
-  std::vector<double> yValues = std::vector<double>(5);
-  for (int i = 0; i < 5; ++i) {
-      yValues[i] = Ith(y, i + 1);  // Assign values
+  // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
+  if (sysPtr->GetYDot() != ydot)
+  {
+    // Save the current ydot pointer in the system
+    sysPtr->SetYDot(ydot);
+
+    // Initialize the dependent variable pointers
+    sysPtr->ConnectYDotToDepVarDeriv(ydot);
   }
-  // END OF MONITORING y
 
   // Set new depenedent variable and reset equation factors
-  sys.ResetDiffEq(y);
+  sysPtr->ResetDiffEq(y);
 
   // Calculate RHS from the system
-  sys.CalculateAuxEqRHS();
-  sys.CalculateDiffEqRHS();
+  sysPtr->CalculateAuxEqRHS();
+  sysPtr->CalculateDiffEqRHS();
 
-  // Extract RHS from system and store it in ydot
-  std::vector<sunrealtype> RHS = sys.GetDiffEqRHS();
-  sunrealtype noOfDiffEq = sys.GetNoOfDiffEq();
-  for (int ii = 0; ii < noOfDiffEq; ii++)
-  {    
-    Ith(ydot, ii + 1) = RHS[ii];
-  };
+  sunrealtype yDot1 = Ith(ydot, 1);
+  sunrealtype yDot2 = Ith(ydot, 2);
+  sunrealtype yDot3 = Ith(ydot, 3);
+  sunrealtype yDot4 = Ith(ydot, 4);
+  sunrealtype yDot5 = Ith(ydot, 5);
 
   return (0);
 }

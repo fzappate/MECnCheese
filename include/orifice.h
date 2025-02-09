@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "./equation.h"
+#include "./object.h"
 #include "./chamber.h"
 
 // Class Orifice
-class Orifice: public NonDiffEquation
+class Orifice : public NonDiffObject
 {
     double area;
     double Cf = 0.678;
@@ -23,7 +23,6 @@ class Orifice: public NonDiffEquation
     PrintStruct printStruct;
 
 public:
-
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
 
     void SetArea(double area);
@@ -52,9 +51,7 @@ public:
 
     void CalculateRHS() override;
 
-    double GetRHS() override;
+    void PrintHeader(std::ofstream &outputFile) override;
 
-    void PrintHeader(std::ofstream& outputFile) override;
-
-    void PrintVariables(std::ofstream& outputFile) override;
+    void PrintVariables(std::ofstream &outputFile) override;
 };

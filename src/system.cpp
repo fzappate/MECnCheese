@@ -7,7 +7,7 @@
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
 #include "system.h"
-#include "equation.h"
+#include "object.h"
 
 #define Ith(v, i) NV_Ith_S(v, i - 1)
 
@@ -15,105 +15,82 @@ System::System() {};
 
 System::System(SUNContext sunctx) : sunctx(sunctx) {};
 
-void System::AddEquation(DiffEquation &equation)
+void System::AddObject(DiffObject &object)
 {
-    // Save the equation in the container diffEquations
-    diffEquations.push_back(&equation);
-
-    // Assign a system index to the object dependent variables
-    int depVarUpdatedIndex = equation.SetDepVarIndex(this->sysDepVarIndex);
-
-    // Increment the sysDepVarIndex by the number of dependent variables in the equation
-    this->sysDepVarIndex = depVarUpdatedIndex;
-
-    //Get the initial conditions of the equation in the form of a vector
-    std::vector<double> eqInitConditions = equation.GetInitialCondition();
-
-    // Append them in the initConditions vector
-    this->initConditions.insert(this->initConditions.end(), eqInitConditions.begin(), eqInitConditions.end());
+    // Save the differential equation reference in the system
+    this->diffObjects.push_back(&object);
 
     // Increment the number of differential equations
-    this->AddDiffEqCount();
+    this->noOfDiffEq++;
+
+    return;
 };
 
-void System::AddEquation(NonDiffEquation &equation)
+void System::AddObject(NonDiffObject &object)
 {
-    nonDiffEquations.push_back(&equation);
-    this->AddNonDiffEqCount();
+    // Save the non-differential equation reference in the system
+    this->nonDiffObjects.push_back(&object);
+
+    // Increment the number of non-differential equations
+    this->noOfAuxEq++;
+
+    return;
 };
 
 void System::AddSUNContext(SUNContext &sunctx)
 {
-    sunctx = sunctx;
+    // Save the SUNDIALS context in the system
+    this->sunctx = sunctx;
     return;
 };
 
 SUNContext System::GetSUNContext()
 {
-
+    // Return the SUNDIALS context saved in the system
     return sunctx;
 };
 
-std::vector<NonDiffEquation *> System::GetNonDiffEquations()
+std::vector<NonDiffObject *> System::GetNonDiffObjects()
 {
-    return nonDiffEquations;
-}
-
-std::vector<DiffEquation *> System::GetDiffEquations()
-{
-    return diffEquations;
-}
-
-void System::AddDiffEqCount()
-{
-    this->noOfDiffEq++;
+    // Return the non-differential equations saved in the system
+    return this->nonDiffObjects;
 };
 
-void System::AddNonDiffEqCount()
+std::vector<DiffObject *> System::GetDiffObjects()
 {
-    this->noOfAuxEq++;
-}
+    // Return the differential equations saved in the system
+    return this->diffObjects;
+};
 
-N_Vector System::GetInitCondition()
+N_Vector System::GetObjAbsTol()
 {
-    N_Vector initCondOut = NULL;
-    
-    // Instead of N_VNew use N_VMake
-    // https://sundials.readthedocs.io/en/latest/cvode/Usage/index.html
-    initCondOut = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
+    // Create the N_Vector eqAbsTol
+    N_Vector eqAbsTol = N_VNew_Serial(this->noOfDiffEq, sunctx);
 
-    sunrealtype temp;
-    
-    // for (double initCondTemp : this->initConditions)
+    // Extract the pointer to the elements of the N_Vector eqAbsTol
+    realtype *eqAbsTolData = N_VGetArrayPointer_Serial(eqAbsTol);
+
+    // Save the absolute tolerance of the differential equations in eqAbsTol
     for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        double initCondTemp = this->initConditions[ii];
-        Ith(initCondOut, ii + 1) = initCondTemp;
-    };
+        DiffObject &tempEq = *diffObjects[ii];
 
-    return initCondOut;
-};
-
-N_Vector System::GetEqAbsTol()
-{
-    int noOfDiffEq = diffEquations.size();
-
-    N_Vector eqAbsTol = N_VNew_Serial(noOfDiffEq, sunctx);
-    for (int ii = 0; ii < noOfDiffEq; ii++)
-    {
-        DiffEquation &eqTemp = *diffEquations[ii];
-        Ith(eqAbsTol, ii + 1) = eqTemp.GetAbsTol();
+        // Iterate on the equations of the object
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
+        {
+            eqAbsTolData[ii] = tempEq.GetAbsTol(jj);
+        };
     };
 
     return eqAbsTol;
-}
+};
 
-int System::GetNoOfDiffEq()
+int System::GetNoOfDiffObj()
 {
     return this->noOfDiffEq;
-}
+};
 
-int System::GetNoOfAuxEq()
+int System::GetNoOfAuxObj()
 {
     return this->noOfAuxEq;
 }
@@ -125,69 +102,101 @@ double System::GetRelTol()
 
 void System::CalculateAuxEqRHS()
 {
-    int noOfAuxEquations = nonDiffEquations.size();
 
-    for (int ii = 0; ii < noOfAuxEquations; ii++)
+    for (int ii = 0; ii < this->noOfAuxEq; ii++)
     {
-        Equation &eqTemp = *nonDiffEquations[ii];
+        NonDiffObject &eqTemp = *nonDiffObjects[ii];
         eqTemp.CalculateRHS();
     };
 };
 
 void System::CalculateDiffEqRHS()
 {
-    int noOfDiffEquations = diffEquations.size();
-    for (int ii = 0; ii < noOfDiffEquations; ii++)
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        Equation &eqTemp = *diffEquations[ii];
+        DiffObject &eqTemp = *diffObjects[ii];
         eqTemp.CalculateRHS();
     };
 };
 
-std::vector<double> System::GetDiffEqRHS()
-{
-    std::vector<double> diffEqRHS;
-
-    int noOfDiffEquations = diffEquations.size();
-
-    for (int ii = 0; ii < noOfDiffEquations; ii++)
-    {
-        Equation &tempEq = *diffEquations[ii];
-
-        double rhs = tempEq.GetRHS();
-        diffEqRHS.push_back(rhs);
-    };
-
-    return diffEqRHS;
-};
-
 void System::ResetDiffEq(N_Vector y)
 {
-
-    // EXTRACT THE DEPENDENT VARIABLE FROM Y
-    // Exract the size of y 
-    size_t n = N_VGetLength_Serial(y);
-
-    // Access the raw data pointer of the N_Vector
-    sunrealtype *yData = N_VGetArrayPointer_Serial(y);
-
-    // Copy the data into a std::vector
-    std::vector<sunrealtype> yValues(n);
-    for (size_t i = 0; i < n; ++i) 
+    // Zero the summation parameters of the equations of the differential objects
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
     {
-        yValues[i] = yData[i];
-    }
-
-    // UPDATE THE OBJECTS OF THE SYSTEM
-    int noOfDiffEquations = this->diffEquations.size();
-
-    for (int ii = 0; ii < noOfDiffEquations; ii++)
-    {
-        DiffEquation &tempEq = *diffEquations[ii];
-
-        tempEq.UpdateDepVar(yValues);
+        DiffObject &tempEq = *diffObjects[ii];
         tempEq.ZeroParameters();
     };
 
     return;
 }
+
+void System::ConnectYToDepVar()
+{
+    // Define the N_Vector yInitCond
+    this->yInitCond = N_VNew_Serial(this->noOfDiffEq, this->sunctx);
+
+    // Extract the pointer to the elements of the N_Vector yInitCond
+    realtype *yData = N_VGetArrayPointer_Serial(this->yInitCond);
+
+    // Start a counter to keep track of the equations' index in the system
+    sunindextype noOfEq = 0;
+
+    // Iterate on the objects of the system
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    {
+        DiffObject &tempEq = *diffObjects[ii];
+
+        // Iterate on the equations of the object
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
+        {
+            // Save the index of the object dependent variables in the system
+            tempEq.SetDepVarIndex(jj, noOfEq);
+
+            // Assign the value of the dependent variable to the N_Vector
+            yData[noOfEq] = tempEq.GetYValuesInit(jj);
+
+            // Save in the object the pointer to the dependent variable in the N_Vector
+            tempEq.SetYValuesPnt(jj, &yData[noOfEq]);
+
+            // Increment the number of equations
+            noOfEq++;
+        };
+    };
+    std::cout << "Equations added to the system: " << noOfEq << std::endl;
+};
+
+void System::ConnectYDotToDepVarDeriv(N_Vector ydot)
+{
+    // Extract the pointer to the elements of the N_Vector ydot
+    realtype *yDotData = N_VGetArrayPointer_Serial(ydot);
+
+    // Iterate on the differential objects of the system
+    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    {
+        DiffObject &tempEq = *this->diffObjects[ii];
+
+        // Iterate on the equation of the object
+        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
+        {
+            // Save in the object the pointer to the dependent variable derivative in the N_Vector
+            tempEq.SetYDotValuesPnt(jj, &yDotData[tempEq.GetDepVarIndex(jj)]);
+        };
+    };
+};
+
+N_Vector System::GetYInitCond()
+{
+    return this->yInitCond;
+};
+
+N_Vector System::GetYDot()
+{
+    return this->ydot;
+};
+
+void System::SetYDot(N_Vector ydot)
+{
+    this->ydot = ydot;
+    return;
+};

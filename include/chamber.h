@@ -6,23 +6,20 @@
 
 #include <nvector/nvector_serial.h> // access to serial N_Vector
 
-#include "./equation.h"
+#include "./object.h"
 
-
-
-class Chamber : public DiffEquation 
+class Chamber : public DiffObject
 {
-    protected:
-    int noOfEq = 1;
-    double bulkMod = 1.8*1.0E9;
-    double pressure; 
+protected:
+    double bulkMod = 1.8 * 1.0E9;
+    double pressure;
     double volume;
     double volDer;
     double dpdt;
     double flowSum = 0;
     double aTol = 1;
     double rTol = 0.001;
-    
+
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
 
@@ -36,11 +33,10 @@ class Chamber : public DiffEquation
     };
     PrintStruct printStruct;
 
-    public:
+public:
+    Chamber(std::string name, double pressure);
 
-    Chamber( std::string name, double pressure);
-
-    void SetPressure(double pressure);
+    // void SetPressure(double pressure);
 
     double GetPressure();
 
@@ -49,34 +45,20 @@ class Chamber : public DiffEquation
     // Base class methods
 
     void CalculateRHS() override;
-    
-    double GetRHS() override;
-
-    int SetDepVarIndex(int sysDepVarIndex) override;
-
-    void UpdateDepVar(std::vector<sunrealtype> &yValues) override;
 
     void ZeroParameters() override;
 
-    std::vector<double> GetInitialCondition() override;
+    void PrintHeader(std::ofstream &outputFile) override;
 
-    double GetAbsTol() override;
-
-    double GetRelTol() override;
-
-    void PrintHeader(std::ofstream& outputFile) override;
-
-    void PrintVariables(std::ofstream& outputFile) override;
-
+    void PrintVariables(std::ofstream &outputFile) override;
 };
 
 // Class InfChamber
 class InfChamber : public Chamber
 {
 public:
+    InfChamber(std::string name, double pressure);
 
-    InfChamber(std::string name,double pressure);
-    
     void AddFlowIn(std::string name, double flow) override;
 
     void CalculateRHS() override;
@@ -86,13 +68,8 @@ public:
 class ConstChamber : public Chamber
 {
 
-
 public:
-    
-    ConstChamber(std::string name, double pressure, double volume);   
+    ConstChamber(std::string name, double pressure, double volume);
 
     void CalculateRHS() override;
-    
-
 };
-

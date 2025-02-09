@@ -1,6 +1,5 @@
 #include "./orifice.h"
 #include "./chamber.h"
-#include "./equation.h"
 #include "./system.h"
 #include "./solver.h"
 #include "./inputreader.h"
@@ -25,58 +24,61 @@ int main()
   // Create system
   System sys = System();
 
-  InfChamber HPChamber = InfChamber("HPChamber", 
+  InfChamber HPChamber = InfChamber("HPChamber",
                                     HPChamber_Pressure);
-  sys.AddEquation(HPChamber);
+  sys.AddObject(HPChamber);
 
-  InfChamber LPChamber = InfChamber("LPChamber", 
+  InfChamber LPChamber = InfChamber("LPChamber",
                                     LPChamber_Pressure);
-  sys.AddEquation(LPChamber);
+  sys.AddObject(LPChamber);
 
-  ConstChamber inletChamber = ConstChamber( "inletChamber", 
-                                        inletChamber_Pressure, 
-                                        inletChamber_Volume);
-  sys.AddEquation(inletChamber);
+  ConstChamber inletChamber = ConstChamber("inletChamber",
+                                           inletChamber_Pressure,
+                                           inletChamber_Volume);
+  sys.AddObject(inletChamber);
 
-  ConstChamber variableChamber = ConstChamber( "variableChamber", 
-                                        inletChamber_Pressure, 
-                                        inletChamber_Volume);
-  sys.AddEquation(variableChamber);
+  ConstChamber variableChamber = ConstChamber("variableChamber",
+                                              inletChamber_Pressure,
+                                              inletChamber_Volume);
+  sys.AddObject(variableChamber);
 
-  ConstChamber outletChamber = ConstChamber("outletChamber", 
-                                        outletChamber_Pressure, 
-                                        outletChamber_Volume);
-  sys.AddEquation(outletChamber);
+  ConstChamber outletChamber = ConstChamber("outletChamber",
+                                            outletChamber_Pressure,
+                                            outletChamber_Volume);
+  sys.AddObject(outletChamber);
 
-  Orifice inletPort = Orifice("inletPort", 
-                            inletPort_Area, 
-                            HPChamber, 
-                            inletChamber);
-  sys.AddEquation(inletPort);
+  Orifice inletPort = Orifice("inletPort",
+                              inletPort_Area,
+                              HPChamber,
+                              inletChamber);
+  sys.AddObject(inletPort);
 
-  Orifice inletOrif = Orifice("inletOrif", 
-                            inletOrif_Area, 
-                            inletChamber, 
-                            variableChamber);
-  sys.AddEquation(inletOrif);
+  Orifice inletOrif = Orifice("inletOrif",
+                              inletOrif_Area,
+                              inletChamber,
+                              variableChamber);
+  sys.AddObject(inletOrif);
 
-  Orifice outletOrif = Orifice("outletOrif", 
-                              outletOrif_Area, 
-                              variableChamber, 
-                              outletChamber);
-  sys.AddEquation(outletOrif);
+  Orifice outletOrif = Orifice("outletOrif",
+                               outletOrif_Area,
+                               variableChamber,
+                               outletChamber);
+  sys.AddObject(outletOrif);
 
-  Orifice outletPort = Orifice("outletPort", 
-                              outletPort_Area, 
-                              outletChamber, 
-                              LPChamber);
-  sys.AddEquation(outletPort);
+  Orifice outletPort = Orifice("outletPort",
+                               outletPort_Area,
+                               outletChamber,
+                               LPChamber);
+  sys.AddObject(outletPort);
 
-  // Solve system 
-  Solver solver = Solver(0.01,1.0);
+  // Move sys dependent variables into N_Vector
+  sys.ConnectYToDepVar();
+
+  // Initialize system
+  Solver solver = Solver(0.01, 1.0);
+
+  // Solve system
   int retVal = solver.SolveSystem(sys);
 
   return retVal;
-  
 }
-

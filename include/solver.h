@@ -2,11 +2,9 @@
 
 #include "./system.h"
 
-
 class Solver
 {
-    public:
-
+public:
     double time;
     double startTime = 0;
     double outTime;
@@ -20,5 +18,4 @@ class Solver
     int CheckReturnValue(void *returnvalue, const char *funcname, int opt);
 
     static int fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
-
 };

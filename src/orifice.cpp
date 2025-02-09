@@ -9,9 +9,9 @@
 #include "./chamber.h"
 
 // Constructors
-Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffEquation(name), area(area), upChamber(upCh), downChamber(downCh)
+Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffObject(name), area(area), upChamber(upCh), downChamber(downCh)
 {
-    
+
     isDifferential = false;
 
     return;
@@ -80,13 +80,15 @@ void Orifice::CalculateFlowrate()
     Chamber &downCh = this->downChamber;
     double upPress = upCh.GetPressure();
     double downPress = downCh.GetPressure();
-    
+
     double isDpNeg = signbit(-upPress + downPress);
     int sign;
-    if (isDpNeg == 0){
+    if (isDpNeg == 0)
+    {
         sign = -1;
     }
-    else{
+    else
+    {
         sign = 1;
     }
 
@@ -96,10 +98,11 @@ void Orifice::CalculateFlowrate()
     return;
 };
 
-void Orifice::UpdateChambersFlow(){
+void Orifice::UpdateChambersFlow()
+{
     // Flow entering a chamber is negative
-    upChamber.AddFlowIn(name,-flowrate);
-    downChamber.AddFlowIn(name,flowrate);
+    upChamber.AddFlowIn(name, -flowrate);
+    downChamber.AddFlowIn(name, flowrate);
     return;
 };
 
@@ -111,45 +114,38 @@ void Orifice::CalculateRHS()
     return;
 };
 
-double Orifice::GetRHS()
+void Orifice::PrintHeader(std::ofstream &outputFile)
 {
-    std::cout << "Orifice GetRHS" << std::endl;
-    return this->flowrate;
-};
-
-void Orifice::PrintHeader(std::ofstream& outputFile)
-{
-    if(printStruct.printCf == 1)
+    if (printStruct.printCf == 1)
     {
-    outputFile << name << ":Cf:-, ";
+        outputFile << name << ":Cf:-, ";
     }
-    if(printStruct.printArea == 1)
+    if (printStruct.printArea == 1)
     {
         outputFile << name << ":Area:m^2, ";
     }
-    if(printStruct.printFlowrate == 1)
+    if (printStruct.printFlowrate == 1)
     {
         outputFile << name << ":Flowrate:m^3/s, ";
     }
 
-
     return;
 }
 
-void Orifice::PrintVariables(std::ofstream& outputFile)
+void Orifice::PrintVariables(std::ofstream &outputFile)
 {
-    if(printStruct.printCf == 1)
+    if (printStruct.printCf == 1)
     {
-    outputFile << Cf << ",";
+        outputFile << Cf << ",";
     }
-    if(printStruct.printArea == 1)
+    if (printStruct.printArea == 1)
     {
         outputFile << area << ",";
     }
-    if(printStruct.printFlowrate == 1)
+    if (printStruct.printFlowrate == 1)
     {
         outputFile << flowrate << ",";
     }
 
     return;
-}   
+}
