@@ -57,6 +57,9 @@
         "xutility": "cpp",
         "string": "cpp",
         "sstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "chrono": "cpp",
+        "forward_list": "cpp",
+        "optional": "cpp"
     }
 }
