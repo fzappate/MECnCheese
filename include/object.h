@@ -51,8 +51,8 @@ protected:
     std::vector<sunrealtype> absTol;
 
 public:
-    // Constructor
-    DiffObject(std::string name);
+    // Constructor initialize name and number of dependent variables
+    DiffObject(std::string name, sunindextype nDepVar);
 
     // Get the number of dependent variables of the object
     sunindextype GetNoOfDepVar();

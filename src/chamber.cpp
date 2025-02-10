@@ -9,11 +9,8 @@
 #include "./chamber.h"
 
 // Chamber
-Chamber::Chamber(std::string name, double pressure) : DiffObject(name), pressure(pressure)
+Chamber::Chamber(std::string name, double pressure) : DiffObject(name, 1), initPressure(pressure)
 {
-    // Set how many dependent variables the object has
-    this->nDepVar = 1;
-
     // Set initial conditions
     this->yValuesInit.push_back(pressure);
     this->yDotValuesInit.push_back(0.0);

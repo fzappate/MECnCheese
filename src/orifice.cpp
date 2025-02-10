@@ -4,7 +4,7 @@
 #include <fstream>
 #include <corecrt_math_defines.h>
 
-#include "./equation.h"
+#include "./object.h"
 #include "./orifice.h"
 #include "./chamber.h"
 
