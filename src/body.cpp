@@ -6,7 +6,7 @@
 
 #include "./body.h"
 
-Body::Body(std::string name) : DiffObject(name, 12)
+Body::Body(std::string name, sunrealtype mass) : DiffObject(name, 12)
 {
     // Set initial conditions
     this->yValuesInit = std::vector<sunrealtype>(this->nDepVar, 0.0);
@@ -17,6 +17,8 @@ Body::Body(std::string name) : DiffObject(name, 12)
     this->yValuesPnt = std::vector<sunrealtype *>(this->nDepVar, nullptr);
     this->yDotValuesPnt = std::vector<sunrealtype *>(this->nDepVar, nullptr);
     this->depVarIndexInSys = std::vector<sunindextype>(this->nDepVar, -1);
+
+    this->mass = mass;
 
     return;
 };
@@ -93,39 +95,39 @@ void Body::PrintHeader(std::ofstream &outputFile)
     }
     if (printStruct.printPosPhi == 1)
     {
-        outputFile << this->name << ":Angular Position Phi:deg, ";
+        outputFile << this->name << ":Angular Position Phi:rad, ";
     }
     if (printStruct.printPosTheta == 1)
     {
-        outputFile << this->name << ":Angular Position Theta:deg, ";
+        outputFile << this->name << ":Angular Position Theta:rad, ";
     }
     if (printStruct.printPosPsi == 1)
     {
-        outputFile << this->name << ":Angular Position Psi:deg, ";
+        outputFile << this->name << ":Angular Position Psi:rad, ";
     }
     if (printStruct.printVelPhi == 1)
     {
-        outputFile << this->name << ":Angular Velocity Phi:deg/s, ";
+        outputFile << this->name << ":Angular Velocity Phi:rad/s, ";
     }
     if (printStruct.printVelTheta == 1)
     {
-        outputFile << this->name << ":Angular Velocity Theta:deg/s, ";
+        outputFile << this->name << ":Angular Velocity Theta:rad/s, ";
     }
     if (printStruct.printVelPsi == 1)
     {
-        outputFile << this->name << ":Angular Velocity Psi:deg/s, ";
+        outputFile << this->name << ":Angular Velocity Psi:rad/s, ";
     }
     if (printStruct.printAccPhi == 1)
     {
-        outputFile << this->name << ":Angular Acceleration Phi:deg/s^2, ";
+        outputFile << this->name << ":Angular Acceleration Phi:rad/s^2, ";
     }
     if (printStruct.printAccTheta == 1)
     {
-        outputFile << this->name << ":Angular Acceleration Theta:deg/s^2, ";
+        outputFile << this->name << ":Angular Acceleration Theta:rad/s^2, ";
     }
     if (printStruct.printAccPsi == 1)
     {
-        outputFile << this->name << ":Angular Acceleration Psi:deg/s^2, ";
+        outputFile << this->name << ":Angular Acceleration Psi:rad/s^2, ";
     }
 
     return;
@@ -207,6 +209,62 @@ void Body::PrintVariables(std::ofstream &outputFile)
         outputFile << *this->yDotValuesPnt[11] << ",";
     }
 
+    return;
+};
+
+// Class ConstVelBody
+ConstVelBody::ConstVelBody(std::string name, sunrealtype velX, sunrealtype velY, sunrealtype velZ) : Body(name, mass)
+{
+    // Override the initial velocity of the body
+    this->yValuesInit[3] = velX;
+    this->yValuesInit[4] = velY;
+    this->yValuesInit[5] = velZ;
+
+    return;
+};
+
+void ConstVelBody::CalculateRHS()
+{
+    *yDotValuesPnt[0] = yValuesInit[3];   // velX
+    *yDotValuesPnt[1] = yValuesInit[4];   // velY
+    *yDotValuesPnt[2] = yValuesInit[5];   // velZ
+    *yDotValuesPnt[3] = 0/this->mass;   // accX
+    *yDotValuesPnt[4] = 0/this->mass;   // accY
+    *yDotValuesPnt[5] = 0/this->mass;   // accZ
+    *yDotValuesPnt[6] = yValuesInit[9];   // velPhi
+    *yDotValuesPnt[7] = yValuesInit[10];   // velTheta
+    *yDotValuesPnt[8] = yValuesInit[11];   // velPsi 
+    *yDotValuesPnt[9] = 0/this->mass;   // accPhi 
+    *yDotValuesPnt[10] = 0/this->mass;  // accTheta
+    *yDotValuesPnt[11] = 0/this->mass;  // accPsi 
+    return;
+};
+
+// Class ConstRotVelBody
+ConstRotVelBody::ConstRotVelBody(std::string name, sunrealtype velPhi, sunrealtype velTheta, sunrealtype velPsi) : Body(name, mass)
+{
+    // Override the initial rotational velocity of the body
+    this->yValuesInit[9] = velPhi;
+    this->yValuesInit[10] = velTheta;
+    this->yValuesInit[11] = velPsi;
+
+    return;
+};
+
+void ConstRotVelBody::CalculateRHS()
+{
+    *yDotValuesPnt[0] = yValuesInit[3];   // velX
+    *yDotValuesPnt[1] = yValuesInit[4];   // velY
+    *yDotValuesPnt[2] = yValuesInit[5];   // velZ
+    *yDotValuesPnt[3] = 0/this->mass;   // accX
+    *yDotValuesPnt[4] = 0/this->mass;   // accY
+    *yDotValuesPnt[5] = 0/this->mass;   // accZ
+    *yDotValuesPnt[6] = yValuesInit[9];   // velPhi
+    *yDotValuesPnt[7] = yValuesInit[10];   // velTheta
+    *yDotValuesPnt[8] = yValuesInit[11];   // velPsi 
+    *yDotValuesPnt[9] = 0/this->mass;   // accPhi 
+    *yDotValuesPnt[10] = 0/this->mass;  // accTheta
+    *yDotValuesPnt[11] = 0/this->mass;  // accPsi 
     return;
 };
 
