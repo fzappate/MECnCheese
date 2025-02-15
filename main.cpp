@@ -72,9 +72,9 @@ int main()
                                LPChamber);
   sys.AddObject(outletPort);
 
-  Body casing = Body("casing");
+  Body casing = Body("Casing");
   sys.AddObject(casing);
-  
+
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();
 

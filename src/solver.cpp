@@ -198,11 +198,23 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sysPtr->CalculateAuxEqRHS();
   sysPtr->CalculateDiffEqRHS();
 
-  sunrealtype yDot1 = Ith(ydot, 1);
-  sunrealtype yDot2 = Ith(ydot, 2);
-  sunrealtype yDot3 = Ith(ydot, 3);
-  sunrealtype yDot4 = Ith(ydot, 4);
-  sunrealtype yDot5 = Ith(ydot, 5);
+  sunrealtype yDot1 = Ith(ydot, 1 );
+  sunrealtype yDot2 = Ith(ydot, 2 );
+  sunrealtype yDot3 = Ith(ydot, 3 );
+  sunrealtype yDot4 = Ith(ydot, 4 );
+  sunrealtype yDot5 = Ith(ydot, 5 );
+  sunrealtype yDot6 = Ith(ydot, 6 );
+  sunrealtype yDot7 = Ith(ydot, 7 );
+  sunrealtype yDot8 = Ith(ydot, 8 );
+  sunrealtype yDot9 = Ith(ydot, 9 );
+  sunrealtype yDot10 = Ith(ydot,10);
+  sunrealtype yDot11 = Ith(ydot,11);
+  sunrealtype yDot12 = Ith(ydot,12);
+  sunrealtype yDot13 = Ith(ydot,13);
+  sunrealtype yDot14 = Ith(ydot,14);
+  sunrealtype yDot15 = Ith(ydot,15);
+  sunrealtype yDot16 = Ith(ydot,16);
+  sunrealtype yDot17 = Ith(ydot,17);
 
   return (0);
 }

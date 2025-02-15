@@ -13,28 +13,29 @@ protected:
     // Phi: object angle around the X axis of the parent reference system
     // Theta: object angle around the Y axis of the parent reference system
     // Psi: object angle around the Z axis of the parent reference system
+    // jj is the number of equations before the body object equations
+    // 
+    // posX: stored in N_Vector y[jj+0]
+    // posY: stored in N_Vector y[jj+1]
+    // posZ: stored in N_Vector y[jj+2]
+    // velX: stored in N_Vector y[jj+3]
+    // velY: stored in N_Vector y[jj+4]
+    // velZ: stored in N_Vector y[jj+5]
+    // accX: stored in N_Vector ydot[jj+3]
+    // accY: stored in N_Vector ydot[jj+4]
+    // accZ: stored in N_Vector ydot[jj+5]
     //
-    // posX: stored in N_Vector y[jj+1]
-    // posY: stored in N_Vector y[jj+2]
-    // posZ: stored in N_Vector y[jj+3]
-    // velX: stored in N_Vector y[jj+4]
-    // velY: stored in N_Vector y[jj+5]
-    // velZ: stored in N_Vector y[jj+6]
-    // accX: stored in N_Vector ydot[jj+4]
-    // accY: stored in N_Vector ydot[jj+5]
-    // accZ: stored in N_Vector ydot[jj+6]
-    //
-    // posPhi: stored in N_Vector y[jj+7]
-    // posTheta: stored in N_Vector y[jj+8]
-    // posPsi: stored in N_Vector y[jj+9]
-    // velPhi: stored in N_Vector y[jj+10]
-    // velTheta: stored in N_Vector y[jj+11]
-    // velPsi: stored in N_Vector y[jj+12]
-    // accPhi: stored in N_Vector ydot[jj+10]
-    // accTheta: stored in N_Vector ydot[jj+11]
-    // accPsi: stored in N_Vector ydot[jj+12]
+    // posPhi: stored in N_Vector y[jj+6]
+    // posTheta: stored in N_Vector y[jj+7]
+    // posPsi: stored in N_Vector y[jj+8]
+    // velPhi: stored in N_Vector y[jj+9]
+    // velTheta: stored in N_Vector y[jj+10]
+    // velPsi: stored in N_Vector y[jj+11]
+    // accPhi: stored in N_Vector ydot[jj+9]
+    // accTheta: stored in N_Vector ydot[jj+10]
+    // accPsi: stored in N_Vector ydot[jj+11]
 
-    sunrealtype mass;
+    sunrealtype mass = 100;
     std::vector<sunrealtype> forces;
     std::vector<std::string> forceNames;
 
