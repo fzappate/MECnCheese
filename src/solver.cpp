@@ -37,7 +37,7 @@ int Solver::SolveSystem(System sys)
   void *cvode_mem;
   cvode_mem = NULL;
 
-  int noOfDiffEq = sys.GetNoOfDiffObj();
+  int noOfDiffEq = sys.GetNoOfDiffEq();
   N_Vector y = sys.GetYInitCond();
 
   // Create SUNDIALS context
@@ -163,11 +163,23 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // Cast the user_data void pointer to a pointer to system
   System *sysPtr = static_cast<System *>(user_data);
 
-  sunrealtype y1 = Ith(y, 1);
-  sunrealtype y2 = Ith(y, 2);
-  sunrealtype y3 = Ith(y, 3);
-  sunrealtype y4 = Ith(y, 4);
-  sunrealtype y5 = Ith(y, 5);
+  sunrealtype y1 = Ith(y, 1 );
+  sunrealtype y2 = Ith(y, 2 );
+  sunrealtype y3 = Ith(y, 3 );
+  sunrealtype y4 = Ith(y, 4 );
+  sunrealtype y5 = Ith(y, 5 );
+  sunrealtype y6 = Ith(y, 6 );
+  sunrealtype y7 = Ith(y, 7 );
+  sunrealtype y8 = Ith(y, 8 );
+  sunrealtype y9 = Ith(y, 9 );
+  sunrealtype y10 = Ith(y,10);
+  sunrealtype y11 = Ith(y,11);
+  sunrealtype y12 = Ith(y,12);
+  sunrealtype y13 = Ith(y,13);
+  sunrealtype y14 = Ith(y,14);
+  sunrealtype y15 = Ith(y,15);
+  sunrealtype y16 = Ith(y,16);
+  sunrealtype y17 = Ith(y,17);
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
   if (sysPtr->GetYDot() != ydot)

@@ -20,8 +20,11 @@ void System::AddObject(DiffObject &object)
     // Save the differential equation reference in the system
     this->diffObjects.push_back(&object);
 
+    // Increment the number of differential objects
+    this->noOfDiffObj++;
+
     // Increment the number of differential equations
-    this->noOfDiffEq++;
+    this->noOfDiffEq = this->noOfDiffEq + object.GetNoOfDepVar();
 
     return;
 };
@@ -70,15 +73,20 @@ N_Vector System::GetObjAbsTol()
     // Extract the pointer to the elements of the N_Vector eqAbsTol
     realtype *eqAbsTolData = N_VGetArrayPointer_Serial(eqAbsTol);
 
+    // Keep track of the number absTol index
+    sunindextype absTolIndx = 0;
+
     // Save the absolute tolerance of the differential equations in eqAbsTol
-    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffObj; ii++)
     {
-        DiffObject &tempEq = *diffObjects[ii];
+        DiffObject &tempObj = *diffObjects[ii];
 
         // Iterate on the equations of the object
-        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
+        for (int jj = 0; jj < tempObj.GetNoOfDepVar(); jj++)
         {
-            eqAbsTolData[ii] = tempEq.GetAbsTol(jj);
+            double absTol = tempObj.GetAbsTol(jj);
+            eqAbsTolData[absTolIndx] = tempObj.GetAbsTol(jj);
+            absTolIndx++;
         };
     };
 
@@ -87,13 +95,18 @@ N_Vector System::GetObjAbsTol()
 
 int System::GetNoOfDiffObj()
 {
-    return this->noOfDiffEq;
+    return this->noOfDiffObj;
 };
 
-int System::GetNoOfAuxObj()
+int System::GetNoOfAuxEq()
 {
     return this->noOfAuxEq;
 }
+
+int System::GetNoOfDiffEq()
+{
+    return this->noOfDiffEq;
+};
 
 double System::GetRelTol()
 {
@@ -112,20 +125,20 @@ void System::CalculateAuxEqRHS()
 
 void System::CalculateDiffEqRHS()
 {
-    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffObj; ii++)
     {
-        DiffObject &eqTemp = *diffObjects[ii];
-        eqTemp.CalculateRHS();
+        DiffObject &tempObj = *diffObjects[ii];
+        tempObj.CalculateRHS();
     };
 };
 
 void System::ResetDiffEq(N_Vector y)
 {
     // Zero the summation parameters of the equations of the differential objects
-    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffObj; ii++)
     {
-        DiffObject &tempEq = *diffObjects[ii];
-        tempEq.ZeroParameters();
+        DiffObject &tempObj = *diffObjects[ii];
+        tempObj.ZeroParameters();
     };
 
     return;
@@ -143,7 +156,7 @@ void System::ConnectYToDepVar()
     sunindextype noOfEq = 0;
 
     // Iterate on the objects of the system
-    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffObj; ii++)
     {
         DiffObject &tempEq = *diffObjects[ii];
 
@@ -163,6 +176,7 @@ void System::ConnectYToDepVar()
             noOfEq++;
         };
     };
+    std::cout << "Objects added to the system: " << noOfDiffObj + noOfAuxEq << std::endl;
     std::cout << "Equations added to the system: " << noOfEq << std::endl;
 };
 
@@ -172,15 +186,15 @@ void System::ConnectYDotToDepVarDeriv(N_Vector ydot)
     realtype *yDotData = N_VGetArrayPointer_Serial(ydot);
 
     // Iterate on the differential objects of the system
-    for (int ii = 0; ii < this->noOfDiffEq; ii++)
+    for (int ii = 0; ii < this->noOfDiffObj; ii++)
     {
-        DiffObject &tempEq = *this->diffObjects[ii];
+        DiffObject &tempObj = *this->diffObjects[ii];
 
         // Iterate on the equation of the object
-        for (int jj = 0; jj < tempEq.GetNoOfDepVar(); jj++)
+        for (int jj = 0; jj < tempObj.GetNoOfDepVar(); jj++)
         {
             // Save in the object the pointer to the dependent variable derivative in the N_Vector
-            tempEq.SetYDotValuesPnt(jj, &yDotData[tempEq.GetDepVarIndex(jj)]);
+            tempObj.SetYDotValuesPnt(jj, &yDotData[tempObj.GetDepVarIndex(jj)]);
         };
     };
 };

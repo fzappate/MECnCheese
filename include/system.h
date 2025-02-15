@@ -16,6 +16,9 @@ protected:
     // Number of differential equations in the system
     int noOfDiffEq = 0;
 
+    // Number of differential objects in the system
+    sunindextype noOfDiffObj = 0;
+
     // Number of dependent variables in the system
     int sysDepVarIndex = 0;
 
@@ -60,10 +63,13 @@ public:
     std::vector<DiffObject *> GetDiffObjects();
 
     // Get the number of differential equations in the system
-    int GetNoOfDiffObj();
+    int GetNoOfDiffEq();
 
     // Get the number of non-differential equations in the system
-    int GetNoOfAuxObj();
+    int GetNoOfAuxEq();
+
+    // Get the number of differential objects in the system
+    int GetNoOfDiffObj();
 
     // Connect the dependent variables of the differential objects to the N_Vector y
     void ConnectYToDepVar();

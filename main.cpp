@@ -3,6 +3,7 @@
 #include "./system.h"
 #include "./solver.h"
 #include "./inputreader.h"
+#include "./body.h"
 
 int main()
 {
@@ -71,6 +72,9 @@ int main()
                                LPChamber);
   sys.AddObject(outletPort);
 
+  Body casing = Body("casing");
+  sys.AddObject(casing);
+  
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();
 
