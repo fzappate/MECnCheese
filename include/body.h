@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
-
 #include "./object.h"
 
 class Body : public DiffObject

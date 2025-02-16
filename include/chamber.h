@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
+
 
 #include "./object.h"
 
 class Chamber : public DiffObject
 {
 protected:
-    double bulkMod = 1.8 * 1.0E9;
+    sunrealtype bulkMod = 1.8 * 1.0E9;
     double initPressure;
     double volume;
     double volDer;

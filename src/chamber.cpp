@@ -3,8 +3,6 @@
 #include <string>
 #include <fstream>
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
-
 #include "./object.h"
 #include "./chamber.h"
 
