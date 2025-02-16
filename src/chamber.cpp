@@ -153,10 +153,10 @@ void ConstChamber::CalculateRHS()
 };
 
 // VariableChamber
-VariableChamber::VariableChamber(std::string name, double pressure, double volume) : Chamber(name, pressure)
+VariableChamber::VariableChamber(std::string name, double initPressure, double initVolume) : Chamber(name, initPressure)
 {
-    this->volume = volume;
-    this->volDer = 0.001;
+    this->volume = initVolume;
+    this->volDer = 0;
     return;
 };
 
@@ -165,7 +165,13 @@ void VariableChamber::CalculateRHS()
     // Calculate and store the depenedent variable in the object
     this->dpdt = bulkMod / volume * (flowSum - volDer);
 
-    // Updatet the dependent variable in y
+    // Updatet the dependent variable in yDot
     *yDotValuesPnt[0] = this->dpdt;
+    return;
+};
+
+void VariableChamber::SetVolumeDer(double volumeDer)
+{
+    this->volDer = volumeDer;
     return;
 };

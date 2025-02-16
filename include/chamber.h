@@ -67,7 +67,6 @@ public:
 // Class Const Chamber
 class ConstChamber : public Chamber
 {
-
 public:
     ConstChamber(std::string name, double pressure, double volume);
 
@@ -77,8 +76,11 @@ public:
 // Class Variable Chamber
 class VariableChamber : public Chamber
 {
-    VariableChamber(std::string name, double pressure, double volume);
+    public:
+    VariableChamber(std::string name, double initPressure, double initVolume);
 
     void CalculateRHS() override;
+
+    void SetVolumeDer(double volumeDer);
 };
 

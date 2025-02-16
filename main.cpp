@@ -40,7 +40,7 @@ int main()
                                            inletChamber_Volume);
   sys.AddObject(inletChamber);
 
-  ConstChamber variableChamber = ConstChamber("variableChamber",
+  VariableChamber variableChamber = VariableChamber("variableChamber",
                                               inletChamber_Pressure,
                                               inletChamber_Volume);
   sys.AddObject(variableChamber);
