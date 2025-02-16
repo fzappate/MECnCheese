@@ -1,12 +1,8 @@
-#pragma once 
+#pragma once
 
 #include "./axialpistonmachinebody.h"
 
-class AxialPistonMachineBody : public ConstRotVelBody
+AxialPistonMachineBody::AxialPistonMachineBody(std::string name, sunrealtype rotVel) : ConstRotVelBody(name, 0, 0, rotVel)
 {
-public:
-    AxialPistonMachineBody(std::string name, sunrealtype rotVel) : ConstRotVelBody(name, 0, 0, rotVel)
-    {
-        return;
-    };
+    return;
 };

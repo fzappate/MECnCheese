@@ -5,6 +5,8 @@
 #include "./solver.h"
 #include "./inputreader.h"
 #include "./body.h"
+#include "./axialpistonmachinebody.h"
+#include "./axialpistonmachinecv.h"
 
 sunrealtype pi = 3.14159265358979323846;
 
@@ -28,6 +30,11 @@ int main()
   // Create system
   System sys = System();
 
+  sunrealtype casingRotVel = 30; // RPM
+  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
+  AxialPistonMachineBody casing = AxialPistonMachineBody("Casing", casingRotVelRad);
+  sys.AddObject(casing);
+
   InfChamber HPChamber = InfChamber("HPChamber",
                                     HPChamber_Pressure);
   sys.AddObject(HPChamber);
@@ -41,9 +48,12 @@ int main()
                                            inletChamber_Volume);
   sys.AddObject(inletChamber);
 
-  VariableChamber variableChamber = VariableChamber("variableChamber",
-                                              inletChamber_Pressure,
-                                              inletChamber_Volume);
+  AxialPistonMachineControlVolume variableChamber = AxialPistonMachineControlVolume("variableChamber",
+                                                                                    casing,
+                                                                                    0.0,
+                                                                                    0.01, 
+                                                                                    inletChamber_Pressure,
+                                                                                    inletChamber_Volume);
   sys.AddObject(variableChamber);
 
   ConstChamber outletChamber = ConstChamber("outletChamber",
@@ -74,11 +84,6 @@ int main()
                                outletChamber,
                                LPChamber);
   sys.AddObject(outletPort);
-
-  sunrealtype casingRotVel = 30; // RPM
-  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
-  ConstRotVelBody casing = ConstRotVelBody("Casing", 0, 0, 30 );
-  sys.AddObject(casing);
 
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();
