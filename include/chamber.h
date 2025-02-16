@@ -12,7 +12,7 @@ class Chamber : public DiffObject
 {
 protected:
     double bulkMod = 1.8 * 1.0E9;
-    double pressure;
+    double initPressure;
     double volume;
     double volDer;
     double dpdt;

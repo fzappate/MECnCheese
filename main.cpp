@@ -3,6 +3,9 @@
 #include "./system.h"
 #include "./solver.h"
 #include "./inputreader.h"
+#include "./body.h"
+
+sunrealtype pi = 3.14159265358979323846;
 
 int main()
 {
@@ -70,6 +73,11 @@ int main()
                                outletChamber,
                                LPChamber);
   sys.AddObject(outletPort);
+
+  sunrealtype casingRotVel = 30; // RPM
+  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
+  ConstRotVelBody casing = ConstRotVelBody("Casing", 0, 0, 30 );
+  sys.AddObject(casing);
 
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();

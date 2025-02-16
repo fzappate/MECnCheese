@@ -4,7 +4,7 @@
 
 Object::Object(std::string name) : name(name) {};
 
-DiffObject::DiffObject(std::string name) : Object(name) {};
+DiffObject::DiffObject(std::string name, sunindextype nDepVar) : Object(name), nDepVar(nDepVar) {};
 
 sunrealtype DiffObject::GetAbsTol(sunindextype index)
 {

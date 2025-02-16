@@ -37,7 +37,7 @@ int Solver::SolveSystem(System sys)
   void *cvode_mem;
   cvode_mem = NULL;
 
-  int noOfDiffEq = sys.GetNoOfDiffObj();
+  int noOfDiffEq = sys.GetNoOfDiffEq();
   N_Vector y = sys.GetYInitCond();
 
   // Create SUNDIALS context
@@ -163,11 +163,23 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // Cast the user_data void pointer to a pointer to system
   System *sysPtr = static_cast<System *>(user_data);
 
-  sunrealtype y1 = Ith(y, 1);
-  sunrealtype y2 = Ith(y, 2);
-  sunrealtype y3 = Ith(y, 3);
-  sunrealtype y4 = Ith(y, 4);
-  sunrealtype y5 = Ith(y, 5);
+  sunrealtype y1 = Ith(y, 1 );
+  sunrealtype y2 = Ith(y, 2 );
+  sunrealtype y3 = Ith(y, 3 );
+  sunrealtype y4 = Ith(y, 4 );
+  sunrealtype y5 = Ith(y, 5 );
+  sunrealtype y6 = Ith(y, 6 );
+  sunrealtype y7 = Ith(y, 7 );
+  sunrealtype y8 = Ith(y, 8 );
+  sunrealtype y9 = Ith(y, 9 );
+  sunrealtype y10 = Ith(y,10);
+  sunrealtype y11 = Ith(y,11);
+  sunrealtype y12 = Ith(y,12);
+  sunrealtype y13 = Ith(y,13);
+  sunrealtype y14 = Ith(y,14);
+  sunrealtype y15 = Ith(y,15);
+  sunrealtype y16 = Ith(y,16);
+  sunrealtype y17 = Ith(y,17);
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
   if (sysPtr->GetYDot() != ydot)
@@ -186,11 +198,23 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sysPtr->CalculateAuxEqRHS();
   sysPtr->CalculateDiffEqRHS();
 
-  sunrealtype yDot1 = Ith(ydot, 1);
-  sunrealtype yDot2 = Ith(ydot, 2);
-  sunrealtype yDot3 = Ith(ydot, 3);
-  sunrealtype yDot4 = Ith(ydot, 4);
-  sunrealtype yDot5 = Ith(ydot, 5);
+  sunrealtype yDot1 = Ith(ydot, 1 );
+  sunrealtype yDot2 = Ith(ydot, 2 );
+  sunrealtype yDot3 = Ith(ydot, 3 );
+  sunrealtype yDot4 = Ith(ydot, 4 );
+  sunrealtype yDot5 = Ith(ydot, 5 );
+  sunrealtype yDot6 = Ith(ydot, 6 );
+  sunrealtype yDot7 = Ith(ydot, 7 );
+  sunrealtype yDot8 = Ith(ydot, 8 );
+  sunrealtype yDot9 = Ith(ydot, 9 );
+  sunrealtype yDot10 = Ith(ydot,10);
+  sunrealtype yDot11 = Ith(ydot,11);
+  sunrealtype yDot12 = Ith(ydot,12);
+  sunrealtype yDot13 = Ith(ydot,13);
+  sunrealtype yDot14 = Ith(ydot,14);
+  sunrealtype yDot15 = Ith(ydot,15);
+  sunrealtype yDot16 = Ith(ydot,16);
+  sunrealtype yDot17 = Ith(ydot,17);
 
   return (0);
 }

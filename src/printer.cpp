@@ -26,7 +26,7 @@ void Printer::PrintResultsHeader()
         tempEq.PrintHeader(outputFile);
     };
 
-    int noOfAuxEquations = sys.GetNoOfAuxObj();
+    int noOfAuxEquations = sys.GetNoOfAuxEq();
     std::vector<NonDiffObject *> auxEquations = sys.GetNonDiffObjects();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
@@ -50,7 +50,7 @@ void Printer::PrintResults(double time)
         tempEq.PrintVariables(outputFile);
     };
 
-    int noOfAuxEquations = sys.GetNoOfAuxObj();
+    int noOfAuxEquations = sys.GetNoOfAuxEq();
     std::vector<NonDiffObject *> auxEquations = sys.GetNonDiffObjects();
     for (int ii = 0; ii < noOfAuxEquations; ii++)
     {
