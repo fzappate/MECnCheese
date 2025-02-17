@@ -28,6 +28,19 @@ AxialPistonMachineControlVolume::AxialPistonMachineControlVolume(std::string nam
 
 void AxialPistonMachineControlVolume::CalculateRHS()
 {
+    // Update volume and volume derivative before calculating the rhs of the differential equation
+    this->UpdateVolumeAndVolumeDerivative();
+
+    // Calculate and store the depenedent variable in the object
+    this->dpdt = bulkMod / volume * (flowSum - volDer);
+
+    // Updatet the dependent variable in y
+    *yDotValuesPnt[0] = this->dpdt;
+    return;
+};
+
+void AxialPistonMachineControlVolume::UpdateVolumeAndVolumeDerivative()
+{
     // Retrieve necessary values
     sunrealtype casingAngPos = this->casing.GetPosPsi();
     sunrealtype pistonCirleRadius = this->casing.GetPistonCircleDiameter() / 2;
@@ -42,7 +55,7 @@ void AxialPistonMachineControlVolume::CalculateRHS()
     sunrealtype pistonArea = pi*pistonRadius*pistonRadius;
     sunrealtype pistonStrokedVol = strokeFromLDP*pistonArea;
 
-    // Calcukate control volume volume
+    // Calculate control volume's volume
     sunrealtype cylinderMaxVolume = pistonArea*fullStroke + deadVol;
     sunrealtype controlVolumeVolume = cylinderMaxVolume - pistonStrokedVol;
     
@@ -54,10 +67,5 @@ void AxialPistonMachineControlVolume::CalculateRHS()
     this->volume = controlVolumeVolume;
     this->volDer = controlVolumeDerivative;
 
-    // Calculate and store the depenedent variable in the object
-    this->dpdt = bulkMod / volume * (flowSum - volDer);
-
-    // Updatet the dependent variable in y
-    *yDotValuesPnt[0] = this->dpdt;
     return;
 };

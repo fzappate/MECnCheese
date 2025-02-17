@@ -21,4 +21,6 @@ public:
                                     double initVolume);
 
     void CalculateRHS() override;
+
+    void UpdateVolumeAndVolumeDerivative();
 };
