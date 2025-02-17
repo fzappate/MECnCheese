@@ -12,12 +12,14 @@
 AxialPistonMachineControlVolume::AxialPistonMachineControlVolume(std::string name,
                                                                  AxialPistonMachineCasing& casing,
                                                                  AxialPistonMachineSwashPlate& swashPlate,
+                                                                 AxialPistonMachinePiston& piston,
                                                                  sunrealtype casingOffset,
                                                                  sunrealtype deadVol,
                                                                  double initPressure,
                                                                  double initVolume) : VariableChamber(name, initPressure, initVolume),
                                                                                       casing(casing),
                                                                                       swashPlate(swashPlate),
+                                                                                      piston(piston),
                                                                                       casingOffset(casingOffset),
                                                                                       deadVol(deadVol)
 {
@@ -26,23 +28,17 @@ AxialPistonMachineControlVolume::AxialPistonMachineControlVolume(std::string nam
 
 void AxialPistonMachineControlVolume::CalculateRHS()
 {
-    sunrealtype deg = 2 * pi / 360;
-    sunrealtype mm = 1e-3;
-
     // Retrieve necessary values
     sunrealtype casingAngPos = this->casing.GetPosPsi();
+    sunrealtype pistonCirleRadius = this->casing.GetPistonCircleDiameter() / 2;
     sunrealtype deadVol = this->deadVol;
-
-    // Pump geometry
     sunrealtype swashPlateAng = this->swashPlate.GetSwashPlateAngle();
-    // 20*deg;
-    sunrealtype axialPistonMachineBodyRadius = 100*mm;
-    sunrealtype pistonRadius = 10*mm;
+    sunrealtype pistonRadius = this->piston.GetPistonDiameter() / 2;
 
     // Calculate stroked volume
-    sunrealtype halfStroke = axialPistonMachineBodyRadius*std::sin(swashPlateAng);
+    sunrealtype halfStroke = pistonCirleRadius*std::sin(swashPlateAng);
     sunrealtype fullStroke = 2*halfStroke;
-    sunrealtype strokeFromLDP = halfStroke + axialPistonMachineBodyRadius*std::cos(casingAngPos)*std::sin(swashPlateAng);
+    sunrealtype strokeFromLDP = halfStroke + pistonCirleRadius*std::cos(casingAngPos)*std::sin(swashPlateAng);
     sunrealtype pistonArea = pi*pistonRadius*pistonRadius;
     sunrealtype pistonStrokedVol = strokeFromLDP*pistonArea;
 
@@ -51,7 +47,7 @@ void AxialPistonMachineControlVolume::CalculateRHS()
     sunrealtype controlVolumeVolume = cylinderMaxVolume - pistonStrokedVol;
     
     // Calculate control volume derivative 
-    sunrealtype strokeDerivative = -axialPistonMachineBodyRadius*std::sin(casingAngPos)*std::cos(swashPlateAng);
+    sunrealtype strokeDerivative = -pistonCirleRadius*std::sin(casingAngPos)*std::cos(swashPlateAng);
     sunrealtype controlVolumeDerivative = pistonArea*strokeDerivative;
 
 
