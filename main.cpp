@@ -30,10 +30,15 @@ int main()
   // Create system
   System sys = System();
 
-  sunrealtype casingRotVel = 30; // RPM
-  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
-  AxialPistonMachineBody casing = AxialPistonMachineBody("Casing", casingRotVelRad);
+  sunrealtype casingRotVel = 1; // RPS
+  sunrealtype casingRotVelRad = casingRotVel * 2 * pi; // rad/s
+  AxialPistonMachineCasing casing = AxialPistonMachineCasing("Casing", casingRotVelRad);
   sys.AddObject(casing);
+
+  sunrealtype swashPlateAngle = 20; // deg
+  sunrealtype swashPlateAngleRad = swashPlateAngle * pi / 180; // rad
+  AxialPistonMachineSwashPlate swashPlate = AxialPistonMachineSwashPlate("SwashPlate", swashPlateAngleRad);
+  sys.AddObject(swashPlate);
 
   InfChamber HPChamber = InfChamber("HPChamber",
                                     HPChamber_Pressure);

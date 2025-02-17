@@ -10,7 +10,7 @@
 #define pi 3.14159265358979323846
 
 AxialPistonMachineControlVolume::AxialPistonMachineControlVolume(std::string name,
-                                                                 AxialPistonMachineBody& casing,
+                                                                 AxialPistonMachineCasing& casing,
                                                                  sunrealtype casingOffset,
                                                                  sunrealtype deadVol,
                                                                  double initPressure,

@@ -4,13 +4,13 @@
 
 class AxialPistonMachineControlVolume : public VariableChamber
 {
-    AxialPistonMachineBody& casing;
+    AxialPistonMachineCasing& casing;
     sunrealtype casingOffset;
     sunrealtype deadVol;
 
 public:
     AxialPistonMachineControlVolume(std::string name,
-                                    AxialPistonMachineBody& casing,
+                                    AxialPistonMachineCasing& casing,
                                     sunrealtype casingOffset,
                                     sunrealtype deadVol,
                                     double initPressure,
