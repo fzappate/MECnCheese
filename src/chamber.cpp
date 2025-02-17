@@ -83,7 +83,7 @@ void Chamber::PrintVariables(std::ofstream &outputFile)
 
     if (printStruct.printBulkMod == 1)
     {
-        outputFile << bulkMod << ",";
+        outputFile << this->bulkMod << ",";
     }
     if (printStruct.printPress == 1)
     {
@@ -91,15 +91,15 @@ void Chamber::PrintVariables(std::ofstream &outputFile)
     }
     if (printStruct.printVolume == 1)
     {
-        outputFile << volume << ",";
+        outputFile << this->volume << ",";
     }
     if (printStruct.printVolDer == 1)
     {
-        outputFile << volDer << ", ";
+        outputFile << this->volDer << ", ";
     }
     if (printStruct.printFlowSum == 1)
     {
-        outputFile << flowSum << ",";
+        outputFile << this->flowSum << ",";
     }
 
     return;

@@ -13,12 +13,11 @@ class Chamber : public DiffObject
 protected:
     sunrealtype bulkMod = 1.8 * 1.0E9;
     double initPressure;
-    double volume;
-    double volDer;
-    double dpdt;
+    double volume = 0;
+    double volDer = 0;
+    double dpdt = 0;
     double flowSum = 0;
     double aTol = 1;
-    double rTol = 0.001;
 
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
