@@ -55,6 +55,7 @@ int main()
 
   AxialPistonMachineControlVolume variableChamber = AxialPistonMachineControlVolume("variableChamber",
                                                                                     casing,
+                                                                                    swashPlate,
                                                                                     0.0,
                                                                                     0.01, 
                                                                                     inletChamber_Pressure,

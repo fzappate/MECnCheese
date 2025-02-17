@@ -11,11 +11,13 @@
 
 AxialPistonMachineControlVolume::AxialPistonMachineControlVolume(std::string name,
                                                                  AxialPistonMachineCasing& casing,
+                                                                 AxialPistonMachineSwashPlate& swashPlate,
                                                                  sunrealtype casingOffset,
                                                                  sunrealtype deadVol,
                                                                  double initPressure,
                                                                  double initVolume) : VariableChamber(name, initPressure, initVolume),
                                                                                       casing(casing),
+                                                                                      swashPlate(swashPlate),
                                                                                       casingOffset(casingOffset),
                                                                                       deadVol(deadVol)
 {
@@ -27,12 +29,13 @@ void AxialPistonMachineControlVolume::CalculateRHS()
     sunrealtype deg = 2 * pi / 360;
     sunrealtype mm = 1e-3;
 
-    // Retrieve values
+    // Retrieve necessary values
     sunrealtype casingAngPos = this->casing.GetPosPsi();
     sunrealtype deadVol = this->deadVol;
 
     // Pump geometry
-    sunrealtype swashPlateAng = 20*deg;
+    sunrealtype swashPlateAng = this->swashPlate.GetSwashPlateAngle();
+    // 20*deg;
     sunrealtype axialPistonMachineBodyRadius = 100*mm;
     sunrealtype pistonRadius = 10*mm;
 
