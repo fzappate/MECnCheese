@@ -54,6 +54,12 @@ void Body::ZeroParameters()
     return;
 };
 
+sunrealtype Body::GetPosPsi()
+{
+    // Return psi
+    return *yValuesPnt[8];
+};
+
 void Body::PrintHeader(std::ofstream &outputFile)
 {
     if (printStruct.printPosX == 1)
