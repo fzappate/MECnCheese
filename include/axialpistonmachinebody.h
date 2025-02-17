@@ -2,8 +2,33 @@
 
 #include "./body.h"
 
-class AxialPistonMachineBody : public ConstRotVelBody
+class AxialPistonMachineCasing : public ConstRotVelBody
 {
+    sunrealtype pistonCircleDiameter;
 public:
-    AxialPistonMachineBody(std::string name, sunrealtype rotVel);
+    AxialPistonMachineCasing(std::string name, sunrealtype rotVel, sunrealtype pistonCircleDiameter);
+
+    sunrealtype GetPistonCircleDiameter();
+};
+
+class AxialPistonMachineSwashPlate : public Body
+{
+    sunrealtype swashPlateAngle;
+public:
+    AxialPistonMachineSwashPlate(std::string name, sunrealtype swashPlateAngle);
+
+    sunrealtype GetSwashPlateAngle();
+};
+
+class AxialPistonMachinePiston : public Body
+{
+    sunrealtype pistonDiameter;
+    sunrealtype pistonArea;
+
+    public:
+    AxialPistonMachinePiston(std::string name, sunrealtype pistonDiameter);
+
+    sunrealtype GetPistonDiameter();
+
+    sunrealtype GetPistonArea();
 };

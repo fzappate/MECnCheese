@@ -4,17 +4,23 @@
 
 class AxialPistonMachineControlVolume : public VariableChamber
 {
-    AxialPistonMachineBody& casing;
+    AxialPistonMachineCasing& casing;
+    AxialPistonMachineSwashPlate& swashPlate;
+    AxialPistonMachinePiston& piston;
     sunrealtype casingOffset;
     sunrealtype deadVol;
 
 public:
     AxialPistonMachineControlVolume(std::string name,
-                                    AxialPistonMachineBody& casing,
+                                    AxialPistonMachineCasing& casing,
+                                    AxialPistonMachineSwashPlate& swashPlate,
+                                    AxialPistonMachinePiston& piston,
                                     sunrealtype casingOffset,
                                     sunrealtype deadVol,
                                     double initPressure,
                                     double initVolume);
 
     void CalculateRHS() override;
+
+    void UpdateVolumeAndVolumeDerivative();
 };

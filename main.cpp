@@ -9,7 +9,10 @@
 #include "./axialpistonmachinecv.h"
 
 sunrealtype pi = 3.14159265358979323846;
-
+sunrealtype mm = 1e-3;          // mm -> m
+sunrealtype deg = 2 * pi / 360; // deg -> rad
+sunrealtype rps = 2 * pi;       // rev/s -> rad/s
+sunrealtype mm3 = 1e-9;         // mm^3 -> m^3
 int main()
 {
   // Inputs
@@ -30,10 +33,19 @@ int main()
   // Create system
   System sys = System();
 
-  sunrealtype casingRotVel = 30; // RPM
-  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
-  AxialPistonMachineBody casing = AxialPistonMachineBody("Casing", casingRotVelRad);
+  sunrealtype casingRotVel = 1 * rps; // RPS
+  sunrealtype pistonCircleDiameter = 100 * mm;
+  AxialPistonMachineCasing casing = AxialPistonMachineCasing("Casing",
+                                                             casingRotVel,
+                                                             pistonCircleDiameter);
   sys.AddObject(casing);
+
+  sunrealtype swashPlateAngle = 20 * deg; // deg
+  AxialPistonMachineSwashPlate swashPlate = AxialPistonMachineSwashPlate("SwashPlate", swashPlateAngle);
+  sys.AddObject(swashPlate);
+
+  sunrealtype pistonDiameter = 10 * mm;
+  AxialPistonMachinePiston piston = AxialPistonMachinePiston("Piston", pistonDiameter);
 
   InfChamber HPChamber = InfChamber("HPChamber",
                                     HPChamber_Pressure);
@@ -48,10 +60,14 @@ int main()
                                            inletChamber_Volume);
   sys.AddObject(inletChamber);
 
+  sunrealtype casingOffset = 0 * deg;
+  sunrealtype deadVol = 10 * mm3;
   AxialPistonMachineControlVolume variableChamber = AxialPistonMachineControlVolume("variableChamber",
                                                                                     casing,
-                                                                                    0.0,
-                                                                                    0.01, 
+                                                                                    swashPlate,
+                                                                                    piston,
+                                                                                    casingOffset,
+                                                                                    deadVol,
                                                                                     inletChamber_Pressure,
                                                                                     inletChamber_Volume);
   sys.AddObject(variableChamber);
@@ -89,7 +105,7 @@ int main()
   sys.ConnectYToDepVar();
 
   // Initialize system
-  Solver solver = Solver(0.01, 1.0);
+  Solver solver = Solver(0.01, 10.0);
 
   // Solve system
   int retVal = solver.SolveSystem(sys);
