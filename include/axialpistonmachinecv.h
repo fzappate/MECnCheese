@@ -10,7 +10,7 @@ class AxialPistonMachineControlVolume : public VariableChamber
 
 public:
     AxialPistonMachineControlVolume(std::string name,
-                                    AxialPistonMachineBody casing,
+                                    AxialPistonMachineBody& casing,
                                     sunrealtype casingOffset,
                                     sunrealtype deadVol,
                                     double initPressure,
