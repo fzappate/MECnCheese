@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
-
 #include "./object.h"
 
 class Body : public DiffObject
@@ -81,6 +79,8 @@ public:
 
     // Zero the forces applied to the Body object
     void ZeroParameters();
+
+    sunrealtype GetPosPsi();
 
     // Print the header of the Body object variable in the output file
     void PrintHeader(std::ofstream &outputFile);

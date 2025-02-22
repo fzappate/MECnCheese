@@ -2,9 +2,6 @@
 
 #include <vector>
 
-#include <cvode/cvode.h>            // prototypes for CVODE fcts., consts.
-#include <nvector/nvector_serial.h> // access to serial N_Vector
-
 #include "./object.h"
 
 class System

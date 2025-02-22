@@ -1,9 +1,9 @@
 #pragma once
-
+#include "./sundials.h"
 #include <string>
 #include <vector>
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
+// #include <nvector/nvector_serial.h> // access to serial N_Vector
 
 class Object
 {

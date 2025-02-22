@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <nvector/nvector_serial.h> // access to serial N_Vector
 
 #include "./body.h"
 
@@ -53,6 +52,12 @@ void Body::CalculateRHS()
 void Body::ZeroParameters()
 {
     return;
+};
+
+sunrealtype Body::GetPosPsi()
+{
+    // Return psi
+    return *yValuesPnt[8];
 };
 
 void Body::PrintHeader(std::ofstream &outputFile)

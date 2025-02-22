@@ -8,7 +8,7 @@
 // Class Orifice
 class Orifice : public NonDiffObject
 {
-    double area;
+    sunrealtype area;
     double Cf = 0.678;
     double flowrate;
     Chamber &upChamber;

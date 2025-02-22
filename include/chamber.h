@@ -4,21 +4,20 @@
 #include <string>
 #include <vector>
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
+
 
 #include "./object.h"
 
 class Chamber : public DiffObject
 {
 protected:
-    double bulkMod = 1.8 * 1.0E9;
+    sunrealtype bulkMod = 1.8 * 1.0E9;
     double initPressure;
-    double volume;
-    double volDer;
-    double dpdt;
+    double volume = 0;
+    double volDer = 0;
+    double dpdt = 0;
     double flowSum = 0;
     double aTol = 1;
-    double rTol = 0.001;
 
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
@@ -64,12 +63,23 @@ public:
     void CalculateRHS() override;
 };
 
-// Class Chamber
+// Class Const Chamber
 class ConstChamber : public Chamber
 {
-
 public:
     ConstChamber(std::string name, double pressure, double volume);
 
     void CalculateRHS() override;
 };
+
+// Class Variable Chamber
+class VariableChamber : public Chamber
+{
+    public:
+    VariableChamber(std::string name, double initPressure, double initVolume);
+
+    void CalculateRHS() override;
+
+    void SetVolumeDer(double volumeDer);
+};
+

@@ -1,12 +1,18 @@
+
 #include "./orifice.h"
 #include "./chamber.h"
 #include "./system.h"
 #include "./solver.h"
 #include "./inputreader.h"
 #include "./body.h"
+#include "./axialpistonmachinebody.h"
+#include "./axialpistonmachinecv.h"
 
 sunrealtype pi = 3.14159265358979323846;
-
+sunrealtype mm = 1e-3;          // mm -> m
+sunrealtype deg = 2 * pi / 360; // deg -> rad
+sunrealtype rps = 2 * pi;       // rev/s -> rad/s
+sunrealtype mm3 = 1e-9;         // mm^3 -> m^3
 int main()
 {
   // Inputs
@@ -27,6 +33,20 @@ int main()
   // Create system
   System sys = System();
 
+  sunrealtype casingRotVel = 1 * rps; // RPS
+  sunrealtype pistonCircleDiameter = 100 * mm;
+  AxialPistonMachineCasing casing = AxialPistonMachineCasing("Casing",
+                                                             casingRotVel,
+                                                             pistonCircleDiameter);
+  sys.AddObject(casing);
+
+  sunrealtype swashPlateAngle = 20 * deg; // deg
+  AxialPistonMachineSwashPlate swashPlate = AxialPistonMachineSwashPlate("SwashPlate", swashPlateAngle);
+  sys.AddObject(swashPlate);
+
+  sunrealtype pistonDiameter = 10 * mm;
+  AxialPistonMachinePiston piston = AxialPistonMachinePiston("Piston", pistonDiameter);
+
   InfChamber HPChamber = InfChamber("HPChamber",
                                     HPChamber_Pressure);
   sys.AddObject(HPChamber);
@@ -40,9 +60,16 @@ int main()
                                            inletChamber_Volume);
   sys.AddObject(inletChamber);
 
-  ConstChamber variableChamber = ConstChamber("variableChamber",
-                                              inletChamber_Pressure,
-                                              inletChamber_Volume);
+  sunrealtype casingOffset = 0 * deg;
+  sunrealtype deadVol = 10 * mm3;
+  AxialPistonMachineControlVolume variableChamber = AxialPistonMachineControlVolume("variableChamber",
+                                                                                    casing,
+                                                                                    swashPlate,
+                                                                                    piston,
+                                                                                    casingOffset,
+                                                                                    deadVol,
+                                                                                    inletChamber_Pressure,
+                                                                                    inletChamber_Volume);
   sys.AddObject(variableChamber);
 
   ConstChamber outletChamber = ConstChamber("outletChamber",
@@ -74,16 +101,11 @@ int main()
                                LPChamber);
   sys.AddObject(outletPort);
 
-  sunrealtype casingRotVel = 30; // RPM
-  sunrealtype casingRotVelRad = casingRotVel * 2 * pi / 60;
-  ConstRotVelBody casing = ConstRotVelBody("Casing", 0, 0, 30 );
-  sys.AddObject(casing);
-
   // Move sys dependent variables into N_Vector
   sys.ConnectYToDepVar();
 
   // Initialize system
-  Solver solver = Solver(0.01, 1.0);
+  Solver solver = Solver(0.01, 10.0);
 
   // Solve system
   int retVal = solver.SolveSystem(sys);

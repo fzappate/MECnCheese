@@ -3,8 +3,6 @@
 #include <string>
 #include <fstream>
 
-#include <nvector/nvector_serial.h> // access to serial N_Vector
-
 #include "./object.h"
 #include "./chamber.h"
 
@@ -85,7 +83,7 @@ void Chamber::PrintVariables(std::ofstream &outputFile)
 
     if (printStruct.printBulkMod == 1)
     {
-        outputFile << bulkMod << ",";
+        outputFile << this->bulkMod << ",";
     }
     if (printStruct.printPress == 1)
     {
@@ -93,15 +91,15 @@ void Chamber::PrintVariables(std::ofstream &outputFile)
     }
     if (printStruct.printVolume == 1)
     {
-        outputFile << volume << ",";
+        outputFile << this->volume << ",";
     }
     if (printStruct.printVolDer == 1)
     {
-        outputFile << volDer << ", ";
+        outputFile << this->volDer << ", ";
     }
     if (printStruct.printFlowSum == 1)
     {
-        outputFile << flowSum << ",";
+        outputFile << this->flowSum << ",";
     }
 
     return;
@@ -149,5 +147,29 @@ void ConstChamber::CalculateRHS()
 
     // Updatet the dependent variable in y
     *yDotValuesPnt[0] = this->dpdt;
+    return;
+};
+
+// VariableChamber
+VariableChamber::VariableChamber(std::string name, double initPressure, double initVolume) : Chamber(name, initPressure)
+{
+    this->volume = initVolume;
+    this->volDer = 0;
+    return;
+};
+
+void VariableChamber::CalculateRHS()
+{
+    // Calculate and store the depenedent variable in the object
+    this->dpdt = bulkMod / volume * (flowSum - volDer);
+
+    // Updatet the dependent variable in yDot
+    *yDotValuesPnt[0] = this->dpdt;
+    return;
+};
+
+void VariableChamber::SetVolumeDer(double volumeDer)
+{
+    this->volDer = volumeDer;
     return;
 };
