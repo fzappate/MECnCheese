@@ -91,7 +91,6 @@ int Solver::SolveSystem(System sys)
 
   // In loop, call CVode, print results, and test for error.
   // Break out of loop when NOUT preset output times have been reached.
-  printf(" \nSolving the system\n\n");
 
   // Impose a maximum timestep of stepTime
   CVodeSetMaxStep(cvode_mem, stepTime);
@@ -101,17 +100,15 @@ int Solver::SolveSystem(System sys)
   printer.PrintResultsHeader();
 
   auto startTimer = std::chrono::high_resolution_clock::now();
+
+  std::cout << "Simulation started" << std::endl;
+
   while (1)
   {
 
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     if (CheckReturnValue(&retval, "CVode", 1))
       break;
-
-    double bar = 1e-5;
-    std::cout << std::fixed << std::setprecision(3);
-    std::cout << "t: " << outTime << " || HPChamber: " << Ith(y, 1) * bar << " || LPChamber: " << Ith(y, 2) * bar;
-    std::cout << " || inletChamber: " << Ith(y, 3) * bar << " || variableChamber: " << Ith(y, 4) * bar << " || outletChamber: " << Ith(y, 5) * bar << std::endl;
 
     printer.PrintResults(outTime);
 

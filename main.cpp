@@ -7,12 +7,14 @@
 #include "./body.h"
 #include "./axialpistonmachinebody.h"
 #include "./axialpistonmachinecv.h"
+#include "./lookuptable.h"
 
 sunrealtype pi = 3.14159265358979323846;
 sunrealtype mm = 1e-3;          // mm -> m
 sunrealtype deg = 2 * pi / 360; // deg -> rad
 sunrealtype rps = 2 * pi;       // rev/s -> rad/s
 sunrealtype mm3 = 1e-9;         // mm^3 -> m^3
+
 int main()
 {
   // Inputs
@@ -29,6 +31,11 @@ int main()
   double inletOrif_Area = input.ImportVarAsDouble("inletOrif_Area");
   double outletOrif_Area = input.ImportVarAsDouble("outletOrif_Area");
   double outletPort_Area = input.ImportVarAsDouble("outletPort_Area");
+
+  // Load useful tables
+  LookUpTable valvePlateAreaTable = LookUpTable("ValvePlateAreas", "ValvePlateAreas.csv");
+  valvePlateAreaTable.TimedReadLargeTable();
+  valvePlateAreaTable.TimedReadTable();
 
   // Create system
   System sys = System();

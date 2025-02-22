@@ -1,16 +1,22 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "./sundials.h"
 
-class OrderedLookUpTable
+class LookUpTable
 {
 private:
-std::string name;
-std::string filename;
-
+    std::string name;
+    std::string filename;
+    std::vector<std::string> headers;
+    std::vector<std::vector<sunrealtype>> data;
 
 public:
-OrderedLookUpTable(std::string name, std::string filename);
+    LookUpTable(std::string name, std::string filename);
 
-void ReadTable();
+    // Read a table
+    sunindextype ReadTable();
+
+    // Read a table and print how long it takes
+    sunindextype TimedReadTable();
 };

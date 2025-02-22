@@ -3,39 +3,74 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <chrono>
 
-OrderedLookUpTable::OrderedLookUpTable(std::string name, std::string filename) : name(name), filename(filename)
+LookUpTable::LookUpTable(std::string name, std::string filename) : name(name), filename(filename)
 {
-    ReadTable();
     return;
 };
 
-void OrderedLookUpTable::ReadTable()
+sunindextype LookUpTable::ReadTable()
 {
-    std::ifstream inputFile(filename);
 
-    if (!inputFile.is_open()) {
+    std::ifstream inputFile(this->filename);
+
+    if (!inputFile.is_open())
+    {
         std::cout << "Error opening file: " << filename << std::endl;
-        return;
+        return 1;
     }
 
+    sunbooleantype loadedHeader = SUNFALSE;
+    sunindextype lineCounter = 0;
+    sunindextype columnCounter = 0;
+
     std::string line;
-    while (std::getline(inputFile, line)) {
+    while (std::getline(inputFile, line))
+    {
         std::stringstream ss(line);
         std::string cell;
-        std::vector<std::string> row;
 
-        while (std::getline(ss, cell, ',')) {
-            row.push_back(cell);
+        if (loadedHeader == SUNFALSE) // Load the header
+        {
+            while (std::getline(ss, cell, ','))
+            {
+                this->headers.push_back(cell);
+            }
+            // Resize the data vector to the number of columns
+            this->data.resize(this->headers.size());
+            // Set the flag to true to prevent headers reload
+            loadedHeader = SUNTRUE;
         }
-        
-        for (const std::string& str : row) {
-            std::cout << str << " ";
+        else
+        {
+            sunindextype columnCounter = 0;
+            while (std::getline(ss, cell, ','))
+            {
+                sunrealtype cellValue = std::stod(cell);
+                this->data[columnCounter].push_back(cellValue);
+
+                columnCounter++;
+            }
         }
-        std::cout << std::endl;
     }
 
     inputFile.close();
-    return;
 
-}
+
+
+    return 0;
+};
+
+sunindextype LookUpTable::TimedReadTable()
+{
+    auto startTimer = std::chrono::high_resolution_clock::now();
+
+    sunindextype readTableSuccess = this->ReadTable();
+
+    auto nowTime = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTimer);
+    std::cout << "Table " << this->name << " read in: " << elapsed.count() << " ms" << std::endl;
+
+    return readTableSuccess;
+};
