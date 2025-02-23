@@ -7,6 +7,7 @@
 #include "./body.h"
 #include "./axialpistonmachinebody.h"
 #include "./axialpistonmachinecv.h"
+
 #include "./lookuptable.h"
 
 sunrealtype pi = 3.14159265358979323846;
@@ -34,7 +35,6 @@ int main()
 
   // Load useful tables
   LookUpTable valvePlateAreaTable = LookUpTable("ValvePlateAreas", "ValvePlateAreas.csv");
-  valvePlateAreaTable.TimedReadLargeTable();
   valvePlateAreaTable.TimedReadTable();
 
   // Create system
@@ -90,6 +90,7 @@ int main()
                               inletChamber);
   sys.AddObject(inletPort);
 
+  ValvePlateConnection 
   Orifice inletOrif = Orifice("inletOrif",
                               inletOrif_Area,
                               inletChamber,

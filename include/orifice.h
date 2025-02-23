@@ -8,6 +8,7 @@
 // Class Orifice
 class Orifice : public NonDiffObject
 {
+    std::string name;
     sunrealtype area;
     double Cf = 0.678;
     double flowrate;
@@ -23,6 +24,8 @@ class Orifice : public NonDiffObject
     PrintStruct printStruct;
 
 public:
+    Orifice(std::string name, Chamber &upCh, Chamber &downCh);
+
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
 
     void SetArea(double area);
@@ -55,3 +58,4 @@ public:
 
     void PrintVariables(std::ofstream &outputFile) override;
 };
+
