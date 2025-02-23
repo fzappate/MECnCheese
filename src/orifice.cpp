@@ -9,11 +9,13 @@
 #include "./chamber.h"
 
 // Constructors
+Orifice::Orifice(std::string name, Chamber &upCh, Chamber &downCh) : NonDiffObject(name), upChamber(upCh), downChamber(downCh)
+{
+    return;
+};
+
 Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) : NonDiffObject(name), area(area), upChamber(upCh), downChamber(downCh)
 {
-
-    isDifferential = false;
-
     return;
 };
 

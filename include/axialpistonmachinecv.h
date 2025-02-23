@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./chamber.h"
+#include "./axialpistonmachinebody.h"
 
 class AxialPistonMachineControlVolume : public VariableChamber
 {

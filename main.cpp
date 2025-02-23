@@ -7,7 +7,6 @@
 #include "./body.h"
 #include "./axialpistonmachinebody.h"
 #include "./axialpistonmachinecv.h"
-
 #include "./lookuptable.h"
 
 sunrealtype pi = 3.14159265358979323846;
@@ -90,7 +89,6 @@ int main()
                               inletChamber);
   sys.AddObject(inletPort);
 
-  ValvePlateConnection 
   Orifice inletOrif = Orifice("inletOrif",
                               inletOrif_Area,
                               inletChamber,
