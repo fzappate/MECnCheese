@@ -19,69 +19,10 @@ Orifice::Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh) 
     return;
 };
 
-void Orifice::SetArea(double area)
-{
-    this->area = area;
-    return;
-};
-
-double Orifice::GetArea()
-{
-    return this->area;
-};
-
-void Orifice::SetCf(double Cf)
-{
-    this->Cf = Cf;
-    return;
-};
-
-double Orifice::GetCf()
-{
-    return this->Cf;
-};
-
-void Orifice::SetFlowrate(double flowrate)
-{
-    this->flowrate = flowrate;
-    return;
-};
-
-double Orifice::GetFlowrate()
-{
-    return this->flowrate;
-};
-
-void Orifice::SetUpChamber(Chamber &upChamber)
-{
-    this->upChamber = upChamber;
-    return;
-};
-
-Chamber Orifice::GetUpChamber()
-{
-    return this->upChamber;
-};
-
-void Orifice::SetDownChamber(Chamber &downChamber)
-{
-    this->downChamber = downChamber;
-    return;
-};
-
-Chamber Orifice::GetDownChamber()
-{
-    return this->downChamber;
-};
-
 void Orifice::CalculateFlowrate()
 {
-    Cf = GetCf();
-    area = GetArea();
-    Chamber &upCh = this->upChamber;
-    Chamber &downCh = this->downChamber;
-    double upPress = upCh.GetPressure();
-    double downPress = downCh.GetPressure();
+    double upPress = this->upChamber.GetPressure();
+    double downPress = this->downChamber.GetPressure();
 
     double isDpNeg = signbit(-upPress + downPress);
     int sign;
@@ -94,7 +35,7 @@ void Orifice::CalculateFlowrate()
         sign = 1;
     }
 
-    flowrate = sign * Cf * area * sqrt(abs(upPress - downPress));
+    flowrate = sign * this->Cf * this->area * sqrt(abs(upPress - downPress));
 
     UpdateChambersFlow();
     return;

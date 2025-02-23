@@ -28,26 +28,6 @@ public:
 
     Orifice(std::string name, double area, Chamber &upCh, Chamber &downCh);
 
-    void SetArea(double area);
-
-    double GetArea();
-
-    void SetCf(double Cf);
-
-    double GetCf();
-
-    void SetFlowrate(double flowrate);
-
-    double GetFlowrate();
-
-    void SetUpChamber(Chamber &upChamber);
-
-    Chamber GetUpChamber();
-
-    void SetDownChamber(Chamber &downChamber);
-
-    Chamber GetDownChamber();
-
     void CalculateFlowrate();
 
     void UpdateChambersFlow();
