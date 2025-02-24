@@ -52,8 +52,13 @@ sunindextype LookUpTable::ReadTable()
 
                 columnCounter++;
             }
+            lineCounter++;
         }
     }
+
+    // Save the number of rows and columns
+    this->noOfCol = columnCounter;
+    this->noOfRow = lineCounter;
 
     inputFile.close();
 
@@ -73,4 +78,16 @@ sunindextype LookUpTable::TimedReadTable()
     std::cout << "Table " << this->name << " read in: " << elapsed.count() << " ms" << std::endl;
 
     return readTableSuccess;
+};
+
+std::vector<sunrealtype>& LookUpTable::GetTableColumn(sunindextype index)
+{
+    return this->data[index];
+};
+
+sunrealtype LookUpTable::GetInterpolatedValue(  sunindextype columnIndex, 
+                                                sunindextype lowerValIndex,     
+                                                sunrealtype coeff)
+{
+    return this->data[columnIndex][lowerValIndex] + coeff*(this->data[columnIndex][lowerValIndex+1] - this->data[columnIndex][lowerValIndex]);
 };

@@ -12,6 +12,10 @@ private:
     std::vector<std::vector<sunrealtype>> data;
 
 public:
+
+    sunindextype noOfRow; 
+    sunindextype noOfCol;
+
     LookUpTable(std::string name, std::string filename);
 
     // Read a table
@@ -19,4 +23,10 @@ public:
 
     // Read a table and print how long it takes
     sunindextype TimedReadTable();
+
+    // Get a column of the data table 
+    std::vector<sunrealtype>& GetTableColumn(sunindextype index);
+
+    // Get interpolated value value 
+    sunrealtype GetInterpolatedValue(sunindextype columnIndex, sunindextype lowerValIndex, sunrealtype coeff);
 };
