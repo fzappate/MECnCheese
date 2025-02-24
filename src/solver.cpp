@@ -105,10 +105,10 @@ int Solver::SolveSystem(System sys)
 
   while (1)
   {
-
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
+    std::cout << "Simulation time: " << outTime << " s" << std::endl;
     if (CheckReturnValue(&retval, "CVode", 1))
-      break;
+    break;
 
     printer.PrintResults(outTime);
 
@@ -121,7 +121,7 @@ int Solver::SolveSystem(System sys)
     {
       auto nowTime = std::chrono::high_resolution_clock::now();
       auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTimer);
-      std::cout << "Simulation time: " << elapsed.count() << " ms" << std::endl;
+      std::cout << "Simulation completed in: " << elapsed.count() << " ms" << std::endl;
       break;
     }
   }

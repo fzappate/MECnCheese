@@ -10,7 +10,6 @@ class Object
 protected:
     // Properties
     std::string name;
-    bool isDifferential;
 
 public:
     // Constructor

@@ -1,9 +1,6 @@
 #include "./axialpistonmachineconnection.h"
 #include <iostream>
 #include <cmath>
-#include <numbers>  // Required for std::numbers::pi
-
-// sunrealtype pi = 3.14159265358979323846;
 
 AxialPistonMachineValvePlateConnection::AxialPistonMachineValvePlateConnection(std::string name,
     AxialPistonMachineControlVolume& pistonControlVolume,
@@ -28,7 +25,7 @@ void AxialPistonMachineValvePlateConnection::CalculateRHS()
 
     // Get interpolated area, diameter, 
     this->SetArea(areaTable.GetInterpolatedValue(this->areaIndex, this->interpLowerIndex, this->interpCoeff));
-
+    std::cout << "Area: " << areaTable.GetInterpolatedValue(this->areaIndex, this->interpLowerIndex, this->interpCoeff) << std::endl;
     // Calculate flowrate 
     this->CalculateFlowrate();
 
@@ -53,7 +50,6 @@ void AxialPistonMachineValvePlateConnection::FindInterpolationIndexes()
     sunindextype noOfRow = this->areaTable.noOfRow;
     sunindextype noOfCol = this->areaTable.noOfCol;
 
-
     std::vector<sunrealtype> tableAngle = this->areaTable.GetTableColumn(this->angleIndex);
 
     // Get the exact interpolation weights 
@@ -77,6 +73,7 @@ void AxialPistonMachineValvePlateConnection::FindInterpolationIndexes()
                 this->interpCoeff = (pistonAngle - lowerAngle) / (upperAngle - lowerAngle);
             }
             std::cout << "Angle index: " << ii << std::endl;
+            std::cout << "Piston angle: " << pistonAngle*180/3.14159265358979323846 << std::endl;
             break;
         }
 

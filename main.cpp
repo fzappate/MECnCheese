@@ -99,7 +99,7 @@ int main()
     2,                            // Area column index
     3                             // Hydraulic diameter column index
   );
-  // sys.AddObject(valvePlateInlet);
+  sys.AddObject(valvePlateInlet);
 
   Orifice inletOrif = Orifice("inletOrif",
     inletOrif_Area,
