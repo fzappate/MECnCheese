@@ -24,4 +24,6 @@ public:
     void CalculateRHS() override;
 
     void UpdateVolumeAndVolumeDerivative();
+
+    sunrealtype GetControlVolumeAngPosition();
 };

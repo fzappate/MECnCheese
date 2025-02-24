@@ -42,7 +42,8 @@ void AxialPistonMachineControlVolume::CalculateRHS()
 void AxialPistonMachineControlVolume::UpdateVolumeAndVolumeDerivative()
 {
     // Retrieve necessary values
-    sunrealtype casingAngPos = this->casing.GetPosPsi();
+    sunrealtype casingAngPos = this->GetControlVolumeAngPosition();
+
     sunrealtype pistonCirleRadius = this->casing.GetPistonCircleDiameter() / 2;
     sunrealtype deadVol = this->deadVol;
     sunrealtype swashPlateAng = this->swashPlate.GetSwashPlateAngle();
@@ -68,4 +69,10 @@ void AxialPistonMachineControlVolume::UpdateVolumeAndVolumeDerivative()
     this->volDer = controlVolumeDerivative;
 
     return;
+};
+
+sunrealtype AxialPistonMachineControlVolume::GetControlVolumeAngPosition()
+{
+    sunrealtype casingAngPos = this->casing.GetPosPsi() + this->casingOffset;
+    return casingAngPos;
 };
