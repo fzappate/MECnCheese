@@ -8,7 +8,6 @@
 // Class Orifice
 class Orifice : public NonDiffObject
 {
-    std::string name;
     sunrealtype area;
     double Cf = 0.678;
     double flowrate;
@@ -31,6 +30,8 @@ public:
     void CalculateFlowrate();
 
     void UpdateChambersFlow();
+
+    void SetArea(sunrealtype area);
 
     void CalculateRHS() override;
 

@@ -49,6 +49,11 @@ void Orifice::UpdateChambersFlow()
     return;
 };
 
+void Orifice::SetArea(sunrealtype area)
+{
+    this->area = area;
+};
+
 void Orifice::CalculateRHS()
 {
     // Calculate and update the flowrate
