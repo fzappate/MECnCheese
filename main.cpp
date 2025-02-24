@@ -7,6 +7,7 @@
 #include "./body.h"
 #include "./axialpistonmachinebody.h"
 #include "./axialpistonmachinecv.h"
+#include "./axialpistonmachineconnection.h"
 #include "./lookuptable.h"
 
 sunrealtype pi = 3.14159265358979323846;
@@ -42,8 +43,8 @@ int main()
   sunrealtype casingRotVel = 1 * rps; // RPS
   sunrealtype pistonCircleDiameter = 100 * mm;
   AxialPistonMachineCasing casing = AxialPistonMachineCasing("Casing",
-                                                             casingRotVel,
-                                                             pistonCircleDiameter);
+    casingRotVel,
+    pistonCircleDiameter);
   sys.AddObject(casing);
 
   sunrealtype swashPlateAngle = 20 * deg; // deg
@@ -54,57 +55,68 @@ int main()
   AxialPistonMachinePiston piston = AxialPistonMachinePiston("Piston", pistonDiameter);
 
   InfChamber HPChamber = InfChamber("HPChamber",
-                                    HPChamber_Pressure);
+    HPChamber_Pressure);
   sys.AddObject(HPChamber);
 
   InfChamber LPChamber = InfChamber("LPChamber",
-                                    LPChamber_Pressure);
+    LPChamber_Pressure);
   sys.AddObject(LPChamber);
 
   ConstChamber inletChamber = ConstChamber("inletChamber",
-                                           inletChamber_Pressure,
-                                           inletChamber_Volume);
+    inletChamber_Pressure,
+    inletChamber_Volume);
   sys.AddObject(inletChamber);
 
   sunrealtype casingOffset = 0 * deg;
   sunrealtype deadVol = 10 * mm3;
   AxialPistonMachineControlVolume variableChamber = AxialPistonMachineControlVolume("variableChamber",
-                                                                                    casing,
-                                                                                    swashPlate,
-                                                                                    piston,
-                                                                                    casingOffset,
-                                                                                    deadVol,
-                                                                                    inletChamber_Pressure,
-                                                                                    inletChamber_Volume);
+    casing,
+    swashPlate,
+    piston,
+    casingOffset,
+    deadVol,
+    inletChamber_Pressure,
+    inletChamber_Volume);
   sys.AddObject(variableChamber);
 
   ConstChamber outletChamber = ConstChamber("outletChamber",
-                                            outletChamber_Pressure,
-                                            outletChamber_Volume);
+    outletChamber_Pressure,
+    outletChamber_Volume);
   sys.AddObject(outletChamber);
 
   Orifice inletPort = Orifice("inletPort",
-                              inletPort_Area,
-                              HPChamber,
-                              inletChamber);
+    inletPort_Area,
+    HPChamber,
+    inletChamber);
   sys.AddObject(inletPort);
 
+  AxialPistonMachineValvePlateConnection valvePlateInlet = AxialPistonMachineValvePlateConnection(
+    "Valve Plate Inlet",          // Name
+    variableChamber,              // Axial piston machine control volume
+    inletChamber,                 // Downstream chamber 
+    valvePlateAreaTable,          // Valve plate geometry look-up table
+    1,                            // Control volume angle column index
+    2,                            // Area column index
+    3                             // Hydraulic diameter column index
+  );
+  // sys.AddObject(valvePlateInlet);
+
   Orifice inletOrif = Orifice("inletOrif",
-                              inletOrif_Area,
-                              inletChamber,
-                              variableChamber);
+    inletOrif_Area,
+    inletChamber,
+    variableChamber);
   sys.AddObject(inletOrif);
 
   Orifice outletOrif = Orifice("outletOrif",
-                               outletOrif_Area,
-                               variableChamber,
-                               outletChamber);
+    outletOrif_Area,
+    variableChamber,
+    outletChamber);
   sys.AddObject(outletOrif);
 
   Orifice outletPort = Orifice("outletPort",
-                               outletPort_Area,
-                               outletChamber,
-                               LPChamber);
+    outletPort_Area,
+    outletChamber,
+    LPChamber);
   sys.AddObject(outletPort);
 
   // Move sys dependent variables into N_Vector

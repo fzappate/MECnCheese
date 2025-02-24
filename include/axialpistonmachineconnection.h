@@ -2,19 +2,32 @@
 #include "./axialpistonmachinecv.h"
 #include "./lookuptable.h"
 
-class ValvePlateConnection : public Orifice
+class AxialPistonMachineValvePlateConnection : public Orifice
 {
+    AxialPistonMachineControlVolume& pistonControlVolume;
     LookUpTable areaTable;
+
+    // Index of the angle column in areaTable
     sunindextype angleIndex; 
     sunindextype areaIndex;
     sunindextype hdIndex;
+
+    sunindextype interpLowerIndex;
+    sunindextype interpCoeff;
+
 public:
 
-    ValvePlateConnection(std::string name,
+    AxialPistonMachineValvePlateConnection(std::string name,
         AxialPistonMachineControlVolume& pistonControlVolume,
         Chamber& downCh,
-        LookUpTable area,
+        LookUpTable& areaTable,
         sunindextype angleIndex,
         sunindextype areaIndex,
         sunindextype hdIndex);
+
+    void CalculateRHS() override;
+
+    void CalculateArea();
+
+    void FindInterpolationIndexes();
 };
