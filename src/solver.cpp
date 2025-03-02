@@ -11,9 +11,8 @@
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime)
+Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime), outTime(stepTime)
 {
-  outTime = stepTime;
   return;
 }
 
@@ -46,17 +45,23 @@ int Solver::SolveSystem(System sys)
   if (CheckReturnValue((void *)absTol, "GetEqAbsTol", 0))
     return (1);
 
-  // Relative tolerance
-  double relTol = sys.GetRelTol();
-
   // Call CVodeCreate to create the solver memory and specify the
   // solver scheme
   cvode_mem = CVodeCreate(CV_BDF, sunctx);
   if (CheckReturnValue((void *)cvode_mem, "CVodeCreate", 0))
     return (1);
 
+  // sunrealtype min_step = 1e-14;
+  // int flag = CVodeSetMinStep(cvode_mem, min_step);
+  // realtype hmax = 1e-3;  // Adjust as needed
+  // CVodeSetMaxStep(cvode_mem, hmax);
+
+  // if (flag != CV_SUCCESS) {
+  //   std::cerr << "Error setting min step size!" << std::endl;
+  // }
+
   // Give user data to the solver function
-  System *sysPtr = &sys;
+  System* sysPtr = &sys;
   retval = CVodeSetUserData(cvode_mem, sysPtr);
   if (CheckReturnValue(&retval, "CVodeSetUserData", 1))
     return (1);
@@ -70,6 +75,7 @@ int Solver::SolveSystem(System sys)
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
   // and vector absolute tolerances
+  double relTol = sys.GetRelTol();
   retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
   if (CheckReturnValue(&retval, "CVodeSVtolerances", 1))
     return (1);
@@ -89,11 +95,18 @@ int Solver::SolveSystem(System sys)
   if (CheckReturnValue(&retval, "CVodeSetLinearSolver", 1))
     return (1);
 
-  // In loop, call CVode, print results, and test for error.
-  // Break out of loop when NOUT preset output times have been reached.
+  // Print CVode log to file
+  FILE *solver_output = fopen("cvode_log.txt", "w");
+  CVodeSetErrFile(cvode_mem, solver_output);
+
+  // CVODE Tuning Solver
 
   // Impose a maximum timestep of stepTime
-  CVodeSetMaxStep(cvode_mem, stepTime);
+  CVodeSetMaxStep(cvode_mem, stepTime/10);
+
+  CVodeSetMaxNumSteps(cvode_mem, 1e6);  // Increase max steps
+
+  CVodeSetMaxOrd(cvode_mem,1);
 
   Printer printer = Printer(sys);
   printer.OpenFile();
