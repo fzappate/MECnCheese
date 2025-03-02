@@ -108,11 +108,6 @@ int System::GetNoOfDiffEq()
     return this->noOfDiffEq;
 };
 
-double System::GetRelTol()
-{
-    return relTol;
-}
-
 void System::CalculateAuxEqRHS()
 {
 

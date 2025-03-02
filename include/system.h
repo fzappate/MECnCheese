@@ -19,14 +19,11 @@ protected:
     // Number of dependent variables in the system
     int sysDepVarIndex = 0;
 
-    // Relative tolerance of the system
-    double relTol = 0.001;
-
     // Pointers to the non-differential object in the system
-    std::vector<NonDiffObject *> nonDiffObjects;
+    std::vector<NonDiffObject*> nonDiffObjects;
 
     // Pointers to the differential object in the system
-    std::vector<DiffObject *> diffObjects;
+    std::vector<DiffObject*> diffObjects;
 
     // Initial conditions of the system
     std::vector<sunrealtype> initConditions;
@@ -48,16 +45,16 @@ public:
     System(SUNContext sunctx);
 
     // Save differential object pointer in the system
-    void AddObject(DiffObject &equation);
+    void AddObject(DiffObject& equation);
 
     // Save non-differential object pointer in the system
-    void AddObject(NonDiffObject &equation);
+    void AddObject(NonDiffObject& equation);
 
     // Get vector of pointers to non-differential objects
-    std::vector<NonDiffObject *> GetNonDiffObjects();
+    std::vector<NonDiffObject*> GetNonDiffObjects();
 
     // Get vector of pointers to differential objects
-    std::vector<DiffObject *> GetDiffObjects();
+    std::vector<DiffObject*> GetDiffObjects();
 
     // Get the number of differential equations in the system
     int GetNoOfDiffEq();
@@ -75,7 +72,7 @@ public:
     void System::ConnectYDotToDepVarDeriv(N_Vector ydot);
 
     // Save the SUNDIALS context in the system
-    void AddSUNContext(SUNContext &sunctx);
+    void AddSUNContext(SUNContext& sunctx);
 
     // Get the SUNDIALS context stored in the system
     SUNContext GetSUNContext();
@@ -100,7 +97,4 @@ public:
 
     // Get the absolute tolerance of the equations of the differential objects
     N_Vector GetObjAbsTol();
-
-    // Get the relative tolerance of the system
-    double GetRelTol();
 };

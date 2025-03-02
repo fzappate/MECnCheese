@@ -11,10 +11,36 @@
 #define Ith(v, i) NV_Ith_S(v, i - 1)                /* i-th vector component i=1..NEQ */
 #define IJth(A, i, j) SM_ELEMENT_D(A, i - 1, j - 1) /* (i,j)-th matrix component i,j=1..NEQ */
 
-Solver::Solver(double stepTime, double endTime) : stepTime(stepTime), endTime(endTime), outTime(stepTime)
+Solver::Solver(double printTime,
+  double endTime) :
+  printTime(printTime),
+  endTime(endTime),
+  outTime(printTime),
+  stepTime(printTime / 10)
 {
   return;
 }
+
+void Solver::SetStepTime(sunrealtype stepTime)
+{
+  this->stepTime = stepTime;
+
+  return;
+};
+
+void Solver::SetMaxNoOfIter(sunindextype maxNoOfIter)
+{
+  this->maxNoOfIter = maxNoOfIter;
+
+  return;
+};
+
+void Solver::SetMaxOrderBfg(sunindextype maxBfgOrder)
+{
+  this->maxBfgOrder = maxBfgOrder;
+
+  return;
+};
 
 int Solver::SolveSystem(System sys)
 {
@@ -27,7 +53,7 @@ int Solver::SolveSystem(System sys)
   A = NULL;
   SUNLinearSolver LS;
   LS = NULL;
-  void *cvode_mem;
+  void* cvode_mem;
   cvode_mem = NULL;
 
   int noOfDiffEq = sys.GetNoOfDiffEq();
@@ -42,23 +68,14 @@ int Solver::SolveSystem(System sys)
 
   // Absolute tolerance
   N_Vector absTol = sys.GetObjAbsTol();
-  if (CheckReturnValue((void *)absTol, "GetEqAbsTol", 0))
+  if (CheckReturnValue((void*)absTol, "GetEqAbsTol", 0))
     return (1);
 
   // Call CVodeCreate to create the solver memory and specify the
   // solver scheme
   cvode_mem = CVodeCreate(CV_BDF, sunctx);
-  if (CheckReturnValue((void *)cvode_mem, "CVodeCreate", 0))
+  if (CheckReturnValue((void*)cvode_mem, "CVodeCreate", 0))
     return (1);
-
-  // sunrealtype min_step = 1e-14;
-  // int flag = CVodeSetMinStep(cvode_mem, min_step);
-  // realtype hmax = 1e-3;  // Adjust as needed
-  // CVodeSetMaxStep(cvode_mem, hmax);
-
-  // if (flag != CV_SUCCESS) {
-  //   std::cerr << "Error setting min step size!" << std::endl;
-  // }
 
   // Give user data to the solver function
   System* sysPtr = &sys;
@@ -75,19 +92,18 @@ int Solver::SolveSystem(System sys)
 
   // Call CVodeSVtolerances to specify the scalar relative tolerance
   // and vector absolute tolerances
-  double relTol = sys.GetRelTol();
-  retval = CVodeSVtolerances(cvode_mem, relTol, absTol);
+  retval = CVodeSVtolerances(cvode_mem, this->relTol, absTol);
   if (CheckReturnValue(&retval, "CVodeSVtolerances", 1))
     return (1);
 
   // Create dense SUNMatrix for use in linear solves
   A = SUNDenseMatrix(noOfDiffEq, noOfDiffEq, sunctx);
-  if (CheckReturnValue((void *)A, "SUNDenseMatrix", 0))
+  if (CheckReturnValue((void*)A, "SUNDenseMatrix", 0))
     return (1);
 
   // Create dense SUNLinearSolver object for use by CVode
   LS = SUNLinSol_Dense(y, A, sunctx);
-  if (CheckReturnValue((void *)LS, "SUNLinSol_Dense", 0))
+  if (CheckReturnValue((void*)LS, "SUNLinSol_Dense", 0))
     return (1);
 
   // Attach the matrix and linear solver
@@ -96,17 +112,20 @@ int Solver::SolveSystem(System sys)
     return (1);
 
   // Print CVode log to file
-  FILE *solver_output = fopen("cvode_log.txt", "w");
+  FILE* solver_output = fopen("cvode_log.txt", "w");
   CVodeSetErrFile(cvode_mem, solver_output);
 
   // CVODE Tuning Solver
 
-  // Impose a maximum timestep of stepTime
-  CVodeSetMaxStep(cvode_mem, stepTime/10);
+  // Impose a maximum solver timestep
+  CVodeSetMaxStep(cvode_mem, stepTime);
+  // Set the maximum number of iterations the solver can perform
+  CVodeSetMaxNumSteps(cvode_mem, this->maxNoOfIter);
 
-  CVodeSetMaxNumSteps(cvode_mem, 1e6);  // Increase max steps
+  CVodeSetMaxOrd(cvode_mem, 1);
 
-  CVodeSetMaxOrd(cvode_mem,1);
+  sunrealtype min_step = 1e-14;
+  int flag = CVodeSetMinStep(cvode_mem, min_step);
 
   Printer printer = Printer(sys);
   printer.OpenFile();
@@ -121,7 +140,7 @@ int Solver::SolveSystem(System sys)
     retval = CVode(cvode_mem, outTime, y, &t, CV_NORMAL);
     std::cout << "Simulation time: " << outTime << " s" << std::endl;
     if (CheckReturnValue(&retval, "CVode", 1))
-    break;
+      break;
 
     printer.PrintResults(outTime);
 
@@ -150,7 +169,7 @@ int Solver::SolveSystem(System sys)
   return (retval);
 }
 
-int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
+int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void* user_data)
 {
   // This function computes the ODE right-hand side for a given value of the independent variable
   //  and state vector
@@ -165,25 +184,25 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   // which case the integration is halted and CV_RHSFUNC_FAIL is returned).
 
   // Cast the user_data void pointer to a pointer to system
-  System *sysPtr = static_cast<System *>(user_data);
+  System* sysPtr = static_cast<System*>(user_data);
 
-  sunrealtype y1 = Ith(y, 1 );
-  sunrealtype y2 = Ith(y, 2 );
-  sunrealtype y3 = Ith(y, 3 );
-  sunrealtype y4 = Ith(y, 4 );
-  sunrealtype y5 = Ith(y, 5 );
-  sunrealtype y6 = Ith(y, 6 );
-  sunrealtype y7 = Ith(y, 7 );
-  sunrealtype y8 = Ith(y, 8 );
-  sunrealtype y9 = Ith(y, 9 );
-  sunrealtype y10 = Ith(y,10);
-  sunrealtype y11 = Ith(y,11);
-  sunrealtype y12 = Ith(y,12);
-  sunrealtype y13 = Ith(y,13);
-  sunrealtype y14 = Ith(y,14);
-  sunrealtype y15 = Ith(y,15);
-  sunrealtype y16 = Ith(y,16);
-  sunrealtype y17 = Ith(y,17);
+  sunrealtype y1 = Ith(y, 1);
+  sunrealtype y2 = Ith(y, 2);
+  sunrealtype y3 = Ith(y, 3);
+  sunrealtype y4 = Ith(y, 4);
+  sunrealtype y5 = Ith(y, 5);
+  sunrealtype y6 = Ith(y, 6);
+  sunrealtype y7 = Ith(y, 7);
+  sunrealtype y8 = Ith(y, 8);
+  sunrealtype y9 = Ith(y, 9);
+  sunrealtype y10 = Ith(y, 10);
+  sunrealtype y11 = Ith(y, 11);
+  sunrealtype y12 = Ith(y, 12);
+  sunrealtype y13 = Ith(y, 13);
+  sunrealtype y14 = Ith(y, 14);
+  sunrealtype y15 = Ith(y, 15);
+  sunrealtype y16 = Ith(y, 16);
+  sunrealtype y17 = Ith(y, 17);
 
   // If the ydot pointer stored in the system is not the same as the ydot pointer used by the solver
   if (sysPtr->GetYDot() != ydot)
@@ -202,47 +221,47 @@ int Solver::fFunction(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data)
   sysPtr->CalculateAuxEqRHS();
   sysPtr->CalculateDiffEqRHS();
 
-  sunrealtype yDot1 = Ith(ydot, 1 );
-  sunrealtype yDot2 = Ith(ydot, 2 );
-  sunrealtype yDot3 = Ith(ydot, 3 );
-  sunrealtype yDot4 = Ith(ydot, 4 );
-  sunrealtype yDot5 = Ith(ydot, 5 );
-  sunrealtype yDot6 = Ith(ydot, 6 );
-  sunrealtype yDot7 = Ith(ydot, 7 );
-  sunrealtype yDot8 = Ith(ydot, 8 );
-  sunrealtype yDot9 = Ith(ydot, 9 );
-  sunrealtype yDot10 = Ith(ydot,10);
-  sunrealtype yDot11 = Ith(ydot,11);
-  sunrealtype yDot12 = Ith(ydot,12);
-  sunrealtype yDot13 = Ith(ydot,13);
-  sunrealtype yDot14 = Ith(ydot,14);
-  sunrealtype yDot15 = Ith(ydot,15);
-  sunrealtype yDot16 = Ith(ydot,16);
-  sunrealtype yDot17 = Ith(ydot,17);
+  sunrealtype yDot1 = Ith(ydot, 1);
+  sunrealtype yDot2 = Ith(ydot, 2);
+  sunrealtype yDot3 = Ith(ydot, 3);
+  sunrealtype yDot4 = Ith(ydot, 4);
+  sunrealtype yDot5 = Ith(ydot, 5);
+  sunrealtype yDot6 = Ith(ydot, 6);
+  sunrealtype yDot7 = Ith(ydot, 7);
+  sunrealtype yDot8 = Ith(ydot, 8);
+  sunrealtype yDot9 = Ith(ydot, 9);
+  sunrealtype yDot10 = Ith(ydot, 10);
+  sunrealtype yDot11 = Ith(ydot, 11);
+  sunrealtype yDot12 = Ith(ydot, 12);
+  sunrealtype yDot13 = Ith(ydot, 13);
+  sunrealtype yDot14 = Ith(ydot, 14);
+  sunrealtype yDot15 = Ith(ydot, 15);
+  sunrealtype yDot16 = Ith(ydot, 16);
+  sunrealtype yDot17 = Ith(ydot, 17);
 
   return (0);
 }
 
-int Solver::CheckReturnValue(void *returnvalue, const char *funcname, int opt)
+int Solver::CheckReturnValue(void* returnvalue, const char* funcname, int opt)
 {
-  int *retval;
+  int* retval;
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && returnvalue == NULL)
   {
     fprintf(stderr, "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
-            funcname);
+      funcname);
     return (1);
   }
 
   /* Check if retval < 0 */
   else if (opt == 1)
   {
-    retval = (int *)returnvalue;
+    retval = (int*)returnvalue;
     if (*retval < 0)
     {
       fprintf(stderr, "\nSUNDIALS_ERROR: %s() failed with retval = %d\n\n",
-              funcname, *retval);
+        funcname, *retval);
       return (1);
     }
   }
@@ -251,7 +270,7 @@ int Solver::CheckReturnValue(void *returnvalue, const char *funcname, int opt)
   else if (opt == 2 && returnvalue == NULL)
   {
     fprintf(stderr, "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n",
-            funcname);
+      funcname);
     return (1);
   }
 
