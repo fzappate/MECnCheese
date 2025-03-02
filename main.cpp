@@ -86,9 +86,12 @@ int main()
 
   Orifice inletPort = Orifice("inletPort",
     inletPort_Area,
-    HPChamber,
+    LPChamber,
     inletChamber);
   sys.AddObject(inletPort);
+  bool useSwashPlate = true;
+
+
 
   AxialPistonMachineValvePlateConnection valvePlateInlet = AxialPistonMachineValvePlateConnection(
     "Valve Plate Inlet",          // Name
@@ -101,22 +104,35 @@ int main()
   );
   sys.AddObject(valvePlateInlet);
 
-  Orifice inletOrif = Orifice("inletOrif",
-    inletOrif_Area,
-    inletChamber,
-    variableChamber);
-  sys.AddObject(inletOrif);
+  AxialPistonMachineValvePlateConnection valvePlateOutlet = AxialPistonMachineValvePlateConnection(
+    "Valve Plate Outlet",          // Name
+    variableChamber,              // Axial piston machine control volume
+    outletChamber,                 // Downstream chamber 
+    valvePlateAreaTable,          // Valve plate geometry look-up table
+    1,                            // Control volume angle column index
+    4,                            // Area column index
+    5                             // Hydraulic diameter column index
+  );
+  sys.AddObject(valvePlateOutlet);
 
-  Orifice outletOrif = Orifice("outletOrif",
-    outletOrif_Area,
-    variableChamber,
-    outletChamber);
-  sys.AddObject(outletOrif);
+
+  // Orifice inletOrif = Orifice("inletOrif",
+  //   inletOrif_Area,
+  //   inletChamber,
+  //   variableChamber);
+  // sys.AddObject(inletOrif);
+
+  // Orifice outletOrif = Orifice("outletOrif",
+  //   outletOrif_Area,
+  //   variableChamber,
+  //   outletChamber);
+  // sys.AddObject(outletOrif);
+
 
   Orifice outletPort = Orifice("outletPort",
     outletPort_Area,
     outletChamber,
-    LPChamber);
+    HPChamber);
   sys.AddObject(outletPort);
 
   // Move sys dependent variables into N_Vector
