@@ -25,16 +25,16 @@ void AxialPistonMachineValvePlateConnection::CalculateRHS()
 
     // Get interpolated area, diameter, 
     this->SetArea(areaTable.GetInterpolatedValue(this->areaIndex, this->interpLowerIndex, this->interpCoeff));
-    std::cout << "Area: " << areaTable.GetInterpolatedValue(this->areaIndex, this->interpLowerIndex, this->interpCoeff) << std::endl;
+
     // Calculate flowrate 
     this->CalculateFlowrate();
+
+    return;
 
 };
 
 void AxialPistonMachineValvePlateConnection::CalculateArea()
 {
-    //
-    sunrealtype a = 9;
     return;
 };
 
@@ -60,7 +60,7 @@ void AxialPistonMachineValvePlateConnection::FindInterpolationIndexes()
     {
         if (tableAngle[ii] >= pistonAngle)
         {
-            if (ii==0)
+            if (ii == 0)
             {
                 this->interpLowerIndex = ii;
                 this->interpCoeff = 0;
@@ -72,8 +72,7 @@ void AxialPistonMachineValvePlateConnection::FindInterpolationIndexes()
                 upperAngle = tableAngle[ii];
                 this->interpCoeff = (pistonAngle - lowerAngle) / (upperAngle - lowerAngle);
             }
-            std::cout << "Angle index: " << ii << std::endl;
-            std::cout << "Piston angle: " << pistonAngle*180/3.14159265358979323846 << std::endl;
+
             break;
         }
 
