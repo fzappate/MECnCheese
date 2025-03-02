@@ -17,7 +17,7 @@ protected:
     double volDer = 0;
     double dpdt = 0;
     double flowSum = 0;
-    double aTol = 1;
+    double aTol = .1;
 
     std::vector<double> flowIn;
     std::vector<std::string> flowInNames;
